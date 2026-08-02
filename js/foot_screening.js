@@ -142,7 +142,6 @@
     ctx.strokeStyle='#FFC24D'; ctx.lineWidth=2; ctx.setLineDash([7,5]);
     ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); ctx.setLineDash([]);
     
-    // 좌측 터치 핸들 (반지름 10으로 유지)
     ctx.fillStyle='#FFC24D'; 
     ctx.beginPath(); ctx.arc(16, y, 10, 0, 7); ctx.fill();
 
@@ -281,7 +280,6 @@
             bw.classList.remove('pa-hide');
         }
         else if(state.mode==='poly'){ 
-            // 💡 올가미 점 취소 기능 안내 문구 추가
             h.innerHTML='<b>📍 다각형 올가미: 화면을 터치해 점을 찍으세요. (이전 점 취소는 되돌리기 ↩️ 버튼)</b>' +
                         '<div style="margin-top:10px; display:flex; gap:8px;">' +
                         '<button id="btnPolyFill" class="pa-btn" style="padding:8px; font-size:13px; flex:1;">영역 채우기</button>' +
@@ -304,24 +302,21 @@
 
   function setMode(mode){ state.mode=(state.mode===mode)?'none':mode; state.brushPt=null; state.polyPts=[]; applyModeUI(); render(); }
   
-  // 🚀 되돌리기 기능 업그레이드 (올가미 점 지우기 연동)
   if($('paUndo')) $('paUndo').addEventListener('click',undo);
   
   function undo(){ 
-      // 다각형 모드에서 점을 찍는 중이었다면, 가장 마지막 점을 삭제
       if(state.mode === 'poly' && state.polyPts.length > 0) {
           state.polyPts.pop();
           refresh();
           return;
       }
-      // 그 외의 경우(그리기 등) 마스크 자체를 되돌림
       var s = state.undoStack.pop(); 
       if(!s) return; 
       state.mask = s.m; 
       state.toeY = s.t; 
       state.heelY = s.h; 
       state.linesManual = s.lm; 
-      state.polyPts = []; // 이전 마스크 상태로 돌아가면 찍던 점도 초기화
+      state.polyPts = []; 
       refresh(); 
   }
 
@@ -350,6 +345,7 @@
   function fillAt(x,y){ paintAt(x,y,1); }
   function pushUndo(){ if(!state.mask) return; state.undoStack.push({m:state.mask.slice(0), t:state.toeY, h:state.heelY, lm:state.linesManual}); if(state.undoStack.length>12) state.undoStack.shift(); }
   
+  // 🚀 핵심 수정: 올가미 채우기/지우기 실행 시 마스크 영역 경계선(toeY, heelY, 핸들바) 자동 재계산 및 하단 이동
   function applyPoly(isFill) {
       if(state.polyPts.length < 3) { alert("점을 3개 이상 찍어 영역을 만들어주세요."); return; }
       pushUndo();
@@ -374,6 +370,22 @@
       for(var i=0; i<W*H; i++) {
           if(polyData[i*4] > 128) { 
               m[i] = isFill ? 1 : 0;
+          }
+      }
+      
+      if(isFill) {
+          state.mask = fillHoles(m);
+      }
+
+      // 💡 마스크 영역 변경에 따라 조절선(핸들바) 위치 재조정
+      if(!state.linesManual) {
+          autoLines();
+      } else {
+          var bb = maskBBox();
+          state.bbox = [bb.top, bb.bot];
+          if(bb.bot > 0) {
+              if(bb.bot > state.heelY) state.heelY = bb.bot;
+              if(bb.top < state.toeY) state.toeY = Math.max(bb.top, Math.min(state.toeY, bb.bot - 2));
           }
       }
       
@@ -409,7 +421,21 @@
     refresh();
   }
   function endDrag(){
-    if(state.drag==='erase'||state.drag==='fill'){ if(state.drag==='fill') state.mask=fillHoles(state.mask); refresh(); }
+    if(state.drag==='erase'||state.drag==='fill'){ 
+        if(state.drag==='fill') state.mask=fillHoles(state.mask); 
+        // 💡 브러시 드래그 완료 후에도 조절선 자동 업데이트
+        if(!state.linesManual) {
+            autoLines();
+        } else {
+            var bb = maskBBox();
+            state.bbox = [bb.top, bb.bot];
+            if(bb.bot > 0) {
+                if(bb.bot > state.heelY) state.heelY = bb.bot;
+                if(bb.top < state.toeY) state.toeY = Math.max(bb.top, Math.min(state.toeY, bb.bot - 2));
+            }
+        }
+        refresh(); 
+    }
     state.drag=null;
   }
   
