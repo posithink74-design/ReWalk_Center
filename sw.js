@@ -1,5 +1,5 @@
 // 캐시 이름 설정 (버전이 올라가면 이름을 바꿔주어 캐시를 갱신합니다)
-const CACHE_NAME = 'rewalk-app-cache-v1';
+const CACHE_NAME = 'rewalk-app-cache-v2';
 const AI_CACHE_NAME = 'rewalk-ai-cache-v1';
 
 // 1. 설치 시 캐싱할 기본 파일들 (원하시는 UI 파일들을 추가하시면 됩니다)
@@ -7,11 +7,22 @@ const uiFiles = [
     '/',
     '/index.html',
     '/manifest.json',
+    '/basic_info.html',
+    '/foot_screen.html',
+    '/posture_screen.html',
+    '/front_gait_screen.html',
+    '/side_gait_screen.html',   
+
     '/js/posture_app.js', 
     '/js/front_gait.js',
     '/js/side_gait.js',
     '/js/rewalk_store.js',
-  // 필요 시 '/css/style.css', '/js/app.js' 등 추가
+
+    '/css/analysis_tool.css',
+    '/css/foot_screen.css',
+    '/css/front_gait.css',
+    '/css/side_gait.css',
+
 ];
 
 // 2. 반드시 로컬에서 가져와야 할 MediaPipe AI 파일들
