@@ -234,5 +234,17 @@
             // 차후 스토어(상태 관리) 연동 부분
         }
     </script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+                console.log('✅ RE:WALK 서비스 워커 구동 성공:', registration.scope);
+            })
+        .catch(error => {
+            console.log('❌ 서비스 워커 구동 실패:', error);
+        });
+    });}
+</script>
 </body>
 </html>
