@@ -1,0 +1,17 @@
+/* 로컬 폴더의 폰트를 불러옵니다 */
+@font-face {
+    font-family: 'Pretendard';
+    src: url('../fonts/Pretendard-Regular.woff2') format('woff2');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'Pretendard';
+    src: url('../fonts/Pretendard-Bold.woff2') format('woff2');
+    font-weight: 700;
+}
+
+/* 앱 전체에 프리텐다드 폰트 적용 */
+body {
+    font-family: 'Pretendard', sans-serif;
+}

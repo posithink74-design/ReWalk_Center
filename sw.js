@@ -1,5 +1,5 @@
 // 캐시 이름 설정 (버전이 올라가면 이름을 바꿔주어 캐시를 갱신합니다)
-const CACHE_NAME = 'rewalk-app-cache-v2';
+const CACHE_NAME = 'rewalk-app-cache-v3';
 const AI_CACHE_NAME = 'rewalk-ai-cache-v1';
 
 // 1. 설치 시 캐싱할 기본 파일들 (원하시는 UI 파일들을 추가하시면 됩니다)
@@ -22,6 +22,9 @@ const uiFiles = [
     '/css/foot_screen.css',
     '/css/front_gait.css',
     '/css/side_gait.css',
+    '/css/local_font.css',
+    '/fonts/Pretendard-Regular.woff2',
+    '/fonts/Pretendard-Bold.woff2'
 
 ];
 
