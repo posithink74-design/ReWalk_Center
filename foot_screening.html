@@ -12,41 +12,43 @@
     <link rel="stylesheet" href="css/foot_screening.css">
 
     <style>
-        /* 💡 편집 툴바 겹침 방지 전용 스타일 (하단 툴바 형태) */
-        .pa-canvas-container {
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 12px rgba(31,56,100,0.1);
-            background: #fff;
-        }
-        .pa-canvaswrap { 
-            position: relative; 
-            width: 100%; 
-            background: #0e1726; 
-        }
-        .pa-editor-tools {
+        /* 💡 오버레이 툴바: 우측 세로 배치 (조절선 핸들과 완벽히 분리) */
+        .pa-canvaswrap { position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: #0e1726; }
+        .overlay-tools {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 18px;
-            padding: 12px 10px;
-            border-top: 1px solid var(--line);
-            background: #ffffff;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 8px;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+            z-index: 10;
         }
         .fab-btn {
-            width: 46px; height: 46px;
+            width: 40px; height: 40px;
             border-radius: 50%;
-            border: 1px solid #D8E0EA;
-            background: #F4F7FA;
+            border: none;
+            background: #F1F4F8;
             color: #1F3864;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer;
             transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .fab-btn.on { background: #2E8B57; color: white; border-color: #2E8B57; }
+        .fab-btn.on { background: #2E8B57; color: white; }
         .fab-btn:active { transform: scale(0.9); }
+
+        /* 🚀 추가: 모바일 하단 내비게이션 바에 버튼이 가려지지 않도록 안전 여백 확보 */
+        body {
+            padding-bottom: calc(40px + env(safe-area-inset-bottom)) !important;
+        }
+        .btn-save-dash {
+            margin-bottom: 20px !important;
+        }
     </style>
 </head>
 <body>
@@ -84,32 +86,32 @@
                     <button class="pa-chip" id="paAuto"><span class="material-icons" style="font-size:16px;">refresh</span> 다시 인식</button>
                 </div>
 
-                <div style="background: var(--paleblue); padding: 14px; border-radius: 11px; border: 1px solid var(--line); margin-bottom: 12px;">
-                    <div style="display:flex; flex-direction:column; gap:12px;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <label style="font-size:12px; font-weight:800; color:var(--navy); min-width:55px;">인식 감도</label>
+                <div style="display:flex; align-items: stretch; justify-content: space-between; margin-bottom: 12px; background: var(--paleblue); padding: 12px 14px; border-radius: 11px; border: 1px solid var(--line);">
+                    <div style="flex:1; display:flex; flex-direction:column; gap:10px; justify-content:center;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <label style="font-size:12px; font-weight:800; color:var(--navy); min-width:50px;">인식 감도</label>
                             <input type="range" id="paTh" min="-60" max="60" value="0" style="flex:1; accent-color:var(--amber); margin:0;">
                             <span class="pa-mono" id="paThVal" style="font-size:12px; font-weight:bold; color:var(--navy); width:24px; text-align:right;">0</span>
                         </div>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <label style="font-size:12px; font-weight:800; color:var(--navy); min-width:55px;">밝기</label>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <label style="font-size:12px; font-weight:800; color:var(--navy); min-width:50px;">밝기</label>
                             <input type="range" id="paBrightness" min="50" max="150" value="100" style="flex:1; accent-color:var(--blue); margin:0;">
                             <span style="width:24px;"></span>
                         </div>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <label style="font-size:12px; font-weight:800; color:var(--navy); min-width:55px;">대비</label>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <label style="font-size:12px; font-weight:800; color:var(--navy); min-width:50px;">대비</label>
                             <input type="range" id="paContrast" min="50" max="150" value="100" style="flex:1; accent-color:var(--blue); margin:0;">
                             <span style="width:24px;"></span>
                         </div>
                     </div>
-                    <button class="pa-btn sec" id="paFilterReset" style="margin-top: 16px; width: 100%; min-height: 42px; font-size:13px; font-weight:700;">조절 초기화</button>
+                    <div style="display:flex; align-items:center; margin-left:12px;">
+                        <button class="pa-btn sec" id="paFilterReset" style="width: 50px; height: 100%; min-height: 70px; font-size:12px; font-weight:700; padding:0; border-radius:8px; margin:0;">초기화</button>
+                    </div>
                 </div>
 
-                <div class="pa-canvas-container">
-                    <div class="pa-canvaswrap">
-                        <canvas id="paCanvas"></canvas>
-                    </div>
-                    <div class="pa-editor-tools">
+                <div class="pa-canvaswrap">
+                    <canvas id="paCanvas"></canvas>
+                    <div class="overlay-tools">
                         <button class="fab-btn" id="paPoly" title="다각형(점 잇기) 영역 편집"><span class="material-icons">polyline</span></button>
                         <button class="fab-btn" id="paPickFoot" title="브러시 채우기"><span class="material-icons">brush</span></button>
                         <button class="fab-btn" id="paSeed" title="브러시 지우개"><span class="material-icons">healing</span></button>
@@ -117,8 +119,7 @@
                     </div>
                 </div>
                 
-                <p class="pa-hint pa-hide" id="paSeedHint" style="color:var(--blue); font-weight:600; margin-bottom: 10px;"></p>
-                
+                <p class="pa-hint pa-hide" id="paSeedHint" style="color:var(--blue); font-weight:600;"></p>
                 <div style="margin-top:8px" id="paBrushWrap" class="pa-hide">
                     <div class="pa-label"><span>붓 크기</span><span class="pa-mono" id="paBrushVal"></span></div>
                     <input type="range" id="paBrush" min="4" max="18" value="8" style="width:100%">
