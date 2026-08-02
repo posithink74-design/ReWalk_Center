@@ -1,0 +1,329 @@
+/* 🌟 대시보드 연동 및 A4 인쇄 스타일 */
+body { margin: 0; padding: 15px; background-color: #F4F7FA; padding-bottom: 20px;}
+.header-info { text-align: center; margin-bottom: 15px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-family: 'Pretendard', sans-serif;}
+.header-info h2 { font-size: 18px; color: #1F3864; margin: 0 0 5px 0; font-weight: 800; }
+.header-info p { font-size: 13px; color: #7F8C8D; margin: 0; }
+.btn-save-dash { width: 100%; max-width: 560px; margin: 20px auto 0; padding: 16px; background-color: #1F3864; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(31,56,100,0.2); font-family: 'Pretendard', sans-serif;}
+
+#print-area { display: none; }
+@media print {
+    body * { visibility: hidden; }
+    body { background: white !important; margin: 0; padding: 0; }
+    #print-area, #print-area * { visibility: visible; }
+    #print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    @page { size: A4 portrait; margin: 8mm; }
+}
+
+/* ========================================================= */
+/* 전문가 오리지널 CSS */
+/* ========================================================= */
+#pa-root {
+  --navy:#1F3864; --blue:#2E5C9E; --amber:#D9842A;
+  --ink:#243244; --gray:#5A6B82; --line:#D8E0EA;
+  --pale:#EEF3FA; --lightblue:#DCE7F4; --bg:#F7F9FC;
+  --ok:#2E8B57; --warn:#D9842A; --bad:#C0392B;
+  width: 100%; max-width: 600px; margin: 0 auto;
+  font-family: 'Pretendard', -apple-system, 'Noto Sans KR', sans-serif !important;
+  font-size: 15px; color: var(--ink);
+}
+#pa-root .pa-mono { font-family:'IBM Plex Mono', monospace !important; font-variant-numeric: tabular-nums; }
+#pa-root *, #pa-root *::before, #pa-root *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+#pa-root .pa-nav { display: flex; background: #ffffff; border-bottom: 2px solid #D8E0EA; border-radius:12px 12px 0 0; overflow:hidden;}
+#pa-root .pa-nav-btn { flex: 1; padding: 14px 6px; font-size: 14px; font-weight: 700; color: #8595AD; background: transparent; border: none; border-bottom: 3px solid transparent; cursor: pointer; text-align: center; transition: 0.2s; }
+#pa-root .pa-nav-btn.on { color: #2E5C9E; border-bottom-color: #2E5C9E; font-weight: 800; background: #EEF3FA;}
+
+#pa-root .pa-panel    { display: none; }
+#pa-root .pa-panel.on { display: block; }
+#pa-root .pa-wrap     { padding: 14px 0; }
+#pa-root .pa-card { background: #ffffff; border-radius: 12px; padding: 20px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,.04); }
+#pa-root .pa-lbl { display: block; font-size: 12px; font-weight: 700; color: #5A6B82; margin-bottom: 6px; }
+
+#pa-root .pa-vtabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+#pa-root .pa-vtab { padding: 11px 0; font-size: 14px; font-weight: 700; border-radius: 10px; border: 2px solid #D8E0EA; background: #fff; color: #5A6B82; cursor: pointer; text-align: center; transition: all .15s; }
+#pa-root .pa-vtab:hover { background: #eff6ff; color: #1F3864; border-color: #93c5fd; }
+#pa-root .pa-vtab.on    { background: #1F3864 !important; color: #fff !important; border-color: #1F3864 !important; }
+
+#pa-root .pa-vhdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
+#pa-root .pa-vname { font-size: 15px; font-weight: 800; color: #374151; }
+#pa-root .pa-veng  { font-size: 11px; color: #8595AD; margin-top: 2px; }
+#pa-root .pa-upbtn { display: inline-flex; align-items: center; gap: 5px; padding: 10px 11px; font-size: 13px; font-weight: 700; border-radius: 10px; border: 2px solid #93c5fd; background: #eff6ff; color: #1F3864; cursor: pointer; position:relative; overflow:hidden;}
+#pa-root .pa-upbtn:hover { background: #1F3864; color: #fff; }
+#pa-root .pa-cambtn{ border-color:var(--amber); color:var(--amber); background:#fffaf0; }
+
+#pa-root .pa-cvbox {position: relative; width: 100%; padding-top: calc(100% * 4/3); border-radius: 10px; overflow: hidden; background: #D8E0EA; border: 2px dashed #D8E0EA; touch-action: none; margin-bottom:10px;}
+#pa-root .pa-cvi { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+#pa-root .pa-cvi img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; display: block; pointer-events: none; user-select: none; }
+#pa-root .pa-cvi canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+#pa-root .pa-ph { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+#pa-root .pa-ph-txt { font-size: 14px; color: #5A6B82; font-weight: 600; text-align: center; }
+
+#pa-root .pa-rotbar { display:flex; align-items:center; gap:8px; margin-bottom:15px; padding:8px 10px; background:#EEF3FA; border:1px solid #E4EAF2; border-radius:10px; }
+#pa-root .pa-rotlbl { font-size:12px; font-weight:700; color:#1F3864; white-space:nowrap; }
+#pa-root .pa-rotbtn { flex:0 0 auto; width:34px; height:34px; border:1.5px solid #D8E0EA; border-radius:8px; background:#fff; color:#2E5C9E; font-size:16px; cursor:pointer; }
+#pa-root .pa-rotrange { flex:1; accent-color:#2E5C9E; height:28px; }
+#pa-root .pa-rotval { font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#2E5C9E; min-width:34px; text-align:right; }
+
+#pa-root .pa-grid-bar{ display:flex; align-items:center; gap:8px; margin:10px 0 10px; flex-wrap:wrap; }
+#pa-root .pa-grid-btn{ flex:0 0 auto; min-height:44px; padding:0 14px; border:1.5px solid var(--navy); border-radius:11px; background:#fff; color:var(--navy); font-size:13.5px; font-weight:700; cursor:pointer; }
+#pa-root .pa-grid-btn.on{ background:var(--navy); color:#fff; }
+#pa-root .pa-grid-opts{ display:flex; gap:6px; flex:1; }
+#pa-root .pa-go{ flex:1; min-height:44px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--gray); font-size:13px; font-weight:700; cursor:pointer; }
+#pa-root .pa-go.on{ border-color:var(--blue); background:var(--pale); color:var(--navy); }
+
+/* 그리기 도구 */
+#pa-root .pa-shape-row{ display:flex; gap:6px; margin-bottom:9px; }
+#pa-root .pa-sh-btn{ flex:1; min-height:44px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--gray); font-size:12.5px; font-weight:700; cursor:pointer; padding:0 2px; }
+#pa-root .pa-sh-btn.on{ border-color:var(--navy); background:var(--navy); color:#fff; }
+#pa-root .pa-tb   { margin-top:10px; display:flex; flex-direction:column; gap:7px; }
+#pa-root .pa-tbr  { display:grid; grid-template-columns:1fr auto; gap:4px; align-items:center; }
+#pa-root .pa-cgrp { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+#pa-root .pa-dot  { width:24px; height:24px; border-radius:50%; border:3px solid transparent; cursor:pointer; transition:transform .12s; }
+#pa-root .pa-dot.on    { transform:scale(1.2); outline:2.5px solid #243244; outline-offset:1px; }
+#pa-root .pa-agrp { display:grid; grid-template-columns:1fr 1fr; gap:4px; }
+#pa-root .pa-abtn { padding:9px 0; font-size:12px; font-weight:700; border-radius:8px; border:2px solid #fca5a5; background:#fef2f2; color:#D9842A; cursor:pointer; text-align:center; transition:all .15s; }
+
+/* 체크리스트 */
+#pa-root .pa-chk-toggle{ width:100%; display:flex; align-items:center; justify-content:space-between; background:#F7F9FC; border:1.5px solid #E4EAF2; border-radius:10px; padding:12px 14px; cursor:pointer; font-family:inherit; }
+#pa-root .pa-chk-toggle-lbl{ font-size:14px; font-weight:700; color:#1F3864; }
+#pa-root .pa-chk-arrow{ font-size:15px; color:#2E5C9E; transition:transform .25s; }
+#pa-root .pa-chk-arrow.open{ transform:rotate(180deg); }
+#pa-root .pa-chk-body{ overflow:hidden; max-height:600px; opacity:1; transition:max-height .28s ease, opacity .22s ease; }
+#pa-root .pa-chk-body.pa-chk-collapsed{ max-height:0; opacity:0; }
+#pa-root .pa-chk-count{ font-size:11px; font-weight:700; color:#fff; background:#D9842A; border-radius:10px; padding:1px 7px; margin-left:5px; display:none; }
+#pa-root .pa-chk-count.on{ display:inline-block; }
+#pa-root .pa-chk-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px 8px; margin-top:10px;}
+#pa-root .pa-chk-item{ display:flex; flex-direction:column; align-items:stretch; gap:6px; min-width:0; }
+#pa-root .pa-chk-item label{ font-size:12px; font-weight:700; color:#243244; text-align:center; word-break:keep-all; }
+#pa-root .pa-chk-sel{ width:100%; min-height:46px; padding:10px 20px 10px 8px; border:2px solid #B9C7DC; border-radius:10px; background:#fff; color:#243244; font-size:13px; font-weight:600; appearance:none; cursor:pointer; }
+#pa-root .pa-chk-sel.set{ border-color:#D9842A; background-color:#FEF6EE; color:#B5651D; font-weight:700; }
+
+#pa-root .pa-auto-btn { width:100%; padding:14px; font-size:14px; font-weight:800; border-radius:10px; border:2px solid #c4b5fd; background:#f5f3ff; color:#7c3aed; cursor:pointer; font-family:inherit; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:6px; }
+#pa-root .pa-auto-btn:disabled{ opacity:.5; cursor:not-allowed; }
+#pa-root .pa-auto-btn.on { background:#f0fdf4 !important; color:#2E8B57 !important; border-color:#86efac !important; }
+#pa-root .pa-auto-st { font-size:12px; color:#5A6B82; text-align:center; margin-top:6px; min-height:16px; font-weight:600;}
+@keyframes pa-root-spin { to { transform: rotate(360deg); } }
+.pa-spin { display: inline-block; width: 16px; height: 16px; border: 2.5px solid rgba(124, 58, 237, 0.3); border-top-color: #7c3aed; border-radius: 50%; animation: pa-root-spin .7s linear infinite; vertical-align: middle; margin-right: 7px; }
+
+#pa-root .pa-ntxt { width: 100%; padding: 12px 13px; font-size: 15px; line-height: 1.5; resize: vertical; min-height: 72px; border-radius: 10px; border: 2px solid #D8E0EA; background: #F7F9FC; color: #243244; outline: none; margin-top:10px;}
+#pa-root .pa-btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 800; border-radius: 12px; border: none; cursor: pointer; transition: opacity .15s, transform .1s; color:#fff;}
+#pa-root .pa-teal   { background: #2E5C9E; }
+#pa-root .pa-green  { background: #2E8B57; }
+
+/* 🌟 비교 탭 CSS: 5:5 꽉 찬 고정 분할 및 Blow-out 완벽 차단 🌟 */
+#pa-root .pa-sellbl { font-size: 12px; font-weight: 700; color: #5A6B82; margin-bottom: 5px; }
+#pa-root .pa-csel { width: 100%; max-width: 100%; box-sizing: border-box; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; padding: 12px 14px; font-size: 14px; font-weight: 600; border-radius: 10px; border: 2px solid #D8E0EA; background: #fff; color: #374151; cursor: pointer; margin-bottom: 10px; outline: none; }
+
+#pa-root .pa-cgrid { display: flex; width: 100%; gap: 10px; margin-bottom: 12px; box-sizing: border-box; align-items: stretch; }
+#pa-root .pa-cgrid > div { flex: 1; min-width: 0; width: 50%; overflow: hidden; display: flex; flex-direction: column; }
+#pa-root .pa-chdr  { font-size: 11px; font-weight: 700; color: #fff; text-align: center; padding: 6px; border-radius: 8px; margin-bottom: 6px; }
+
+#pa-root .pa-cwrap-comp { position: relative; width: 100%; border-radius: 9px; overflow: hidden; background: #D8E0EA; aspect-ratio: 3/4; display:flex; align-items:center; justify-content:center; }
+#pa-root .pa-cinner-comp { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+#pa-root .pa-cinner-comp img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; display: block; object-fit:contain; }
+
+#pa-root .pa-slist { display: flex; flex-direction: column; gap: 10px; }
+#pa-root .pa-sitem { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.08); border-left: 4px solid #2E5C9E; }
+#pa-root .pa-sttl  { font-size: 15px; font-weight: 800; color: #374151; margin-bottom:4px;}
+#pa-root .pa-sdate { font-size: 11px; color: #8595AD; margin-bottom: 8px;}
+#pa-root .pa-sbtn.del { background: #fef2f2; color: #D9842A; border: 1px solid #fca5a5; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight:bold; cursor: pointer; width: 100%;}
+/* ... (위쪽은 전문가님의 기존 코드) ... */
+#pa-root .pa-sdate { font-size: 11px; color: #8595AD; margin-bottom: 8px;}
+#pa-root .pa-sbtn.del { background: #fef2f2; color: #D9842A; border: 1px solid #fca5a5; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight:bold; cursor: pointer; width: 100%;}
+
+/* ========================================================================= */
+/* [신규 UI] 빼꼼 핸들형 우측 슬라이딩 오버레이 서랍 */
+/* ========================================================================= */
+
+/* 1. 사진 상자 및 하단 레이아웃 원상 복구 (하단 UI 겹침 완벽 해결) */
+#pa-root .pa-cvbox {
+  position: relative !important;
+  width: 100% !important;
+  border-radius: 10px;
+  overflow: hidden !important;
+  background: #D8E0EA;
+  border: 2px dashed #D8E0EA;
+  touch-action: none;
+  margin-bottom: 10px !important;
+}
+
+#pa-root .pa-cvi {
+  position: absolute !important;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden !important;
+}
+
+#pa-root .pa-cvi img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+#pa-root .pa-cvi canvas {
+  position: absolute !important;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 2. 슬라이딩 서랍 컨테이너 */
+.pa-overlay-drawer {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-start;
+  /* 닫힌 상태: 핸들(32px)만 우측 끝에 보이고 도구함(70px)은 우측 밖으로 숨김 */
+  transform: translateX(70px);
+  transition: transform 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.pa-overlay-drawer.open {
+  transform: translateX(0); /* 열림 상태: 툴바 전체 노출 */
+}
+
+/* 3. 빼꼼 손잡이 (항상 화면 우측 끝에 보임) */
+.pa-drawer-handle {
+  width: 32px !important;
+  height: 52px !important;
+  background: rgba(31, 56, 100, 0.92) !important; /* 시인성 높은 네이비색 */
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-right: none !important;
+  border-radius: 12px 0 0 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.2) !important;
+  padding: 0 !important;
+  flex-shrink: 0;
+}
+
+.pa-drawer-handle .material-icons {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* 4. 도구함 내용물 (폭 70px) */
+.pa-drawer-content {
+  width: 70px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 10px 6px;
+  border-radius: 0 0 0 14px;
+  border: 1px solid rgba(216, 224, 234, 0.9);
+  border-right: none;
+  box-shadow: -4px 4px 12px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* 5. 버튼 규격 고정 */
+.pa-ot-group { display: flex; flex-direction: column; gap: 6px; }
+.pa-ot-divider { height: 1px; background: #d8e0ea; margin: 4px 2px; }
+
+.pa-ot-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 58px !important;
+  padding: 6px 0 !important;
+  border: 1.5px solid #d8e0ea !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: #1f3864 !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}
+
+.pa-ot-btn .material-icons { font-size: 18px; }
+.pa-ot-btn .ot-txt { font-size: 9px; font-weight: 800; margin-top: 2px; white-space: nowrap; }
+
+.pa-ot-btn.on {
+  background: #1f3864 !important;
+  color: #ffffff !important;
+  border-color: #1f3864 !important;
+}
+
+.pa-ot-btn.danger { color: #d9842a !important; background: #fff8f5 !important; border-color: #fcdbd0 !important; }
+.pa-ot-btn:active { transform: scale(0.93); }
+
+/* 6. 색상 도트 팔레트 */
+.pa-ot-colors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  justify-items: center;
+  padding: 2px 0;
+}
+
+.pa-ot-colors .pa-dot {
+  width: 15px !important;
+  height: 15px !important;
+  border-radius: 50% !important;
+  border: 2px solid #ffffff !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
+
+.pa-ot-colors .pa-dot.on {
+  transform: scale(1.25);
+  outline: 2px solid #1F3864;
+}
+/* ========================================================= */
+/* 🚀 사진 상자 컴팩트 스타일 (태블릿/모바일 스크롤 제거) */
+/* ========================================================= */
+
+#pa-root .pa-cvbox {
+  position: relative !important;
+  width: 100% !important;
+  height: 48vh !important;        /* 화면 높이의 약 48%로 상자 높이 제한 */
+  min-height: 320px !important;
+  max-height: 480px !important;    /* 아무리 큰 세로 사진도 480px을 넘지 않음 */
+  margin: 0 auto 12px auto !important;
+  border-radius: 12px;
+  overflow: hidden !important;
+  background: #1e293b !important; /* 어두운 배경으로 사진 시인성 극대화 */
+  border: 2px solid #D8E0EA;
+  touch-action: none;
+}
+
+#pa-root .pa-cvi {
+  position: absolute !important;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden !important;
+}
+
+#pa-root .pa-cvi img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important; /* 비율 유지하며 상자 안에 정중앙 안착 */
+  display: block;
+}
+
+#pa-root .pa-cvi canvas {
+  position: absolute !important;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}

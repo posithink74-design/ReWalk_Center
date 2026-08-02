@@ -1,0 +1,175 @@
+@charset "UTF-8";
+
+/* 📌 공통 UI 및 배경 설정 */
+body { margin: 0; padding: 15px; background-color: #F4F7FA; font-family: 'Pretendard', -apple-system, sans-serif; }
+
+.header-info { text-align: center; margin-bottom: 15px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.header-info h2 { font-size: 18px; color: #1F3864; margin: 0 0 5px 0; font-weight: 800; }
+.header-info p { font-size: 13px; color: #7F8C8D; margin: 0; }
+.btn-save-dash { width: 100%; padding: 16px; background-color: #1F3864; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; box-shadow: 0 4px 15px rgba(31,56,100,0.2); }
+
+#sl-root { --navy: #1F3864 !important; --navy2: #2A4A7C !important; --blue: #2E5C9E !important; --blue2: #5B8BD0 !important; --amber: #D9842A !important; --amber-d: #B5651D !important; --amber-l: #FBEAD3 !important; --bg: #F4F7FB !important; --panel: #FFFFFF !important; --panel2: #EEF3FA !important; --line: rgba(31, 56, 100, .14) !important; --line2: rgba(31, 56, 100, .24) !important; --txt: #16243C !important; --dim: #5A6B82 !important; --alert: #C0392B !important; --grid: rgba(46, 92, 158, .05) !important; --mono: 'IBM Plex Mono', monospace !important; --sans: 'Pretendard', -apple-system, sans-serif !important; }
+#sl-root, #sl-root * { box-sizing: border-box !important; margin: 0 !important; padding: 0 !important; }
+#sl-root { background: var(--bg) !important; color: var(--txt) !important; font-family: var(--sans) !important; font-size: 16px !important; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px) !important; background-size: 28px 28px !important; -webkit-font-smoothing: antialiased !important; text-rendering: optimizeLegibility !important; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) !important; }
+#sl-root .wrap { max-width: 600px !important; margin: 0 auto !important; padding: 14px 10px calc(40px + env(safe-area-inset-bottom)) !important; }
+#sl-root .hero { background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%) !important; border-radius: 18px !important; padding: 20px 16px !important; margin-bottom: 14px !important; position: relative !important; overflow: hidden !important; box-shadow: 0 6px 18px rgba(31, 56, 100, .22) !important; }
+#sl-root .hero::after { content: "" !important; position: absolute !important; right: -40px !important; top: -40px !important; width: 140px !important; height: 140px !important; border-radius: 50% !important; background: rgba(91, 139, 208, .22) !important; }
+#sl-root .hero .eyebrow { font-family: var(--mono) !important; font-size: 11px !important; letter-spacing: .18em !important; color: var(--amber) !important; text-transform: uppercase !important; font-weight: 600 !important; }
+#sl-root .hero h1 { font-size: 26px !important; font-weight: 800 !important; color: #fff !important; margin-top: 6px !important; letter-spacing: -.02em !important; }
+#sl-root .hero .sub { color: #CDDBF0 !important; font-size: 13.5px !important; margin-top: 8px !important; line-height: 1.55 !important; position: relative !important; }
+#sl-root .hero .sub b { color: #fff !important; font-weight: 600 !important; }
+#sl-root .card { background: var(--panel) !important; border: 1px solid var(--line) !important; border-radius: 16px !important; padding: 20px 15px !important; margin-bottom: 18px !important; box-shadow: 0 2px 8px rgba(31, 56, 100, .06) !important; }
+#sl-root .card h2 { font-size: 14px !important; font-weight: 700 !important; color: var(--navy) !important; margin-bottom: 20px !important; display: flex !important; align-items: center !important; gap: 8px !important; }
+#sl-root .card h2 .n { display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 22px !important; height: 22px !important; border-radius: 7px !important; background: var(--amber) !important; color: #fff !important; font-size: 12px !important; font-weight: 700 !important; font-family: var(--mono) !important; }
+#sl-root .row { display: flex !important; gap: 10px !important; align-items: center !important; flex-wrap: wrap !important; }
+#sl-root .sl-play{ display:flex !important; align-items:center !important; gap:8px !important; }
+#sl-root .sl-pbtn{ flex:1 !important; min-height:52px !important; border:1.5px solid var(--navy) !important; border-radius:12px !important; background:var(--navy) !important; color:#fff !important; font-family:var(--sans) !important; font-size:16px !important; font-weight:700 !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; gap:8px !important; -webkit-tap-highlight-color:transparent !important; touch-action:manipulation !important; }
+#sl-root .sl-pbtn:disabled{ opacity:.45 !important; cursor:not-allowed !important; background:var(--panel2) !important; color:var(--dim) !important; border-color:var(--line) !important; }
+#sl-root .sl-pbtn.stop{ background:#fff !important; color:var(--alert) !important; border-color:var(--alert) !important; }
+
+/* ===== 분석 중 가로 전체화면 ===== */
+#sl-root .stage:fullscreen, #sl-root .stage:-webkit-full-screen{
+  width:100vw !important; height:100vh !important; max-width:none !important;
+  border-radius:0 !important; background:#000 !important; }
+#sl-root .stage:fullscreen video, #sl-root .stage:-webkit-full-screen video{
+  width:100% !important; height:100% !important; object-fit:contain !important; }
+/* 전체화면에서는 컨트롤을 영상 위 하단에 겹쳐 표시(면적이 커 13%만 가림) */
+#sl-root .stage:fullscreen .sl-fsbar, #sl-root .stage:-webkit-full-screen .sl-fsbar{
+  display:flex !important; position:absolute !important; left:0 !important; right:0 !important; bottom:0 !important;
+  align-items:center !important; gap:10px !important; z-index:8 !important;
+  padding:20px 16px calc(12px + env(safe-area-inset-bottom)) !important;
+  background:linear-gradient(to top, rgba(6,12,24,.85), rgba(6,12,24,0)) !important;
+  pointer-events:none !important; }
+#sl-root .sl-fsbar{ display:none; }
+#sl-root .sl-fsbar .t{ color:#fff !important; font-size:13px !important; font-weight:700 !important; flex:1 !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.6) !important; }
+#sl-root .sl-fsbar button{ pointer-events:auto !important; min-height:40px !important; padding:0 16px !important;
+  border:1px solid rgba(255,255,255,.4) !important; border-radius:10px !important;
+  background:rgba(255,255,255,.92) !important; color:var(--alert) !important;
+  font-family:var(--sans) !important; font-size:14px !important; font-weight:700 !important; cursor:pointer !important; }
+/* 전체화면 중에는 아래쪽 일반 컨트롤 숨김 */
+body.sl-fsmode #sl-root .sl-ctrlbar{ display:none !important; }
+/* 영상 바로 아래 재생 컨트롤 (정면 도구와 동일 구성) */
+#sl-root .sl-ctrlbar{ display:flex !important; flex-direction:column !important; gap:2px !important; margin:-6px 0 16px !important; }
+#sl-root .sl-crow{ display:flex !important; align-items:center !important; gap:6px !important; }
+#sl-root .sl-cspacer{ flex:1 !important; }
+#sl-root .sl-cbtn{ flex:0 0 auto !important; width:36px !important; height:36px !important; padding:0 !important;
+  border:1.5px solid var(--line) !important; border-radius:9px !important; background:#fff !important;
+  color:var(--navy) !important; font-family:var(--sans) !important; font-size:14px !important; font-weight:700 !important;
+  cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important;
+  touch-action:manipulation !important; -webkit-tap-highlight-color:transparent !important; }
+#sl-root .sl-cbtn.play{ width:44px !important; height:44px !important; font-size:17px !important;
+  background:var(--navy) !important; color:#fff !important; border-color:var(--navy) !important; }
+#sl-root .sl-cbtn.play.stop{ background:#fff !important; color:var(--alert) !important; border-color:var(--alert) !important; }
+#sl-root .sl-cbtn.spd{ width:44px !important; font-family:var(--mono) !important; font-size:15px !important; font-weight:800 !important; color:var(--amber) !important; }
+#sl-root .sl-cbtn:disabled{ opacity:.45 !important; }
+/* 얇은 재생 그래프(손가락 드래그) */
+#sl-root .sl-seek{ position:relative !important; width:100% !important; height:22px !important; cursor:pointer !important;
+  display:flex !important; align-items:center !important; touch-action:none !important; }
+#sl-root .sl-seek::before{ content:"" !important; position:absolute !important; left:0 !important; right:0 !important;
+  height:3px !important; border-radius:2px !important; background:var(--line) !important; }
+#sl-root .sl-seek i{ position:absolute !important; left:0 !important; height:3px !important; width:0% !important;
+  border-radius:2px !important; background:var(--amber) !important; }
+#sl-root .sl-seek b{ position:absolute !important; left:0 !important; width:13px !important; height:13px !important;
+  margin-left:-6.5px !important; border-radius:50% !important; background:#fff !important;
+  border:1.5px solid var(--navy) !important; box-shadow:0 1px 4px rgba(0,0,0,.25) !important; }
+#sl-root label.file { flex: 1 1 auto !important; min-width: 0 !important; }
+#sl-root label.file input[type=file] { display: none !important; }
+#sl-root .btn { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; min-height: 46px !important; border: 1.5px solid var(--line2) !important; background: var(--panel2) !important; color: var(--navy) !important; font-family: var(--sans) !important; font-size: 15px !important; font-weight: 700 !important; border-radius: 12px !important; padding: 11px 16px !important; cursor: pointer !important; -webkit-tap-highlight-color: transparent !important; transition: .15s !important; touch-action: manipulation !important; }
+#sl-root .btn:active { transform: scale(.985) !important; }
+#sl-root .btn.primary { background: var(--navy) !important; color: #fff !important; border-color: var(--navy) !important; }
+#sl-root .btn.primary:disabled { opacity: .45 !important; cursor: not-allowed !important; background: var(--panel2) !important; color: var(--dim) !important; border-color: var(--line) !important; }
+#sl-root .btn.danger { background: #fff !important; border-color: var(--alert) !important; color: var(--alert) !important; }
+#sl-root .btn.full { width: 100% !important; }
+#sl-root .btn.compact { min-height: 44px !important; padding: 8px 14px !important; font-size: 14px !important; font-weight: 600 !important; }
+#sl-root label.file>span { overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; min-width: 0 !important; }
+#sl-root .inrow { display: flex !important; gap: 10px !important; align-items: center !important; margin-bottom: 12px !important; }
+#sl-root .inrow .file { flex: 1 1 auto !important; min-width: 0 !important; }
+#sl-root .inrow .file, #sl-root .inrow .field { height: 46px !important; min-height: 46px !important; max-height: 46px !important; box-sizing: border-box !important; margin: 0 !important; }
+#sl-root .field { display: flex !important; align-items: center !important; gap: 8px !important; background: var(--panel2) !important; border: 1.5px solid var(--line) !important; border-radius: 12px !important; padding: 0 14px !important; flex: 0 0 auto !important; }
+#sl-root .field label { font-size: 14px !important; color: var(--dim) !important; white-space: nowrap !important; font-weight: 600 !important; }
+#sl-root .field input[type=number] { width: 60px !important; background: transparent !important; border: none !important; color: var(--navy) !important; font-family: var(--mono) !important; font-size: 18px !important; font-weight: 600 !important; text-align: right !important; outline: none !important; }
+#sl-root .field span.u { font-size: 13px !important; color: var(--dim) !important; }
+#sl-root .stage { position: relative !important; width: 100% !important; aspect-ratio: 16/9 !important; min-height: 200px !important; max-height: 64vh !important; background: #0b1220 !important; border: 1px solid var(--line) !important; border-radius: 16px !important; overflow: hidden !important; margin-bottom: 18px !important; box-shadow: 0 2px 8px rgba(31, 56, 100, .08) !important; }
+#sl-root .stage video { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; object-fit: contain !important; background: #0b1220 !important; }
+#sl-root .stage canvas { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; pointer-events: none !important; }
+#sl-root .empty.sl-gone { display: none !important; }
+#sl-root .empty { position: absolute !important; inset: 0 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 10px !important; color: #9FB3D6 !important; font-size: 14px !important; text-align: center !important; padding: 24px !important; line-height: 1.5 !important; }
+#sl-root .empty .big { font-size: 38px !important; }
+#sl-root .hud { position: absolute !important; left: 12px !important; top: 12px !important; font-family: var(--mono) !important; font-size: 12px !important; line-height: 1.7 !important; color: #F0B36B !important; background: rgba(11, 18, 32, .66) !important; border: 1px solid rgba(255, 255, 255, .16) !important; border-radius: 10px !important; padding: 7px 11px !important; backdrop-filter: blur(4px) !important; }
+#sl-root .hud b { color: #fff !important; }
+#sl-root .speed { display: flex !important; gap: 8px !important; flex-wrap: wrap !important; }
+#sl-root .speed button { flex: 1 !important; font-family: var(--mono) !important; font-size: 14px !important; font-weight: 600 !important; padding: 11px 8px !important; border-radius: 10px !important; min-height: 46px !important; border: 1.5px solid var(--line) !important; background: #fff !important; color: var(--dim) !important; cursor: pointer !important; touch-action: manipulation !important; }
+#sl-root .speed button.on { border-color: var(--blue) !important; background: var(--panel2) !important; color: var(--navy) !important; }
+#sl-root .status { font-family: var(--mono) !important; font-size: 13px !important; color: var(--dim) !important; min-height: 20px !important; margin-top: 6px !important; line-height: 1.5 !important; }
+#sl-root .status.err { color: var(--alert) !important; font-weight: 600 !important; }
+#sl-root .status.go { color: var(--blue) !important; font-weight: 600 !important; }
+#sl-root .tip { font-size: 13px !important; color: var(--dim) !important; line-height: 1.65 !important; }
+#sl-root .tip b { color: var(--txt) !important; font-weight: 600 !important; }
+#sl-root .progress { height: 6px !important; background: var(--panel2) !important; border-radius: 4px !important; overflow: hidden !important; margin-top: 12px !important; border: 1px solid var(--line) !important; }
+#sl-root .progress i { display: block !important; height: 100% !important; width: 0 !important; background: linear-gradient(90deg, var(--blue), var(--amber)) !important; transition: width .1s linear !important; }
+#sl-root .grid { display: block !important; }
+@media (min-width:768px) {
+#sl-root .wrap { max-width: 1000px !important; padding: 22px 24px 48px !important; }
+#sl-root .hero { padding: 26px 26px !important; }
+#sl-root .hero h1 { font-size: 30px !important; }
+#sl-root .hero .sub { font-size: 14.5px !important; max-width: 760px !important; }
+#sl-root .grid { display: grid !important; grid-template-columns: 1.3fr 1fr !important; column-gap: 20px !important; row-gap: 16px !important; align-items: start !important; grid-template-areas:
+          "stage input"
+          "stage analyze"
+          "stage guide"
+          "stage ." !important; }
+#sl-root .area-stage { grid-area: stage !important; position: sticky !important; top: 18px !important; margin-bottom: 0 !important; max-height: 76vh !important; aspect-ratio: 16/9 !important; }
+#sl-root .area-input { grid-area: input !important; margin-bottom: 0 !important; }
+#sl-root .area-analyze { grid-area: analyze !important; margin-bottom: 0 !important; }
+#sl-root .area-guide { grid-area: guide !important; margin-bottom: 0 !important; }
+#sl-root .btn { min-height: 44px !important; }
+#sl-root .btn.compact { min-height: 38px !important; }
+#sl-root .speed button { min-height: 42px !important; }
+}
+@media (min-width:1180px) {
+#sl-root .wrap { max-width: 1120px !important; }
+#sl-root .grid { grid-template-columns: 1.4fr 1fr !important; column-gap: 26px !important; }
+}
+
+#sl-root .slg-toggle { display:flex !important; align-items:center !important; justify-content:space-between !important; width:100% !important; min-height:44px !important; border:1.5px solid #D9842A !important; border-radius:11px !important; background:#F6E7D3 !important; color:#1F3864 !important; font-family:inherit !important; font-size:14px !important; font-weight:700 !important; cursor:pointer !important; padding:0 14px !important; margin-top:6px !important; }
+#sl-root .slg-box { border:1px solid #D8E0EA !important; border-radius:12px !important; padding:12px 10px !important; margin-top:10px !important; background:#fff !important; }
+#sl-root .slg-box svg { width:100% !important; height:auto !important; display:block !important; }
+#sl-root .slg-cap { font-size:11.5px !important; font-weight:700 !important; color:#D9842A !important; background:#F6E7D3 !important; border-radius:20px !important; padding:3px 10px !important; display:inline-block !important; margin:0 4px 6px !important; }
+#sl-root .slg-tip { font-size:12.5px !important; color:#243244 !important; line-height:1.6 !important; margin-top:10px !important; }
+#sl-root .slg-tip b { color:#1F3864 !important; }
+#sl-root .slg-hide { display:none !important; }
+#sl-root .btn.sl-cam { margin-top: 4px !important; margin-bottom: 2px !important; min-height: 46px !important; }
+#sl-root .sl-rot { position:absolute !important; inset:0 !important; z-index:5 !important; display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; gap:10px !important; background:rgba(11,18,32,.82) !important; color:#fff !important; text-align:center !important; padding:20px !important; backdrop-filter:blur(2px) !important; }
+#sl-root .sl-rot.sl-hide { display:none !important; }
+#sl-root .sl-rot .ic { font-size:40px !important; line-height:1 !important; animation:slRot 1.6s ease-in-out infinite !important; }
+#sl-root .sl-rot .t { font-size:16px !important; font-weight:800 !important; color:#fff !important; }
+#sl-root .sl-rot .d { font-size:12.5px !important; color:#CDDBF0 !important; line-height:1.6 !important; }
+#sl-root .sl-rot .ok { margin-top:6px !important; min-height:42px !important; padding:9px 18px !important; border:1.5px solid rgba(255,255,255,.5) !important; border-radius:10px !important; background:transparent !important; color:#fff !important; font-family:inherit !important; font-size:13px !important; font-weight:700 !important; cursor:pointer !important; }
+@keyframes slRot { 0%,100%{ transform:rotate(0deg); } 50%{ transform:rotate(-90deg); } }
+#sl-root .sl-zone{ position:absolute !important; top:0 !important; bottom:0 !important; pointer-events:none !important; z-index:3 !important; }
+#sl-root .sl-zone .zn{ position:absolute !important; top:0 !important; bottom:0 !important; width:2px !important; background:#FFC24D !important; }
+#sl-root .sl-zone .zn::after{ content:'' !important; position:absolute !important; top:50% !important; left:-9px !important; width:20px !important; height:20px !important; margin-top:-10px !important; border-radius:50% !important; background:#FFC24D !important; box-shadow:0 1px 4px rgba(0,0,0,.35) !important; }
+#sl-root .sl-zone .shade{ position:absolute !important; top:0 !important; bottom:0 !important; background:rgba(11,18,32,.55) !important; }
+#sl-root .sl-zone .lbl{ position:absolute !important; top:8px !important; font-family:'IBM Plex Mono',monospace !important; font-size:11px !important; font-weight:600 !important; color:#1F3864 !important; background:#FFC24D !important; padding:2px 8px !important; border-radius:10px !important; white-space:nowrap !important; }
+#sl-root .sl-zone.sl-hide{ display:none !important; }
+#sl-root .sl-hide{ display:none !important; }
+#sl-root .sl-zonebar{ display:flex !important; align-items:center !important; gap:10px !important; margin-top:10px !important; padding:10px 12px !important; background:var(--panel2) !important; border:1px solid var(--line) !important; border-radius:11px !important; }
+#sl-root .sl-zonebar .t{ font-size:12.5px !important; color:var(--dim) !important; line-height:1.5 !important; flex:1 !important; }
+
+/* ? 도움말 버튼 · 접히는 설명 상자 · 배속 라벨 */
+#sl-root .sl-qbtn{ flex:0 0 auto !important; width:28px !important; height:28px !important; min-height:28px !important; padding:0 !important;
+  border:1.5px solid var(--line) !important; border-radius:50% !important; background:#fff !important; color:var(--blue) !important;
+  font-family:var(--sans) !important; font-size:14px !important; font-weight:800 !important; line-height:1 !important; cursor:pointer !important;
+  display:flex !important; align-items:center !important; justify-content:center !important; }
+#sl-root .sl-qbtn.on{ background:var(--blue) !important; color:#fff !important; border-color:var(--blue) !important; }
+#sl-root .sl-helpbox{ margin-top:6px !important; padding:11px 13px !important; background:#fff !important;
+  border:1px solid var(--line) !important; border-left:3px solid var(--blue) !important; border-radius:10px !important;
+  font-size:12.5px !important; color:var(--dim) !important; line-height:1.65 !important; }
+#sl-root .sl-helpbox b{ color:var(--navy) !important; }
+#sl-root .sl-speedbar{ display:flex !important; align-items:center !important; gap:8px !important; margin-top:14px !important; }
+#sl-root .sl-speedlbl{ font-size:12.5px !important; font-weight:700 !important; color:var(--navy) !important; flex:1 !important; }
+#sl-root .speed{ margin-top:8px !important; }
+#sl-root .sl-zonebar .t b{ color:var(--txt) !important; }
+#sl-root .sl-zonebar button{ flex:0 0 auto !important; min-height:38px !important; padding:8px 14px !important; border:1.5px solid var(--line2) !important; border-radius:9px !important; background:#fff !important; color:var(--navy) !important; font-family:inherit !important; font-size:12.5px !important; font-weight:700 !important; cursor:pointer !important; }
+#sl-root .sl-zonebar button.on{ background:var(--navy) !important; color:#fff !important; border-color:var(--navy) !important; }

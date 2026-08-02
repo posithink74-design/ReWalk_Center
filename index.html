@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ReWalk Center - 전문가 대시보드</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="192x192" href="images/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="images/icon-512x512.png">
+    
+    <script src="js/rewalk_store.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1F3864; 
+            --action-color: #4A90E2;  
+            --bg-color: #F4F7FA;
+            --card-bg: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #7F8C8D;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); }
+
+        /* 📌 동적 상단 헤더 */
+        header { 
+            height: 60px; background-color: var(--primary-color); color: white; 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; padding-top: env(safe-area-inset-top);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 100; position: relative;
+        }
+        .header-title { font-size: 18px; font-weight: 700; flex: 1; text-align: center; }
+        
+        /* 뒤로가기 버튼 */
+        .btn-back {
+            background: rgba(255,255,255,0.2); border: none; color: white;
+            padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 4px; visibility: hidden;
+        }
+        .btn-logout { visibility: hidden; } 
+
+        /* 🖥 메인 컨테이너 (Flexbox로 iframe 찌그러짐 방지) */
+        main { 
+            height: calc(100vh - 60px); 
+            display: flex; 
+            flex-direction: column;
+            position: relative; 
+            overflow: hidden; 
+        }
+        
+        iframe { 
+            flex: 1; 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+            display: block; 
+            background: var(--bg-color); 
+        }
+
+        /* 📊 대시보드 뷰 (Hub) */
+        #dashboard-view { 
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px; 
+            padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
+        }
+        
+        /* 회원 요약 카드 */
+        .user-summary {
+            background: var(--card-bg); border-radius: 12px; padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 24px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .user-info h2 { font-size: 22px; color: var(--primary-color); margin-bottom: 4px; }
+        .user-info p { font-size: 14px; color: var(--text-muted); }
+        .btn-change-user {
+            background: #E5E8E8; color: var(--text-main); border: none;
+            padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer;
+        }
+
+        /* 측정 도구 그리드 */
+        .grid-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; }
+        .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        
+        .tool-card {
+            background: var(--card-bg); border-radius: 16px; padding: 20px 15px;
+            text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+            border: 2px solid transparent; cursor: pointer; transition: 0.2s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .tool-card:active { transform: scale(0.96); }
+        .tool-icon { 
+            width: 48px; height: 48px; border-radius: 12px; background: #F1F4F8; 
+            display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+            color: var(--action-color);
+        }
+        .tool-name { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+        .tool-status { font-size: 12px; font-weight: 600; color: #BDC3C7; background: #F8F9F9; padding: 4px 10px; border-radius: 10px; }
+        
+        /* 상태별 스타일 */
+        .status-done { color: #27AE60; background: #EAFAF1; }
+
+        /* 종합 리포트 버튼 */
+        .btn-report {
+            width: 100%; background: var(--primary-color); color: white;
+            border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700;
+            display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(31, 56, 100, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="btn-back" id="btn-back" onclick="showDashboard()">
+            <span class="material-icons" style="font-size: 18px;">arrow_back_ios_new</span> 뒤로
+        </button>
+        <div class="header-title" id="header-title">RE:WALK CENTER</div>
+        <button class="btn-back btn-logout">숨김</button>
+    </header>
+
+    <main>
+        <iframe id="tool-frame" src="basic_info.html" style="display:block;"></iframe>
+
+        <div id="dashboard-view" style="display:none;">
+            <div class="user-summary">
+                <div class="user-info">
+                    <h2 id="dash-user-name">게스트 님</h2>
+                    <p id="dash-user-meta">만 55세 / 165cm</p>
+                </div>
+                <button class="btn-change-user" onclick="changeUser()">회원 변경</button>
+            </div>
+
+            <div class="grid-title">측정 및 분석 도구</div>
+            <div class="tool-grid">
+                <div class="tool-card" onclick="openTool('posture_analysis.html', '정적 자세 분석')">
+                    <div class="tool-icon"><span class="material-icons">accessibility_new</span></div>
+                    <div class="tool-name">자세 분석</div>
+                    <div class="tool-status" id="status-posture">대기 중</div>
+                </div>
+        
+                <div class="tool-card" onclick="openTool('foot_screening.html', '발 스크리닝')">
+                    <div class="tool-icon"><span class="material-icons">do_not_step</span></div>
+                    <div class="tool-name">발 스크리닝</div>
+                    <div class="tool-status" id="status-foot">대기 중</div>
+                </div>
+
+                <div class="tool-card" onclick="openTool('front_gait.html', '정면 보행 분석')">
+                    <div class="tool-icon"><span class="material-icons">directions_walk</span></div>
+                    <div class="tool-name">정면 보행</div>
+                    <div class="tool-status" id="status-front">대기 중</div>
+                </div>
+
+                <div class="tool-card" onclick="openTool('side_gait.html', '측면 보행 분석')">
+                    <div class="tool-icon"><span class="material-icons">directions_run</span></div>
+                    <div class="tool-name">측면 보행</div>
+                    <div class="tool-status" id="status-side">대기 중</div>
+                </div>
+            </div>             
+
+            <button class="btn-report" onclick="openTool('report.html', '종합 분석 리포트')">
+                <span class="material-icons">assessment</span> 종합 리포트 생성
+            </button>
+        </div>
+    </main>
+    <script>
+        const iframe = document.getElementById('tool-frame');
+        const dashboardView = document.getElementById('dashboard-view');
+        const btnBack = document.getElementById('btn-back');
+        const headerTitle = document.getElementById('header-title');
+
+        // 1. 대시보드 화면 띄우기
+        function showDashboard() {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('rewalk_current_user'));
+                if(currentUser) {
+                    document.getElementById('dash-user-name').textContent = `${currentUser.name} 님`;
+                    document.getElementById('dash-user-meta').textContent = `만 ${currentUser.currentAge}세 / ${currentUser.height}cm`;
+                }
+            } catch(e) {}
+
+            iframe.style.display = 'none';
+            dashboardView.style.display = 'block';
+            iframe.src = ""; // 메모리 해제
+            
+            btnBack.style.visibility = 'hidden';
+            headerTitle.textContent = '회원 대시보드';
+            updateToolStatus();
+        }
+
+        // 2. 측정 도구 열기 (캐시 방지 적용)
+        function openTool(url, title) {
+            dashboardView.style.display = 'none';
+            
+            // 현재 시간을 URL 뒤에 붙여 브라우저가 과거 파일을 재사용하지 못하도록 강제함
+            const timeStamp = new Date().getTime();
+            iframe.src = url + "?v=" + timeStamp;
+            
+            iframe.style.display = 'block';
+            
+            btnBack.style.visibility = 'visible';
+            headerTitle.textContent = title;
+        }
+
+        function changeUser() {
+            if(confirm("다른 회원을 선택하시겠습니까? (현재 세션 기록은 보존됩니다)")) {
+                dashboardView.style.display = 'none';
+                
+                const timeStamp = new Date().getTime();
+                iframe.src = 'basic_info.html?v=' + timeStamp;
+                iframe.style.display = 'block';
+                
+                btnBack.style.visibility = 'hidden';
+                headerTitle.textContent = 'RE:WALK CENTER';
+            }
+        }
+
+        // 3. 자식 창(iframe)에서 보내는 신호 감지
+        window.addEventListener('message', (event) => {
+            // basic_info.html에서 "입력 완료"를 눌렀을 때
+            if (event.data && event.data.action === 'NEXT_STEP') {
+                showDashboard();
+            }
+            // 발 스크리닝 등에서 "측정 완료 및 대시보드 복귀"를 눌렀을 때
+            if (event.data && event.data.action === 'MEASUREMENT_DONE') {
+                showDashboard();
+            }
+        });
+
+        function updateToolStatus() {
+            // 차후 스토어(상태 관리) 연동 부분
+        }
+    </script>
+</body>
+</html>

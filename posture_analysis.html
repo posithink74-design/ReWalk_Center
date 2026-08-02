@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>RE:WALK 자세 분석 시스템 (모듈화 버전)</title>
+<link media="print" onload="this.media='all'" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="css/analysis_tool.css">
+</head>
+<body>
+
+<div class="header-info">
+    <h2 id="display-name">대상자 로딩 중...</h2>
+    <p id="display-meta">기본 정보를 입력해주세요</p>
+</div>
+
+<div id="print-area"></div>
+
+<div id="pa-root">
+  <div class="pa-nav">
+    <button class="pa-nav-btn on" data-tab="analyze"><span class="material-icons" style="font-size:16px;vertical-align:middle;">camera_alt</span> 분석</button>
+    <button class="pa-nav-btn" data-tab="compare"><span class="material-icons" style="font-size:16px;vertical-align:middle;">compare</span> 회차비교</button>
+    <button class="pa-nav-btn" data-tab="history"><span class="material-icons" style="font-size:16px;vertical-align:middle;">folder</span> 기록관리</button>
+  </div>
+
+  <div class="pa-panel on" id="pa-analyze">
+    <div class="pa-wrap">
+      
+      <div class="pa-card">
+        <div class="pa-vtabs">
+          <button class="pa-vtab on" data-v="front">정면</button>
+          <button class="pa-vtab" data-v="side">측면</button>
+          <button class="pa-vtab" data-v="back">후면</button>
+        </div>
+        <div class="pa-vhdr">
+          <div>
+            <div class="pa-vname" id="pa-vname">정면</div>
+            <div class="pa-veng" id="pa-veng">Anterior View</div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <label class="pa-upbtn">
+              <span id="pa-upbtn-txt">사진 선택</span>
+              <input type="file" id="pa-file" accept="image/*" style="display:none;">
+            </label>
+            <label class="pa-upbtn pa-cambtn">
+              <span>카메라 촬영</span>
+              <input type="file" id="pa-camfile" accept="image/*" capture="environment" style="display:none;">
+            </label>
+          </div>
+        </div>
+
+        <div class="pa-cvbox">
+          <div class="pa-cvi" id="pa-cvi">
+            <div class="pa-ph" id="pa-ph">
+              <span class="material-icons" style="font-size:48px; color:#B9C7DC;">add_photo_alternate</span>
+              <div class="pa-ph-txt">사진을 업로드해주세요</div>
+            </div>
+            <img id="pa-img" style="display:none" alt="자세 사진"/>
+            <canvas id="pa-cv"></canvas>
+            <div class="pa-cvhint" id="pa-cvhint" style="display:none;"></div>
+
+            <div class="pa-overlay-drawer" id="pa-overlay-drawer">
+              
+              <button type="button" class="pa-drawer-handle" id="pa-drawer-handle" title="도구함 열기/닫기">
+                <span class="material-icons" id="pa-drawer-icon">chevron_left</span>
+              </button>
+
+              <div class="pa-drawer-content">
+                <div class="pa-ot-group">
+                  <button type="button" id="pa-grid-density-btn" class="pa-ot-btn" title="격자 순환">
+                    <span class="material-icons">grid_off</span>
+                    <span class="ot-txt">격자 OFF</span>
+                  </button>
+                  <button type="button" id="pa-lbl-btn" class="pa-ot-btn on" title="측정값">
+                    <span class="material-icons">straighten</span>
+                    <span class="ot-txt">측정값</span>
+                  </button>
+                  <button type="button" id="pa-moire-btn" class="pa-ot-btn" title="등고선">
+                    <span class="material-icons">3d_rotation</span>
+                    <span class="ot-txt">등고선</span>
+                  </button>
+                </div>
+
+                <div class="pa-ot-divider"></div>
+
+                <div class="pa-ot-group">
+                  <button type="button" class="pa-ot-btn pa-sh-btn on" data-tool="edit" title="선택/이동">
+                    <span class="material-icons">open_with</span>
+                  </button>
+                  <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="rect" title="사각형">
+                    <span class="material-icons">crop_square</span>
+                  </button>
+                  <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="circle" title="원">
+                    <span class="material-icons">panorama_fish_eye</span>
+                  </button>
+                  <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="arrow" title="화살표">
+                    <span class="material-icons">north_east</span>
+                  </button>
+                  <button type="button" id="pa-undo" class="pa-ot-btn" title="되돌리기">
+                    <span class="material-icons">undo</span>
+                  </button>
+                  <button type="button" id="pa-clear" class="pa-ot-btn danger" title="삭제">
+                    <span class="material-icons">delete_outline</span>
+                  </button>
+                </div>
+
+                <div class="pa-ot-divider"></div>
+
+                <div class="pa-ot-colors">
+                  <button type="button" class="pa-dot on" data-c="#D9842A" style="background:#D9842A"></button>
+                  <button type="button" class="pa-dot" data-c="#C0392B" style="background:#C0392B"></button>
+                  <button type="button" class="pa-dot" data-c="#2E5C9E" style="background:#2E5C9E"></button>
+                  <button type="button" class="pa-dot" data-c="#2E8B57" style="background:#2E8B57"></button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>  
+        <div class="pa-rotbar" id="pa-rotbar" style="display:none">
+          <span class="pa-rotlbl">사진 회전</span>
+          <button class="pa-rotbtn" id="pa-rot-l" type="button">↺</button>
+          <input type="range" id="pa-rot" min="-15" max="15" step="0.5" value="0" class="pa-rotrange">
+          <button class="pa-rotbtn" id="pa-rot-r" type="button">↻</button>
+          <span class="pa-rotval" id="pa-rotval">0°</span>
+        </div>
+
+        <button class="pa-auto-btn" id="pa-auto-btn" disabled>관절 자동 감지 (AI)</button>
+        <div class="pa-auto-st" id="pa-auto-st">사진을 올리고 앵글을 맞춘 후 AI 버튼을 누르세요.</div>
+          
+        <label style="font-size: 13px; font-weight: bold; color: #5A6B82; margin-top: 15px; display: block;">📝 소견 메모</label>
+        <textarea class="pa-ntxt" id="pa-notes" placeholder="예) 우측 어깨 하강, 거북목 심화 등"></textarea>
+      </div>
+
+      <div class="pa-card" id="pa-checklist-card">
+        <button class="pa-chk-toggle" id="pa-chk-toggle" type="button">
+          <span class="pa-chk-toggle-lbl">🔍 지도자 관찰 소견 <span class="pa-chk-count" id="pa-chk-count"></span></span>
+          <span class="pa-chk-arrow" id="pa-chk-arrow">▾</span>
+        </button>
+        <div class="pa-chk-body pa-chk-collapsed" id="pa-chk-body">
+          <div style="font-size:11.5px; color:#8595AD; margin:8px 0 14px;">2D 측정으로 정량화 어려운 항목 · 육안 관찰 소견</div>
+          <div class="pa-chk-grid">
+            <div class="pa-chk-item"><label>라운드 숄더</label><select class="pa-chk-sel" data-chk="roundedShoulder"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+            <div class="pa-chk-item"><label>흉추후만</label><select class="pa-chk-sel" data-chk="thoracicKyphosis"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+            <div class="pa-chk-item"><label>요추전만</label><select class="pa-chk-sel" data-chk="lumbarLordosis"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+            <div class="pa-chk-item"><label>골반 전방경사</label><select class="pa-chk-sel" data-chk="anteriorPelvicTilt"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+            <div class="pa-chk-item"><label>골반 후방경사</label><select class="pa-chk-sel" data-chk="posteriorPelvicTilt"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+            <div class="pa-chk-item"><label>스웨이백</label><select class="pa-chk-sel" data-chk="swayBack"><option value="none">해당 없음</option><option value="present">관찰됨</option></select></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pa-card">
+        <button class="pa-btn pa-teal" id="pa-save">💾 현재 화면 분석 데이터 저장</button>
+        <div style="font-size:12px; color:#8595AD; text-align:center; margin-top:8px;">정면, 측면, 후면을 각각 분석 후 누적 저장하세요.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pa-panel" id="pa-compare">
+    <div class="pa-wrap">
+      <div class="pa-card">
+        <div class="pa-sellbl">🔵 이전 회차 (Before)</div>
+        <select class="pa-csel" id="pa-ca"></select>
+        <div class="pa-sellbl">🔴 최근 회차 (After)</div>
+        <select class="pa-csel" id="pa-cb"></select>
+
+        <div class="pa-vtabs" style="margin-top:10px;">
+          <button class="pa-cvt on" data-cv="front">정면</button>
+          <button class="pa-cvt" data-cv="side">측면</button>
+          <button class="pa-cvt" data-cv="back">후면</button>
+        </div>
+
+        <div class="pa-cgrid">
+          <div>
+            <div class="pa-chdr" style="background:#1F3864">이전</div>
+            <div class="pa-cwrap-comp" id="pa-cia"><div class="pa-cinner-comp" style="color:#888; font-size:12px;">선택 대기중</div></div>
+          </div>
+          <div>
+            <div class="pa-chdr" style="background:#D9842A">최근</div>
+            <div class="pa-cwrap-comp" id="pa-cib"><div class="pa-cinner-comp" style="color:#888; font-size:12px;">선택 대기중</div></div>
+          </div>
+        </div>
+        
+        <button class="pa-btn pa-green" id="pa-cpdf">
+            <span class="material-icons" style="vertical-align:middle; font-size:18px;">print</span> Before/After 맞춤 리포트 출력
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pa-panel" id="pa-history">
+    <div class="pa-wrap">
+      <button class="pa-btn pa-teal" id="pa-new-session-btn" style="margin-bottom: 8px; box-shadow: 0 4px 12px rgba(46,92,158,0.2);">
+          <span class="material-icons" style="vertical-align:middle; font-size:18px;">add_circle_outline</span> 새로운 측정(회차) 시작하기
+      </button>
+      <div style="font-size:12px; color:#8595AD; text-align:center; margin-bottom:15px; word-break:keep-all;">같은 날 연속 측정 시, 위 버튼을 눌러 이전 기록을 보존하고 새 회차를 만드세요.</div>
+      
+      <div class="pa-card" id="pa-slist" style="background:transparent; box-shadow:none; padding:0;"></div>
+    </div>
+  </div>
+</div>
+
+<button class="btn-save-dash" id="pa-btn-dash">
+    <span class="material-icons" style="vertical-align:middle;">check_circle</span> 모든 측정 완료 및 대시보드 복귀
+</button>
+<script src="./mediapipe/pose.js"></script>
+
+<script src="js/data.js"></script>
+<script src="js/posture_app.js"></script>
+
+</body>
+</html>

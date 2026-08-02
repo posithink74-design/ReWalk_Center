@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>발 스크리닝 · 아치 + 부하 반응 (양발 비교)</title>
+    
+    <link media="print" onload="this.media='all'" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <script src="js/rewalk_store.js"></script>
+    <link rel="stylesheet" href="css/foot_screening.css">
+
+    <style>
+        /* 💡 편집 툴바 겹침 방지 전용 스타일 (하단 툴바 형태) */
+        .pa-canvas-container {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(31,56,100,0.1);
+            background: #fff;
+        }
+        .pa-canvaswrap { 
+            position: relative; 
+            width: 100%; 
+            background: #0e1726; 
+        }
+        .pa-editor-tools {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 18px;
+            padding: 12px 10px;
+            border-top: 1px solid var(--line);
+            background: #ffffff;
+        }
+        .fab-btn {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            border: 1px solid #D8E0EA;
+            background: #F4F7FA;
+            color: #1F3864;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .fab-btn.on { background: #2E8B57; color: white; border-color: #2E8B57; }
+        .fab-btn:active { transform: scale(0.9); }
+    </style>
+</head>
+<body>
+
+    <div class="header-info">
+        <h2 id="display-name">대상자 로딩 중...</h2>
+        <p id="display-meta">기본 정보를 입력해주세요</p>
+    </div>
+
+    <div id="print-area"></div>
+
+    <div id="fs-root">
+        <h1>발 스크리닝 (양발 비교)</h1>
+        <p class="pa-sub" style="font-size:13px; color:#6B7787; margin-bottom:15px;">발자국으로 좌/우측 발의 아치 유형과 <b>체중 부하 시 아치 변화</b>를 확인합니다.</p>
+
+        <div class="fs-tabs">
+            <button class="fs-tab on" id="fsTab1">발자국 측정</button>
+            <button class="fs-tab" id="fsTab2">좌/우 부하 반응</button>
+        </div>
+
+        <div class="fs-pane" id="fsPane1">
+            <div class="pa-card" id="paIntake">
+                <span class="pa-step">1 · 발자국 사진 올리기</span>
+                <button class="pa-btn" id="paPick"><span class="material-icons" style="vertical-align:middle;font-size:18px;">photo_camera</span> 사진 선택 / 촬영</button>
+                <input type="file" id="paFile" accept="image/*" class="pa-hide">
+            </div>
+
+            <div class="pa-card pa-hide" id="paAdjust">
+                <span class="pa-step">2 · 영역 맞추기 및 편집</span>
+                
+                <div class="pa-row" style="margin-top: 12px; margin-bottom: 12px;">
+                    <button class="pa-chip" id="paAutoC"><span class="material-icons" style="font-size:16px;">auto_fix_high</span> 자동 대비</button>
+                    <button class="pa-chip" id="paInvert"><span class="material-icons" style="font-size:16px;">invert_colors</span> 색 반전</button>
+                    <button class="pa-chip" id="paRotate"><span class="material-icons" style="font-size:16px;">rotate_90_degrees_ccw</span> 90° 회전</button>
+                    <button class="pa-chip" id="paAuto"><span class="material-icons" style="font-size:16px;">refresh</span> 다시 인식</button>
+                </div>
+
+                <div style="background: var(--paleblue); padding: 14px; border-radius: 11px; border: 1px solid var(--line); margin-bottom: 12px;">
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <label style="font-size:12px; font-weight:800; color:var(--navy); min-width:55px;">인식 감도</label>
+                            <input type="range" id="paTh" min="-60" max="60" value="0" style="flex:1; accent-color:var(--amber); margin:0;">
+                            <span class="pa-mono" id="paThVal" style="font-size:12px; font-weight:bold; color:var(--navy); width:24px; text-align:right;">0</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <label style="font-size:12px; font-weight:800; color:var(--navy); min-width:55px;">밝기</label>
+                            <input type="range" id="paBrightness" min="50" max="150" value="100" style="flex:1; accent-color:var(--blue); margin:0;">
+                            <span style="width:24px;"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <label style="font-size:12px; font-weight:800; color:var(--navy); min-width:55px;">대비</label>
+                            <input type="range" id="paContrast" min="50" max="150" value="100" style="flex:1; accent-color:var(--blue); margin:0;">
+                            <span style="width:24px;"></span>
+                        </div>
+                    </div>
+                    <button class="pa-btn sec" id="paFilterReset" style="margin-top: 16px; width: 100%; min-height: 42px; font-size:13px; font-weight:700;">조절 초기화</button>
+                </div>
+
+                <div class="pa-canvas-container">
+                    <div class="pa-canvaswrap">
+                        <canvas id="paCanvas"></canvas>
+                    </div>
+                    <div class="pa-editor-tools">
+                        <button class="fab-btn" id="paPoly" title="다각형(점 잇기) 영역 편집"><span class="material-icons">polyline</span></button>
+                        <button class="fab-btn" id="paPickFoot" title="브러시 채우기"><span class="material-icons">brush</span></button>
+                        <button class="fab-btn" id="paSeed" title="브러시 지우개"><span class="material-icons">healing</span></button>
+                        <button class="fab-btn" id="paUndo" title="되돌리기"><span class="material-icons">undo</span></button>
+                    </div>
+                </div>
+                
+                <p class="pa-hint pa-hide" id="paSeedHint" style="color:var(--blue); font-weight:600; margin-bottom: 10px;"></p>
+                
+                <div style="margin-top:8px" id="paBrushWrap" class="pa-hide">
+                    <div class="pa-label"><span>붓 크기</span><span class="pa-mono" id="paBrushVal"></span></div>
+                    <input type="range" id="paBrush" min="4" max="18" value="8" style="width:100%">
+                </div>
+                
+                <button class="pa-btn sec" id="paReset" style="margin-top:20px; font-size: 13px; padding: 10px;">다른 사진 불러오기</button>
+            </div>
+
+            <div class="pa-card pa-hide" id="paResult">
+                <span class="pa-step">3 · 결과 및 슬롯 저장</span>
+                <div class="pa-result" style="padding: 10px 0;">
+                    <div class="pa-ai pa-mono" id="paAI">–</div>
+                    <div style="font-size:12px; color:#6B7787; font-weight:bold;">ARCH INDEX</div>
+                    <div><span class="pa-cat" id="paCat">–</span></div>
+                    <div class="pa-interp" id="paInterp" style="font-size:14px; color:#1F3864; margin-bottom:15px;"></div>
+                    <div style="font-size:14px; color:#1F3864; font-weight:bold;">CSI: <span id="paCSI">–</span>%</div>
+                    <div style="font-size:12px; color:#6B7787;">(정상 범위: <span id="paRange">0.21–0.26</span>)</div>
+                </div>
+
+                <div class="ld-slot">
+                    <div style="font-size:14px; font-weight:600; color:#1F3864; margin-bottom: 10px;">현재 분석된 발을 지정하여 저장하세요</div>
+                    <div class="ld-slot-b">
+                        <div class="slot-col">
+                            <div class="slot-title">좌측 발 (L)</div>
+                            <button class="ld-sbtn" id="btn-L-sit" onclick="saveToSlot('L', 'sit')">앉기 (무부하)</button>
+                            <button class="ld-sbtn" id="btn-L-stand" onclick="saveToSlot('L', 'stand')">서기 (체중부하)</button>
+                        </div>
+                        <div class="slot-col">
+                            <div class="slot-title" style="color:#D9842A;">우측 발 (R)</div>
+                            <button class="ld-sbtn" id="btn-R-sit" onclick="saveToSlot('R', 'sit')">앉기 (무부하)</button>
+                            <button class="ld-sbtn" id="btn-R-stand" onclick="saveToSlot('R', 'stand')">서기 (체중부하)</button>
+                        </div>
+                    </div>
+                    <div style="font-size:12px; color:#6B7787;" id="ldSlotStatus">저장된 상태가 여기에 표시됩니다.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="fs-pane fs-off" id="fsPane2">
+            <div class="pa-card">
+                <span class="pa-step">좌/우 부하 반응 (ΔAI) 비교</span>
+                <div id="ldEmpty" style="text-align:center; padding:30px 0; color:#6B7787; font-size:14px;">
+                    아직 저장된 값이 없습니다.<br><b>발자국 측정</b> 탭에서 양발의 앉기/서기를 저장해 주세요.
+                </div>
+
+                <div id="ldBody" class="pa-hide">
+                    <div style="border-bottom: 2px solid var(--line); padding-bottom: 15px; margin-bottom: 15px;">
+                        <h3 style="color:var(--navy); font-size: 16px; margin-top: 0;">좌측 발 (Left)</h3>
+                        <div class="ld-pair">
+                            <div class="ld-card"><div style="font-size:11px; color:#6B7787;">앉기</div><div style="font-size:18px; font-weight:800; color:#1F3864;" id="ldSitAI-L">–</div><div style="font-size:11px;" id="ldSitSub-L">-</div></div>
+                            <div class="ld-card"><div style="font-size:11px; color:#6B7787;">서기</div><div style="font-size:18px; font-weight:800; color:#D9842A;" id="ldStandAI-L">–</div><div style="font-size:11px;" id="ldStandSub-L">-</div></div>
+                        </div>
+                        <div class="ld-hero">
+                            <div style="font-size:12px; font-weight:bold; color:#6B7787;">변화량 (ΔAI)</div>
+                            <div class="ld-delta" id="ldDelta-L" style="font-size:24px; margin:5px 0;">–</div>
+                            <div><span class="ld-badge" id="ldBadge-L">–</span></div>
+                            <div id="ldNote-L" style="font-size:13px; color:#2C3E50; margin-top:5px;"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 style="color:#D9842A; font-size: 16px; margin-top: 0;">우측 발 (Right)</h3>
+                        <div class="ld-pair">
+                            <div class="ld-card"><div style="font-size:11px; color:#6B7787;">앉기</div><div style="font-size:18px; font-weight:800; color:#1F3864;" id="ldSitAI-R">–</div><div style="font-size:11px;" id="ldSitSub-R">-</div></div>
+                            <div class="ld-card"><div style="font-size:11px; color:#6B7787;">서기</div><div style="font-size:18px; font-weight:800; color:#D9842A;" id="ldStandAI-R">–</div><div style="font-size:11px;" id="ldStandSub-R">-</div></div>
+                        </div>
+                        <div class="ld-hero" style="background:#FFF3E0; border-color:#FFE0B2;">
+                            <div style="font-size:12px; font-weight:bold; color:#6B7787;">변화량 (ΔAI)</div>
+                            <div class="ld-delta" id="ldDelta-R" style="font-size:24px; margin:5px 0;">–</div>
+                            <div><span class="ld-badge" id="ldBadge-R">–</span></div>
+                            <div id="ldNote-R" style="font-size:13px; color:#2C3E50; margin-top:5px;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="pa-btn" id="paPrintPDF" style="margin-top:20px; background-color:#2E8B57;">
+                    <span class="material-icons" style="vertical-align:middle; font-size:18px;">print</span> 결과지 1장(A4) PDF 인쇄
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-save-dash" onclick="saveToDashboard()">
+        <span class="material-icons">task_alt</span> 측정 완료 및 대시보드 복귀
+    </button>
+
+    <script src="js/foot_screening.js"></script>
+</body>
+</html>

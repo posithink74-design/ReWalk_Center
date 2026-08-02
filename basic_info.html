@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>기본 정보 및 회원 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1F3864;
+            --action-color: #4A90E2;
+            --bg-color: #F7F9FC;
+            --text-main: #333;
+            --border-color: #E5E7EB;
+        }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); padding: 20px; color: var(--text-main); }
+        
+        .container { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 500px; margin: 0 auto; }
+        .title { font-size: 20px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+
+        .tabs { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; }
+        .tab { flex: 1; text-align: center; padding: 12px; font-weight: 600; color: #999; cursor: pointer; }
+        .tab.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #555; }
+        .form-group input, .form-group select { 
+            width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; 
+            font-size: 15px; font-family: inherit; box-sizing: border-box;
+        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--action-color); }
+
+        /* 검색 리스트 스타일 개선 */
+        .search-box { position: relative; margin-bottom: 16px; }
+        .search-box input { padding-right: 40px; }
+        .search-box .material-icons { position: absolute; right: 12px; top: 12px; color: #999; }
+        
+        .user-list { max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; display: none; }
+        .user-item { padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+        .user-item:last-child { border-bottom: none; }
+        .user-item:hover { background-color: #F1F8FF; }
+        .user-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .user-name { font-weight: 700; font-size: 16px; color: var(--primary-color); }
+        .user-phone { font-size: 13px; background: #E5E7EB; padding: 2px 6px; border-radius: 4px; color: #555;}
+        .user-meta { font-size: 12px; color: #666; display: flex; justify-content: space-between; }
+        .user-regdate { color: #888; font-size: 11px; }
+
+        .status-msg { margin-top: 15px; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; text-align: center; display: none; line-height: 1.4; }
+        .success { background-color: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+
+        .btn-start { 
+            width: 100%; padding: 14px; background-color: var(--action-color); color: white; 
+            border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="title">대상자 정보 입력</div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('new')" id="tab-new">신규 등록</div>
+        <div class="tab" onclick="switchTab('search')" id="tab-search">기존 회원 검색</div>
+    </div>
+
+    <div id="form-new">
+        <div class="form-group" style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label for="new-name">이름 (필수)</label>
+                <input type="text" id="new-name" placeholder="홍길동">
+            </div>
+            <div style="flex: 1;">
+                <label for="new-phone">연락처 뒤 4자리</label>
+                <input type="tel" id="new-phone" maxlength="4" placeholder="예: 1234">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="new-dob">생년월일 (나이 자동계산용)</label>
+            <input type="date" id="new-dob">
+        </div>
+        <div class="form-group" style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label for="new-height">신장 (cm)</label>
+                <input type="number" id="new-height" placeholder="165">
+            </div>
+            <div style="flex: 1;">
+                <label for="new-gender">성별</label>
+                <select id="new-gender">
+                    <option value="M">남성</option>
+                    <option value="F">여성</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-start" onclick="registerAndStart()">정보 저장 및 측정 시작</button>
+    </div>
+
+    <div id="form-search" style="display: none;">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="이름 또는 연락처 4자리 검색" oninput="searchUsers()">
+            <span class="material-icons">search</span>
+        </div>
+        <div class="user-list" id="user-list"></div>
+        <div id="selected-user-display" class="status-msg success"></div>
+        <button class="btn-start" id="btn-start-search" onclick="startWithExisting()" style="display: none;">이 회원으로 누적 측정 시작</button>
+    </div>
+</div>
+
+<script>
+    let usersDB = JSON.parse(localStorage.getItem('rewalk_users')) || [];
+    let selectedUser = null;
+
+    // 만 나이 계산 함수 (핵심 로직)
+    function calculateAge(dobString) {
+        if(!dobString) return 0;
+        const today = new Date();
+        const birthDate = new Date(dobString);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+        return age;
+    }
+
+    // 날짜 포맷 함수 (YYYY-MM-DD)
+    function formatDate(isoString) {
+        const d = new Date(isoString);
+        return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function switchTab(tabId) {
+        document.getElementById('tab-new').classList.remove('active');
+        document.getElementById('tab-search').classList.remove('active');
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+
+        document.getElementById('form-new').style.display = tabId === 'new' ? 'block' : 'none';
+        document.getElementById('form-search').style.display = tabId === 'search' ? 'block' : 'none';
+        
+        if(tabId === 'search') searchUsers();
+    }
+
+    // 신규 등록
+    function registerAndStart() {
+        const name = document.getElementById('new-name').value.trim();
+        const phone = document.getElementById('new-phone').value.trim();
+        const dob = document.getElementById('new-dob').value;
+        const gender = document.getElementById('new-gender').value;
+        const height = document.getElementById('new-height').value;
+
+        if (!name || !dob || !height || !phone) {
+            alert('이름, 연락처 4자리, 생년월일, 신장을 모두 입력해주세요.');
+            return;
+        }
+
+        const newUser = {
+            id: 'user_' + Date.now(),
+            name: name,
+            phone: phone,     // 연락처 뒤 4자리 저장
+            dob: dob,         // 생년월일 저장
+            gender: gender,
+            height: parseFloat(height),
+            createdAt: new Date().toISOString() // 최초 등록일
+        };
+
+        usersDB.push(newUser);
+        localStorage.setItem('rewalk_users', JSON.stringify(usersDB));
+        setCurrentUserAndProceed(newUser);
+    }
+
+    // 회원 검색 (이름 또는 전화번호 뒷자리로 검색 가능)
+    function searchUsers() {
+        const query = document.getElementById('search-input').value.trim().toLowerCase();
+        const listEl = document.getElementById('user-list');
+        listEl.innerHTML = '';
+
+        if(query === '') {
+            listEl.style.display = 'none';
+            return;
+        }
+
+        // 이름이나 폰번호에 검색어가 포함된 사람 필터링
+        const filtered = usersDB.filter(u => 
+            u.name.toLowerCase().includes(query) || 
+            (u.phone && u.phone.includes(query))
+        );
+
+        if (filtered.length > 0) {
+            listEl.style.display = 'block';
+            filtered.forEach(user => {
+                const currentAge = calculateAge(user.dob); // 리스트에 띄울 때 현재 만 나이 계산
+                const regDate = formatDate(user.createdAt); // 등록일 포맷
+                
+                const item = document.createElement('div');
+                item.className = 'user-item';
+                item.innerHTML = `
+                    <div class="user-top">
+                        <span class="user-name">${user.name} <span style="font-size:14px; color:#555; font-weight:normal;">(${user.gender === 'M'?'남':'여'})</span></span>
+                        <span class="user-phone">📞 ${user.phone || '번호없음'}</span>
+                    </div>
+                    <div class="user-meta">
+                        <span>생년월일: ${user.dob} (만 ${currentAge}세) / ${user.height}cm</span>
+                        <span class="user-regdate">최초등록: ${regDate}</span>
+                    </div>
+                `;
+                item.onclick = () => selectUser(user, currentAge);
+                listEl.appendChild(item);
+            });
+        } else {
+            listEl.style.display = 'none';
+        }
+    }
+
+    // 회원 선택
+    function selectUser(user, currentAge) {
+        selectedUser = user;
+        document.getElementById('user-list').style.display = 'none';
+        document.getElementById('search-input').value = `${user.name} (${user.phone})`;
+        
+        const display = document.getElementById('selected-user-display');
+        display.innerHTML = `✅ <b>${user.name}</b>님 (만 ${currentAge}세)<br><span style="font-size:12px; font-weight:normal; color:#444;">최초 등록일: ${formatDate(user.createdAt)}</span><br>이전 데이터에 누적하여 기록합니다.`;
+        display.style.display = 'block';
+        
+        document.getElementById('btn-start-search').style.display = 'block';
+    }
+
+    function startWithExisting() {
+        if(!selectedUser) return;
+        setCurrentUserAndProceed(selectedUser);
+    }
+
+    // 데이터 세팅 후 다음 페이지 이동
+    function setCurrentUserAndProceed(user) {
+        // 측정 시점의 정확한 '나이'를 계산해서 저장 객체에 추가 전달
+        const sessionUser = {
+            ...user,
+            currentAge: calculateAge(user.dob) // 지금 측정하는 순간의 나이
+        };
+
+        localStorage.setItem('rewalk_current_user', JSON.stringify(sessionUser));
+        localStorage.setItem('rewalk_current_session_id', 'session_' + Date.now());
+
+        window.parent.postMessage({ action: 'NEXT_STEP' }, '*');
+    }
+</script>
+</body>
+</html>
