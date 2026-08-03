@@ -1,14 +1,13 @@
 /* 로컬 폴더의 폰트를 불러옵니다 */
 @font-face {
     font-family: 'Pretendard';
-    src: url('../fonts/Pretendard-Regular.woff2') format('woff2');
+        src: url('/ReWalk_Center/fonts/Pretendard-Regular.woff2') format('woff2');
     font-weight: 400;
 }
 
 @font-face {
     font-family: 'Pretendard';
-    src: url('../fonts/Pretendard-Bold.woff2') format('woff2');
-    font-weight: 700;
+    src: url('/ReWalk_Center/fonts/Pretendard-Bold.woff2') format('woff2');
 }
 
 /* 앱 전체에 프리텐다드 폰트 적용 */
@@ -23,7 +22,7 @@ body {
     font-family: 'Material Icons';
     font-style: normal;
     font-weight: 400;
-    src: url('../fonts/MaterialIcons-Regular.woff2') format('woff2');
+    src: url('/ReWalk_Center/fonts/MaterialIcons-Regular.woff2') format('woff2');
 }
 
 .material-icons {
