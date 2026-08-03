@@ -4,37 +4,37 @@ const AI_CACHE_NAME = 'rewalk-ai-cache-v1';
 
 // 1. 설치 시 캐싱할 기본 파일들 (원하시는 UI 파일들을 추가하시면 됩니다)
 const uiFiles = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    '/basic_info.html',
-    '/foot_screen.html',
-    '/posture_screen.html',
-    '/front_gait_screen.html',
-    '/side_gait_screen.html',   
+    './',
+    './index.html',
+    './manifest.json',
+    './basic_info.html',
+    './foot_screen.html',
+    './posture_screen.html',
+    './front_gait_screen.html',
+    './side_gait_screen.html',   
 
-    '/js/posture_app.js', 
-    '/js/front_gait.js',
-    '/js/side_gait.js',
-    '/js/rewalk_store.js',
+    './js/posture_app.js', 
+    './js/front_gait.js',
+    './js/side_gait.js',
+    './js/rewalk_store.js',
 
-    '/css/analysis_tool.css',
-    '/css/foot_screen.css',
-    '/css/front_gait.css',
-    '/css/side_gait.css',
-    '/css/local_font.css',
-    '/fonts/Pretendard-Regular.woff2',
-    '/fonts/Pretendard-Bold.woff2',
-    '/fonts/MaterialIcons-Regular.woff2'
+    './css/analysis_tool.css',
+    './css/foot_screen.css',
+    './css/front_gait.css',
+    './css/side_gait.css',
+    './css/local_font.css',
+    './fonts/Pretendard-Regular.woff2',
+    './fonts/Pretendard-Bold.woff2',
+    './fonts/MaterialIcons-Regular.woff2'
 ];
 
 // 2. 반드시 로컬에서 가져와야 할 MediaPipe AI 파일들
 const aiFiles = [
-    '/mediapipe/pose.js',
-    '/mediapipe/pose_solution_packed_assets.data',
-    '/mediapipe/pose_solution_simd_wasm_bin.js',
-    '/mediapipe/pose_solution_simd_wasm_bin.wasm',
-    '/mediapipe/pose_web.binarypb'
+    './mediapipe/pose.js',
+    './mediapipe/pose_solution_packed_assets.data',
+    './mediapipe/pose_solution_simd_wasm_bin.js',
+    './mediapipe/pose_solution_simd_wasm_bin.wasm',
+    './mediapipe/pose_web.binarypb'
 ];
 
 // [설치 이벤트] 앱이 처음 실행될 때 파일들을 스마트폰에 다운로드(저장)합니다.
