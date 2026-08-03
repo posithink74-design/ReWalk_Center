@@ -24,8 +24,8 @@ const uiFiles = [
     '/css/side_gait.css',
     '/css/local_font.css',
     '/fonts/Pretendard-Regular.woff2',
-    '/fonts/Pretendard-Bold.woff2'
-
+    '/fonts/Pretendard-Bold.woff2',
+    '/fonts/MaterialIcons-Regular.woff2'
 ];
 
 // 2. 반드시 로컬에서 가져와야 할 MediaPipe AI 파일들
