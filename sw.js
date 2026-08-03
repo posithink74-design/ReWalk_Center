@@ -1,5 +1,5 @@
 // 캐시 이름 설정 (버전이 올라가면 이름을 바꿔주어 캐시를 갱신합니다)
-const CACHE_NAME = 'rewalk-app-cache-v3';
+const CACHE_NAME = 'rewalk-app-cache-v6';
 const AI_CACHE_NAME = 'rewalk-ai-cache-v1';
 
 // 1. 설치 시 캐싱할 기본 파일들 (원하시는 UI 파일들을 추가하시면 됩니다)

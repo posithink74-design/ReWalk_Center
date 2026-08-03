@@ -25,19 +25,34 @@ body {
     font-weight: 400;
     src: url('../fonts/MaterialIcons-Regular.woff2') format('woff2');
 }
+/* -------------------------------------
+    구글 Material Icons 오프라인 완벽 설정 
+-------------------------------------- */
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/MaterialIcons-Regular.woff2') format('woff2');
+}
 
 .material-icons {
-    font-family: 'Material Icons';
+    font-family: 'Material Icons' !important;
     font-weight: normal;
     font-style: normal;
     font-size: 24px;
     line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
     display: inline-block;
     white-space: nowrap;
     word-wrap: normal;
     direction: ltr;
+    letter-spacing: normal;
+    text-transform: none;
+    vertical-align: middle;
+    
+    /* 리가처(단어 -> 아이콘 변환) 크로스 브라우저 필수 설정 */
+    font-feature-settings: 'liga';
     -webkit-font-feature-settings: 'liga';
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
 }
