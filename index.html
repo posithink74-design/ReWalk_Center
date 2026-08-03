@@ -196,11 +196,8 @@
             dashboardView.style.display = 'none';
             
             // 현재 시간을 URL 뒤에 붙여 브라우저가 과거 파일을 재사용하지 못하도록 강제함
-            const timeStamp = new Date().getTime();
-            iframe.src = url + "?v=" + timeStamp;
-            
+            iframe.src = url; 
             iframe.style.display = 'block';
-            
             btnBack.style.visibility = 'visible';
             headerTitle.textContent = title;
         }
@@ -208,11 +205,8 @@
         function changeUser() {
             if(confirm("다른 회원을 선택하시겠습니까? (현재 세션 기록은 보존됩니다)")) {
                 dashboardView.style.display = 'none';
-                
-                const timeStamp = new Date().getTime();
-                iframe.src = 'basic_info.html?v=' + timeStamp;
+                iframe.src = 'basic_info.html';
                 iframe.style.display = 'block';
-                
                 btnBack.style.visibility = 'hidden';
                 headerTitle.textContent = 'RE:WALK CENTER';
             }
