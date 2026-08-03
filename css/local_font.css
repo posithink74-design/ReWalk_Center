@@ -17,15 +17,6 @@ body {
 }
 
 /* -------------------------------------
-    구글 Material Icons 오프라인 설정 
--------------------------------------- */
-@font-face {
-    font-family: 'Material Icons';
-    font-style: normal;
-    font-weight: 400;
-    src: url('../fonts/MaterialIcons-Regular.woff2') format('woff2');
-}
-/* -------------------------------------
     구글 Material Icons 오프라인 완벽 설정 
 -------------------------------------- */
 @font-face {
