@@ -274,17 +274,19 @@
 
     // 다운로드 버튼 클릭 시 실행
     function startOfflineDownload() {
-        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-            document.getElementById('download-btn').disabled = true;
-            document.getElementById('download-btn').innerText = '준비 중...';
-            document.getElementById('progress-container').style.display = 'block';
-            
-            // sw.js 파일에 다운로드 시작하라고 신호 보내기
-            navigator.serviceWorker.controller.postMessage({ type: 'START_DOWNLOAD' });
-        } else {
-            alert("앱이 아직 완전히 로딩되지 않았습니다. 새로고침 후 다시 시도해주세요.");
-        }
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        const btn = document.getElementById('download-btn');
+        btn.disabled = true;
+        // 아이콘을 유지하면서 글씨만 변경
+        btn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 5px;">hourglass_empty</i>다운로드 진행 중...';
+        
+        document.getElementById('progress-container').style.display = 'block';
+        
+        navigator.serviceWorker.controller.postMessage({ type: 'START_DOWNLOAD' });
+    } else {
+        alert("앱이 아직 완전히 로딩되지 않았습니다. 새로고침 후 다시 시도해주세요.");
     }
+}
 </script>
 </body>
 </html>
