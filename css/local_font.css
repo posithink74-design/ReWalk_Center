@@ -1,7 +1,7 @@
 /* 로컬 폴더의 폰트를 불러옵니다 */
 @font-face {
     font-family: 'Pretendard';
-        src: url('./fonts/Pretendard-Regular.woff2') format('woff2');
+        src: url('../fonts/Pretendard-Regular.woff2') format('woff2');
     font-weight: 400;
 }
 
@@ -22,7 +22,7 @@ body {
     font-family: 'Material Icons';
     font-style: normal;
     font-weight: 400;
-    src: url('./fonts/MaterialIcons-Regular.woff2') format('woff2'); /* 이 경로가 중요합니다! */
+    src: url('../fonts/MaterialIcons-Regular.woff2') format('woff2'); /* 이 경로가 중요합니다! */
 }
 
 .material-icons {
