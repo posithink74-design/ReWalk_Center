@@ -7,7 +7,7 @@
 
 @font-face {
     font-family: 'Pretendard';
-    src: url('./fonts/Pretendard-Bold.woff2') format('woff2');
+    src: url('../fonts/Pretendard-Bold.woff2') format('woff2');
 }
 
 /* 앱 전체에 프리텐다드 폰트 적용 */
