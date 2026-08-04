@@ -32,10 +32,9 @@ const aiFiles = [
     './mediapipe/control_utils.js',
     './mediapipe/drawing_utils.js',
     './mediapipe/pose.js',
-    './mediapipe/pose_solution_packed_assets.data',
+    './mediapipe/pose_solution_packed_assets.loader.js',
     './mediapipe/pose_solution_simd_wasm_bin.js',
-    './mediapipe/pose_solution_simd_wasm_bin.wasm',
-    './mediapipe/pose_web.binarypb'
+    './mediapipe/pose_solution_wasm_bin.js',
 ];
 
 // 앱 최초 실행 시 기본 파일만 우선 설치
