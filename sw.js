@@ -1,11 +1,11 @@
-// 캐시 버전 업데이트
-const CACHE_NAME = 'rewalk-app-cache-v10';
+const CACHE_NAME = 'rewalk-app-cache-v11';
 
-// 1. 기본 UI 및 도구 파일들
+// 🔴 전문가님의 실제 폴더에 "있는 파일만" 남기고 없는 것은 지워주세요!
 const urlsToCache = [
     './',
     './index.html',
     './manifest.json',
+    // 아래 파일 중 실제 없는 파일이 있다면 삭제하세요!
     './basic_info.html',
     './foot_screen.html',
     './posture_screen.html',
@@ -25,7 +25,6 @@ const urlsToCache = [
     './fonts/MaterialIcons-Regular.woff2'
 ];
 
-// 2. 무거운 MediaPipe AI 파일들
 const aiFiles = [
     './mediapipe/camera_utils.js',
     './mediapipe/control_utils.js',
@@ -40,7 +39,7 @@ const aiFiles = [
 ];
 
 self.addEventListener('install', event => {
-    event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
+    event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache).catch(()=>console.log("기본 캐싱 일부 실패"))));
     self.skipWaiting();
 });
 
@@ -57,45 +56,52 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-// 🔴 수정된 부분 1: 특정 ID(clientId) 대신 즉시 실행
 self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'START_DOWNLOAD') {
         cacheFilesWithProgress(); 
     }
 });
 
-// 🔴 수정된 부분 2: 방송(Broadcast) 방식으로 100% 도달 보장
 async function cacheFilesWithProgress() {
     const cache = await caches.open(CACHE_NAME);
     const allFiles = [...urlsToCache, ...aiFiles];
     let loadedCount = 0;
     const totalFiles = allFiles.length;
+    let errorFiles = []; // 실패한 파일 추적
 
     for (const url of allFiles) {
         try {
             const response = await fetch(new Request(url, { cache: 'reload' }));
             if (response.ok) {
                 await cache.put(url, response);
-                loadedCount++;
-                
-                // 모든 클라이언트(화면)에 진행률 방송
-                const allClients = await clients.matchAll();
-                allClients.forEach(client => {
-                    client.postMessage({
-                        type: 'PROGRESS',
-                        percent: Math.round((loadedCount / totalFiles) * 100)
-                    });
-                });
+            } else {
+                console.error('❌ 폴더에 없는 파일 발견 (404):', url);
+                errorFiles.push(url);
             }
         } catch (error) {
-            console.error('다운로드 실패:', url);
+            console.error('❌ 네트워크 에러:', url);
+            errorFiles.push(url);
         }
+
+        loadedCount++;
+        
+        // includeUncontrolled: true 옵션으로 연결 끊김 방지
+        const allClients = await self.clients.matchAll({ includeUncontrolled: true });
+        allClients.forEach(client => {
+            client.postMessage({
+                type: 'PROGRESS',
+                percent: Math.round((loadedCount / totalFiles) * 100)
+            });
+        });
     }
 
-    // 모든 클라이언트(화면)에 완료 방송
-    const allClients = await clients.matchAll();
+    const allClients = await self.clients.matchAll({ includeUncontrolled: true });
     allClients.forEach(client => {
-        client.postMessage({ type: 'COMPLETE' });
+        if (errorFiles.length > 0) {
+            client.postMessage({ type: 'ERROR', fails: errorFiles });
+        } else {
+            client.postMessage({ type: 'COMPLETE' });
+        }
     });
 }
 

@@ -261,16 +261,27 @@
         });
 
         // 서비스 워커(sw.js)로부터 오는 메시지(%) 수신
+        // index.html 하단의 스크립트 중 메시지 수신 부분만 아래로 교체
         navigator.serviceWorker.addEventListener('message', event => {
             if (event.data.type === 'PROGRESS') {
                 document.getElementById('progress-bar').style.width = event.data.percent + '%';
                 document.getElementById('progress-text').innerText = event.data.percent + '% 다운로드 중...';
-            } else if (event.data.type === 'COMPLETE') {
+            } 
+            else if (event.data.type === 'COMPLETE') {
                 document.getElementById('progress-text').innerText = '✅ 다운로드 완료! (오프라인 사용 가능)';
-                document.getElementById('download-btn').style.display = 'none'; // 버튼 숨기기
+                document.getElementById('progress-text').style.color = '#28a745';
+                document.getElementById('download-btn').style.display = 'none';
+            } 
+            else if (event.data.type === 'ERROR') {
+                // 파일이 없어서 에러가 났을 때 빨간색으로 경고!
+                document.getElementById('progress-text').innerText = '❌ 누락된 파일이 있습니다. (F12 콘솔창 확인)';
+                document.getElementById('progress-text').style.color = 'red';
+                document.getElementById('progress-bar').style.background = 'red';
+                document.getElementById('download-btn').innerHTML = '새로고침 후 다시 시도';
+                document.getElementById('download-btn').disabled = false;
+                console.warn("다운로드 실패 목록:", event.data.fails);
             }
         });
-    }
 
     // 다운로드 버튼 클릭 시 실행
     function startOfflineDownload() {
