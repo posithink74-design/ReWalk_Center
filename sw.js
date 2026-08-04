@@ -18,7 +18,7 @@ const urlsToCache = [
     './js/foot_screening.js',
     './js/data.js',
     './css/analysis_tool.css',
-    './css/foot_screen.css',
+    './css/foot_screening.css',
     './css/front_gait.css',
     './css/side_gait.css',
     './css/local_font.css',
@@ -36,7 +36,7 @@ const aiFiles = [
     './mediapipe/pose_solution_simd_wasm_bin.js',
     './mediapipe/pose_solution_simd_wasm_bin.wasm',
     './mediapipe/pose_web.binarypb',
-    './mediapipe/pose_solution_packed_assets.loader.js',
+    './mediapipe/pose_solution_packed_assets_loader.js',
     './mediapipe/pose_solution_wasm_bin.js',
 ];
 
