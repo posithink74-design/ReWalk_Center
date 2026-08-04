@@ -16,7 +16,6 @@ const urlsToCache = [
     './js/posture_app.js', 
     './js/front_gait.js',
     './js/side_gait.js',
-    './js/rewalk_store.js',
 
     './css/analysis_tool.css',
     './css/foot_screen.css',
@@ -30,13 +29,15 @@ const urlsToCache = [
 
 // 2. 반드시 로컬에서 가져와야 할 MediaPipe AI 파일들
 const aiFiles = [
+    './js/rewalk_store.js',
     './mediapipe/pose.js',
     './mediapipe/pose_solution_packed_assets.data',
     './mediapipe/pose_solution_simd_wasm_bin.js',
     './mediapipe/pose_solution_simd_wasm_bin.wasm',
-    './mediapipe/pose_web.binarypb'
-];
-
+    './mediapipe/pose_web.binarypb',
+    './mediapipe/camera_utils.js',
+    './mediapipe/control_utils.js',
+    './mediapipe/drawing_utils.js',
 // [설치 이벤트] 앱이 처음 실행될 때 파일들을 스마트폰에 다운로드(저장)합니다.
 self.addEventListener('install', event => {
     event.waitUntil(
