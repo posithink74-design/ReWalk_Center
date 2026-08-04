@@ -254,14 +254,12 @@
     });}
 </script>
 <script>
-    // 서비스 워커 등록
+    // 1. 서비스 워커 등록 및 다운로드 상태 수신
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').then(() => {
             console.log("서비스 워커 등록 완료");
         });
 
-        // 서비스 워커(sw.js)로부터 오는 메시지(%) 수신
-        // index.html 하단의 스크립트 중 메시지 수신 부분만 아래로 교체
         navigator.serviceWorker.addEventListener('message', event => {
             if (event.data.type === 'PROGRESS') {
                 document.getElementById('progress-bar').style.width = event.data.percent + '%';
@@ -273,7 +271,6 @@
                 document.getElementById('download-btn').style.display = 'none';
             } 
             else if (event.data.type === 'ERROR') {
-                // 파일이 없어서 에러가 났을 때 빨간색으로 경고!
                 document.getElementById('progress-text').innerText = '❌ 누락된 파일이 있습니다. (F12 콘솔창 확인)';
                 document.getElementById('progress-text').style.color = 'red';
                 document.getElementById('progress-bar').style.background = 'red';
@@ -282,22 +279,22 @@
                 console.warn("다운로드 실패 목록:", event.data.fails);
             }
         });
-
-    // 다운로드 버튼 클릭 시 실행
-    function startOfflineDownload() {
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        const btn = document.getElementById('download-btn');
-        btn.disabled = true;
-        // 아이콘을 유지하면서 글씨만 변경
-        btn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 5px;">hourglass_empty</i>다운로드 진행 중...';
-        
-        document.getElementById('progress-container').style.display = 'block';
-        
-        navigator.serviceWorker.controller.postMessage({ type: 'START_DOWNLOAD' });
-    } else {
-        alert("앱이 아직 완전히 로딩되지 않았습니다. 새로고침 후 다시 시도해주세요.");
     }
-}
+
+    // 2. 버튼 클릭 시 실행되는 함수
+    function startOfflineDownload() {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            const btn = document.getElementById('download-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 5px;">hourglass_empty</i>다운로드 진행 중...';
+            
+            document.getElementById('progress-container').style.display = 'block';
+            
+            navigator.serviceWorker.controller.postMessage({ type: 'START_DOWNLOAD' });
+        } else {
+            alert("앱이 아직 완전히 로딩되지 않았습니다. 새로고침 후 다시 시도해주세요.");
+        }
+    }
 </script>
 </body>
 </html>
