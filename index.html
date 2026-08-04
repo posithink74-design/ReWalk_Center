@@ -112,7 +112,21 @@
     </style>
 </head>
 <body>
+    <div id="download-card" style="margin: 20px; padding: 20px; border-radius: 12px; background: #f8f9fa; border: 1px solid #e9ecef; text-align: center;">
+        <h3 style="margin-top:0; font-size: 16px; color:#333;">오프라인 현장 평가 준비</h3>
+        <p style="font-size: 13px; color:#666; margin-bottom: 15px;">인터넷이 없는 곳에서도 작동하도록 AI 데이터를 기기에 다운로드합니다.</p>
+        
+        <button id="download-btn" onclick="startOfflineDownload()" style="background:#0056b3; color:white; border:none; padding:12px 24px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">
+            <i class="material-icons" style="vertical-align: middle; margin-right: 5px;">cloud_download</i>데이터 다운로드 시작
+        </button>
 
+        <div id="progress-container" style="display: none; margin-top: 15px;">
+            <div style="background: #e9ecef; border-radius: 10px; height: 10px; width: 100%; overflow: hidden;">
+                <div id="progress-bar" style="background: #28a745; width: 0%; height: 100%; transition: width 0.3s;"></div>
+            </div>
+            <div id="progress-text" style="margin-top: 8px; font-size: 14px; font-weight: bold; color: #28a745;">0%</div>
+        </div>
+    </div>
     <header>
         <button class="btn-back" id="btn-back" onclick="showDashboard()">
             <span class="material-icons" style="font-size: 18px;">arrow_back_ios_new</span> 뒤로
@@ -238,6 +252,39 @@
             console.log('❌ 서비스 워커 구동 실패:', error);
         });
     });}
+</script>
+<script>
+    // 서비스 워커 등록
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then(() => {
+            console.log("서비스 워커 등록 완료");
+        });
+
+        // 서비스 워커(sw.js)로부터 오는 메시지(%) 수신
+        navigator.serviceWorker.addEventListener('message', event => {
+            if (event.data.type === 'PROGRESS') {
+                document.getElementById('progress-bar').style.width = event.data.percent + '%';
+                document.getElementById('progress-text').innerText = event.data.percent + '% 다운로드 중...';
+            } else if (event.data.type === 'COMPLETE') {
+                document.getElementById('progress-text').innerText = '✅ 다운로드 완료! (오프라인 사용 가능)';
+                document.getElementById('download-btn').style.display = 'none'; // 버튼 숨기기
+            }
+        });
+    }
+
+    // 다운로드 버튼 클릭 시 실행
+    function startOfflineDownload() {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            document.getElementById('download-btn').disabled = true;
+            document.getElementById('download-btn').innerText = '준비 중...';
+            document.getElementById('progress-container').style.display = 'block';
+            
+            // sw.js 파일에 다운로드 시작하라고 신호 보내기
+            navigator.serviceWorker.controller.postMessage({ type: 'START_DOWNLOAD' });
+        } else {
+            alert("앱이 아직 완전히 로딩되지 않았습니다. 새로고침 후 다시 시도해주세요.");
+        }
+    }
 </script>
 </body>
 </html>

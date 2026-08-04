@@ -1,8 +1,6 @@
-// 캐시 이름 설정 (버전이 올라가면 이름을 바꿔주어 캐시를 갱신합니다)
-const CACHE_NAME = 'rewalk-app-cache-v8'; // 버전을 v8로 올려서 새로고침 유도
-const AI_CACHE_NAME = 'rewalk-ai-cache-v1';
+const CACHE_NAME = 'rewalk-app-cache-v9';
 
-// 1. 설치 시 캐싱할 기본 파일들
+// 1. 기본 UI 및 도구 파일들 (가벼운 파일)
 const urlsToCache = [
     './',
     './index.html',
@@ -12,11 +10,10 @@ const urlsToCache = [
     './posture_screen.html',
     './front_gait_screen.html',
     './side_gait_screen.html',   
-
     './js/posture_app.js', 
     './js/front_gait.js',
     './js/side_gait.js',
-
+    './js/rewalk_store.js',
     './css/analysis_tool.css',
     './css/foot_screen.css',
     './css/front_gait.css',
@@ -27,40 +24,31 @@ const urlsToCache = [
     './fonts/MaterialIcons-Regular.woff2'
 ];
 
-// 2. 반드시 로컬에서 가져와야 할 MediaPipe AI 파일들
+// 2. 무거운 MediaPipe AI 파일들 (진행률 표시의 핵심)
 const aiFiles = [
-    './js/rewalk_store.js',
+    './mediapipe/camera_utils.js',
+    './mediapipe/control_utils.js',
+    './mediapipe/drawing_utils.js',
     './mediapipe/pose.js',
     './mediapipe/pose_solution_packed_assets.data',
     './mediapipe/pose_solution_simd_wasm_bin.js',
     './mediapipe/pose_solution_simd_wasm_bin.wasm',
-    './mediapipe/pose_web.binarypb',
-    './mediapipe/camera_utils.js',
-    './mediapipe/control_utils.js',
-    './mediapipe/drawing_utils.js',
-// [설치 이벤트] 앱이 처음 실행될 때 파일들을 스마트폰에 다운로드(저장)합니다.
+    './mediapipe/pose_web.binarypb'
+];
+
+// 앱 최초 실행 시 기본 파일만 우선 설치
 self.addEventListener('install', event => {
-    event.waitUntil(
-        Promise.all([
-            // 🚨 수정됨: uiFiles 대신 선언된 변수명인 urlsToCache 사용
-            caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)),
-            caches.open(AI_CACHE_NAME).then(cache => cache.addAll(aiFiles))
-        ])
-    );
+    event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
     self.skipWaiting();
 });
 
-// 🌟 [새로 추가됨] 구버전 캐시 삭제 (용량 확보 및 최신 파일 강제 적용)
+// 구버전 캐시 삭제
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cache => {
-                    // 현재 활성화된 UI 캐시와 AI 캐시가 아닌 예전 캐시들은 모두 삭제
-                    if (cache !== CACHE_NAME && cache !== AI_CACHE_NAME) {
-                        console.log('구버전 캐시 삭제됨:', cache);
-                        return caches.delete(cache);
-                    }
+                    if (cache !== CACHE_NAME) return caches.delete(cache);
                 })
             );
         })
@@ -68,34 +56,54 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
-// [통신(Fetch) 이벤트] 교통경찰 역할: 요청의 종류에 따라 길을 안내합니다.
-self.addEventListener('fetch', event => {
-    const requestUrl = new URL(event.request.url);
+// 화면(HTML)에서 다운로드 시작 버튼을 눌렀을 때 실행되는 로직
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'START_DOWNLOAD') {
+        const clientId = event.source.id; // 요청한 브라우저 창의 ID
+        cacheFilesWithProgress(clientId);
+    }
+});
 
-    // 전략 A. MediaPipe 파일 요청 시 -> [오프라인 우선 (Cache First)]
-    if (requestUrl.pathname.includes('/mediapipe/')) {
-        event.respondWith(
-            caches.match(event.request).then(cachedResponse => {
-                // 캐시에 있으면 즉시 반환 (지연시간 0초), 없으면 인터넷에서 다운로드
-                return cachedResponse || fetch(event.request);
-            })
-        );
-        return; // MediaPipe 요청은 여기서 처리 종료
+// 파일을 한 개씩 받으면서 퍼센트(%)를 화면으로 쏴주는 함수
+async function cacheFilesWithProgress(clientId) {
+    const cache = await caches.open(CACHE_NAME);
+    const allFiles = [...urlsToCache, ...aiFiles];
+    let loadedCount = 0;
+    const totalFiles = allFiles.length;
+
+    for (const url of allFiles) {
+        try {
+            const response = await fetch(new Request(url, { cache: 'reload' }));
+            if (response.ok) {
+                await cache.put(url, response);
+                loadedCount++;
+                
+                // 화면으로 진행률 전송
+                const client = await clients.get(clientId);
+                if (client) {
+                    client.postMessage({
+                        type: 'PROGRESS',
+                        percent: Math.round((loadedCount / totalFiles) * 100)
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('다운로드 실패:', url);
+        }
     }
 
-    // 전략 B. 일반 앱 화면/데이터 요청 시 -> [온라인 우선 (Network First) + 오프라인 폴백]
+    // 100% 완료 메시지 전송
+    const client = await clients.get(clientId);
+    if (client) {
+        client.postMessage({ type: 'COMPLETE' });
+    }
+}
+
+// 오프라인 요청 처리 (기존과 동일)
+self.addEventListener('fetch', event => {
     event.respondWith(
-        fetch(event.request)
-        .then(networkResponse => {
-            // 온라인 통신이 원활하면 최신 데이터를 보여주고, 몰래 캐시도 업데이트
-            return caches.open(CACHE_NAME).then(cache => {
-                cache.put(event.request, networkResponse.clone());
-                return networkResponse;
-            });
-        })
-        .catch(() => {
-            // 통신이 끊겼을 때(오프라인) 에러를 띄우지 않고 기존 저장된 화면을 보여줌
-            return caches.match(event.request);
-        })
+        caches.match(event.request).then(response => {
+            return response || fetch(event.request);
+        }).catch(() => caches.match('./index.html'))
     );
 });
