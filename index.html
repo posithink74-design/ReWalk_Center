@@ -223,7 +223,6 @@
             </button>
         </div>
     </main>
-
     <script>
         // =========================================
         // 1. 회원 관리 로직 (생년월일 및 폰번호 통합)
@@ -405,7 +404,7 @@
         });
 
         // =========================================
-        // 3. 오프라인 다운로드 제어 시스템 (유지)
+        // 3. 오프라인 다운로드 제어 시스템 (NaN 오류 수정판)
         // =========================================
         document.addEventListener("DOMContentLoaded", function() {
             if (localStorage.getItem('rewalk_offline_ready') === 'true') {
@@ -423,13 +422,26 @@
 
             navigator.serviceWorker.addEventListener('message', event => {
                 if (event.data.type === 'PROGRESS') {
-                    document.getElementById('progress-bar').style.width = event.data.percent + '%';
-                    document.getElementById('progress-text').innerText = event.data.percent + '% 다운로드 중...';
+                    let percent = parseInt(event.data.percent);
+                    
+                    // 💡 서버에서 전체 용량을 안 줘서 NaN이 뜰 때의 방어 코드!
+                    if (isNaN(percent)) {
+                        document.getElementById('progress-bar').style.width = '100%';
+                        document.getElementById('progress-bar').style.backgroundColor = '#17a2b8'; // 대기/진행을 의미하는 파란색
+                        document.getElementById('progress-text').innerText = '⏳ AI 데이터를 안전하게 받아오는 중입니다... (1~2분 소요)';
+                    } else {
+                        document.getElementById('progress-bar').style.backgroundColor = '#28a745'; // 정상 초록색
+                        document.getElementById('progress-bar').style.width = percent + '%';
+                        document.getElementById('progress-text').innerText = percent + '% 다운로드 중...';
+                    }
                 } 
                 else if (event.data.type === 'COMPLETE') {
                     localStorage.setItem('rewalk_offline_ready', 'true');
                     const card = document.getElementById('download-card');
                     if (card) card.style.display = 'none';
+                    
+                    // 💡 다운로드가 백그라운드에서 끝났음을 확실하게 알려주는 팝업창!
+                    alert("🎉 오프라인 구동용 AI 데이터 다운로드가 완벽하게 끝났습니다!");
                 } 
             });
         }
@@ -451,5 +463,6 @@
             }
         };
     </script>
+    
 </body>
 </html>
