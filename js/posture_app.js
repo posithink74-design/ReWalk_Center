@@ -4,7 +4,6 @@
   var STORE_KEY = 'pa_sessions_master_v10';
   var VIEWS = { front: { name: '정면', eng: 'Anterior View' }, side: { name: '측면', eng: 'Lateral View' }, back: { name: '후면', eng: 'Posterior View' } };
   
-  // data.js 파일에서 전역으로 가져온 운동 데이터 할당
   var EXERCISE_DB = window.EXERCISE_DB || {};
 
   var st = {
@@ -26,7 +25,7 @@
   var G = function(id) { return document.getElementById(id); };
   var cv = G('pa-cv'), ctx = cv.getContext('2d'), imgEl = G('pa-img'), cvi = G('pa-cvi');
   var gridOn = true, gridN = 4, _showLabels = true;
-  var _showMoire = false; // 🚀 [추가] 무아레 기본 상태: 꺼짐 
+  var _showMoire = false; 
   var _pose = null;
 
   const userStr = localStorage.getItem('rewalk_current_user');
@@ -66,37 +65,36 @@
         st.slides[st.v].shapes = [];
         
         imgEl.src = st.slides[st.v].img; imgEl.style.display = 'block';
-        G('pa-ph').style.display = 'none'; G('pa-upbtn-txt').textContent = '사진 교체';
-        G('pa-rotbar').style.display = 'flex'; 
-        
-        st.rotDeg[st.v] = 0; applyRot();
-        imgEl.src = st.slides[st.v].img; imgEl.style.display = 'block';
-        G('pa-ph').style.display = 'none'; G('pa-upbtn-txt').textContent = '사진 교체';
-        G('pa-rotbar').style.display = 'flex';
+        if(G('pa-ph')) G('pa-ph').style.display = 'none'; 
+        if(G('pa-upbtn-txt')) G('pa-upbtn-txt').textContent = '사진 교체';
+        if(G('pa-rotbar')) G('pa-rotbar').style.display = 'flex'; 
         
         st.rotDeg[st.v] = 0; applyRot();
 
         var aBtn = G('pa-auto-btn');
-        aBtn.disabled = false; aBtn.innerHTML = '관절 자동 감지 (AI)'; aBtn.classList.remove('on');
-        G('pa-auto-st').textContent = '사진 각도를 맞춘 후 AI 버튼을 눌러주세요.';
+        if(aBtn) {
+            aBtn.disabled = false; aBtn.innerHTML = '관절 자동 감지 (AI)'; aBtn.classList.remove('on');
+        }
+        if(G('pa-auto-st')) G('pa-auto-st').textContent = '사진 각도를 맞춘 후 AI 버튼을 눌러주세요.';
         syncCv();
       };
       tmpImg.src = ev.target.result;
     };
     r.readAsDataURL(f); e.target.value = '';
   }
-  G('pa-file').addEventListener('change', handlePhoto);
-  G('pa-camfile').addEventListener('change', handlePhoto);
+  
+  if(G('pa-file')) G('pa-file').addEventListener('change', handlePhoto);
+  if(G('pa-camfile')) G('pa-camfile').addEventListener('change', handlePhoto);
 
   function applyRot(){
       var deg = st.rotDeg[st.v] || 0; cvi.style.transform = `rotate(${deg}deg)`;
-      G('pa-rotval').textContent = (deg>0?'+':'')+deg+'°'; G('pa-rot').value = deg;
+      if(G('pa-rotval')) G('pa-rotval').textContent = (deg>0?'+':'')+deg+'°'; 
+      if(G('pa-rot')) G('pa-rot').value = deg;
   }
-  G('pa-rot').addEventListener('input', function(){ st.rotDeg[st.v] = parseFloat(this.value); applyRot(); });
-  G('pa-rot-l').addEventListener('click', function(){ st.rotDeg[st.v] = Math.max(-15, (st.rotDeg[st.v]||0) - 0.5); applyRot(); });
-  G('pa-rot-r').addEventListener('click', function(){ st.rotDeg[st.v] = Math.min(15, (st.rotDeg[st.v]||0) + 0.5); applyRot(); });
+  if(G('pa-rot')) G('pa-rot').addEventListener('input', function(){ st.rotDeg[st.v] = parseFloat(this.value); applyRot(); });
+  if(G('pa-rot-l')) G('pa-rot-l').addEventListener('click', function(){ st.rotDeg[st.v] = Math.max(-15, (st.rotDeg[st.v]||0) - 0.5); applyRot(); });
+  if(G('pa-rot-r')) G('pa-rot-r').addEventListener('click', function(){ st.rotDeg[st.v] = Math.min(15, (st.rotDeg[st.v]||0) + 0.5); applyRot(); });
 
-// 🚀 [1] 빼꼼 손잡이(Drawer Handle) 터치 시 서랍 열기/닫기
   var drawerHandle = G('pa-drawer-handle');
   var drawerContainer = G('pa-overlay-drawer');
   var drawerIcon = G('pa-drawer-icon');
@@ -106,31 +104,21 @@
           e.stopPropagation();
           var isOpen = drawerContainer.classList.toggle('open');
           if (drawerIcon) {
-              // 열렸을 땐 오른쪽 화살표(>), 닫혔을 땐 왼쪽 화살표(<)
               drawerIcon.textContent = isOpen ? 'chevron_right' : 'chevron_left';
           }
       });
   }
 
-  // 🚀 [2] 통합 격자 순환 버튼 (격자 OFF -> 4×4 -> 6×6 -> 8×8 -> 12×12 -> 격자 OFF)
   var gridDensityBtn = G('pa-grid-density-btn');
   if (gridDensityBtn) {
       gridDensityBtn.addEventListener('click', function() {
           var txtEl = this.querySelector('.ot-txt');
           var iconEl = this.querySelector('.material-icons');
-
-          if (!gridOn) { 
-              gridOn = true; 
-              gridN = 4; 
-          } else if (gridN === 4) { 
-              gridN = 6; 
-          } else if (gridN === 6) { 
-              gridN = 8; 
-          } else if (gridN === 8) { 
-              gridN = 12; 
-          } else { 
-              gridOn = false; 
-          }
+          if (!gridOn) { gridOn = true; gridN = 4; } 
+          else if (gridN === 4) { gridN = 6; } 
+          else if (gridN === 6) { gridN = 8; } 
+          else if (gridN === 8) { gridN = 12; } 
+          else { gridOn = false; }
 
           if (gridOn) {
               this.classList.add('on');
@@ -145,14 +133,14 @@
       });
   }
 
-  // 🚀 [3] 측정값 라벨 표시/숨김 버튼
-  G('pa-lbl-btn').addEventListener('click', function(){
-      _showLabels = !_showLabels; 
-      this.classList.toggle('on', _showLabels);
-      drawLines();
-  });
+  if(G('pa-lbl-btn')) {
+      G('pa-lbl-btn').addEventListener('click', function(){
+          _showLabels = !_showLabels; 
+          this.classList.toggle('on', _showLabels);
+          drawLines();
+      });
+  }
 
-  // 🚀 [4] 3D 등고선(무아레) 토글 버튼
   var moireBtn = G('pa-moire-btn');
   if(moireBtn) {
       moireBtn.addEventListener('click', function(){
@@ -185,7 +173,6 @@
     return { x: cx * (cv.width / r.width), y: cy * (cv.height / r.height) };
   }
 
-  // 도형 이동 및 크기 조절 로직
   function _unifiedStart(e) {
       var p = _canvasXY(e);
       var normX = p.x / cv.width, normY = p.y / cv.height;
@@ -219,14 +206,8 @@
               var d1 = Math.hypot(normX - sh.x1, normY - sh.y1);
               var d2 = Math.hypot(normX - sh.x2, normY - sh.y2);
               
-              if (d1 < 0.05) {
-                  _dragIdx = 'shape_p1_' + i;
-                  e.preventDefault(); e.stopPropagation(); return;
-              }
-              if (d2 < 0.05) {
-                  _dragIdx = 'shape_p2_' + i;
-                  e.preventDefault(); e.stopPropagation(); return;
-              }
+              if (d1 < 0.05) { _dragIdx = 'shape_p1_' + i; e.preventDefault(); e.stopPropagation(); return; }
+              if (d2 < 0.05) { _dragIdx = 'shape_p2_' + i; e.preventDefault(); e.stopPropagation(); return; }
 
               var sx1 = Math.min(sh.x1, sh.x2), sx2 = Math.max(sh.x1, sh.x2);
               var sy1 = Math.min(sh.y1, sh.y2), sy2 = Math.max(sh.y1, sh.y2);
@@ -268,11 +249,9 @@
                   sh.y1 += dy; sh.y2 += dy;
                   window._dragLastPt = { x: normX, y: normY };
               } else if (action === 'p1') {
-                  sh.x1 = Math.max(0, Math.min(1, normX));
-                  sh.y1 = Math.max(0, Math.min(1, normY));
+                  sh.x1 = Math.max(0, Math.min(1, normX)); sh.y1 = Math.max(0, Math.min(1, normY));
               } else if (action === 'p2') {
-                  sh.x2 = Math.max(0, Math.min(1, normX));
-                  sh.y2 = Math.max(0, Math.min(1, normY));
+                  sh.x2 = Math.max(0, Math.min(1, normX)); sh.y2 = Math.max(0, Math.min(1, normY));
               }
           } else {
               st.slides[st.v].landmarks[_dragIdx].x = Math.max(0, Math.min(1, (p.x - imM.ox) / imM.rw));
@@ -340,8 +319,8 @@
       b.classList.add('on');
     });
   });
-  G('pa-undo').addEventListener('click', function() { var a=_shapesArr(); if(a.length) a.pop(); drawLines(); });
-  G('pa-clear').addEventListener('click', function() { st.slides[st.v].shapes = []; drawLines(); });
+  if(G('pa-undo')) G('pa-undo').addEventListener('click', function() { var a=_shapesArr(); if(a.length) a.pop(); drawLines(); });
+  if(G('pa-clear')) G('pa-clear').addEventListener('click', function() { st.slides[st.v].shapes = []; drawLines(); });
 
   function initChecklistUI(){
     var toggle = G('pa-chk-toggle'), body = G('pa-chk-body'), arrow = G('pa-chk-arrow');
@@ -367,7 +346,7 @@
 
   function switchView(v) {
     try {
-        if(st.slides[st.v]) st.slides[st.v].notes = G('pa-notes').value || '';
+        if(st.slides[st.v]) st.slides[st.v].notes = G('pa-notes') ? G('pa-notes').value : '';
         st.v = v;
         document.querySelectorAll('.pa-vtab').forEach(b => b.classList.toggle('on', b.dataset.v === v));
         
@@ -377,24 +356,17 @@
         
         if (sl.img) {
           imgEl.src = sl.img; imgEl.style.display = 'block'; if(G('pa-ph')) G('pa-ph').style.display = 'none';
-         
           if(G('pa-upbtn-txt')) G('pa-upbtn-txt').textContent = '사진 교체';
           if(G('pa-rotbar')) G('pa-rotbar').style.display = 'flex'; 
-          if(G('pa-grid-bar')) G('pa-grid-bar').style.display = 'flex'; 
-          if(G('pa-linetb')) G('pa-linetb').style.display = 'flex';
           if(G('pa-auto-btn')) G('pa-auto-btn').disabled = false; applyRot();
           if(sl.landmarks) { if(G('pa-auto-btn')){G('pa-auto-btn').classList.add('on'); G('pa-auto-btn').innerHTML = 'AI 감지 완료';} }
           else { if(G('pa-auto-btn')){G('pa-auto-btn').classList.remove('on'); G('pa-auto-btn').innerHTML = '관절 자동 감지 (AI)';} }
         } else {
-          // 🚀 [추가할 코드 2] 빈 탭으로 왔을 때는 기본 3:4 비율 상자로 초기화
           var cvbox = document.querySelector('.pa-cvbox');
           if (cvbox) cvbox.style.paddingTop = 'calc(100% * 4/3)'; 
-
           imgEl.style.display = 'none'; if(G('pa-ph')) G('pa-ph').style.display = 'flex';
           if(G('pa-upbtn-txt')) G('pa-upbtn-txt').textContent = '기기에서 선택';
           if(G('pa-rotbar')) G('pa-rotbar').style.display = 'none'; 
-          if(G('pa-grid-bar')) G('pa-grid-bar').style.display = 'none'; 
-          if(G('pa-linetb')) G('pa-linetb').style.display = 'none';
           if(G('pa-auto-btn')) G('pa-auto-btn').disabled = true; 
           if(G('pa-auto-st')) G('pa-auto-st').textContent='사진을 올려주세요.';
         }
@@ -410,72 +382,74 @@
       });
   }
 
-  G('pa-auto-btn').addEventListener('click', async function() {
-    if(!st.slides[st.v].img) return;
-    var btn = this, stEl = G('pa-auto-st');
-    btn.disabled = true; btn.innerHTML = '<span class="pa-spin"></span> AI 로딩 중...';
-    
-    let finalImage = imgEl;
-    if (Math.abs(st.rotDeg[st.v]) > 0.01) {
-        stEl.textContent = "회전값을 적용하여 이미지를 보정 중입니다...";
-        const iw = imgEl.naturalWidth, ih = imgEl.naturalHeight;
-        const rad = st.rotDeg[st.v] * Math.PI / 180;
-        const cos = Math.abs(Math.cos(rad)), sin = Math.abs(Math.sin(rad));
-        const nw = Math.round(iw * cos + ih * sin), nh = Math.round(iw * sin + ih * cos);
-        const rc = document.createElement('canvas'); rc.width = nw; rc.height = nh;
-        const rctx = rc.getContext('2d');
-        rctx.fillStyle = '#fff'; rctx.fillRect(0, 0, nw, nh);
-        rctx.translate(nw / 2, nh / 2); rctx.rotate(rad); rctx.drawImage(imgEl, -iw / 2, -ih / 2);
-        const rotatedUrl = rc.toDataURL('image/jpeg', 0.8);
-        finalImage = new Image(); finalImage.src = rotatedUrl;
-        await new Promise(r => finalImage.onload = r);
-        imgEl.src = rotatedUrl; st.slides[st.v].img = rotatedUrl;
-        st.rotDeg[st.v] = 0; applyRot(); 
-    }
+  if(G('pa-auto-btn')) {
+    G('pa-auto-btn').addEventListener('click', async function() {
+      if(!st.slides[st.v].img) return;
+      var btn = this, stEl = G('pa-auto-st');
+      btn.disabled = true; btn.innerHTML = '<span class="pa-spin"></span> AI 로딩 중...';
+      
+      let finalImage = imgEl;
+      if (Math.abs(st.rotDeg[st.v]) > 0.01) {
+          stEl.textContent = "회전값을 적용하여 이미지를 보정 중입니다...";
+          const iw = imgEl.naturalWidth, ih = imgEl.naturalHeight;
+          const rad = st.rotDeg[st.v] * Math.PI / 180;
+          const cos = Math.abs(Math.cos(rad)), sin = Math.abs(Math.sin(rad));
+          const nw = Math.round(iw * cos + ih * sin), nh = Math.round(iw * sin + ih * cos);
+          const rc = document.createElement('canvas'); rc.width = nw; rc.height = nh;
+          const rctx = rc.getContext('2d');
+          rctx.fillStyle = '#fff'; rctx.fillRect(0, 0, nw, nh);
+          rctx.translate(nw / 2, nh / 2); rctx.rotate(rad); rctx.drawImage(imgEl, -iw / 2, -ih / 2);
+          const rotatedUrl = rc.toDataURL('image/jpeg', 0.8);
+          finalImage = new Image(); finalImage.src = rotatedUrl;
+          await new Promise(r => finalImage.onload = r);
+          imgEl.src = rotatedUrl; st.slides[st.v].img = rotatedUrl;
+          st.rotDeg[st.v] = 0; applyRot(); 
+      }
 
-    const CDN_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/';
-    const LOCAL_BASE = './mediapipe/';
+      const CDN_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1675469404/';
+      const LOCAL_BASE = './mediapipe/';
 
-    async function executeAI() {
-        if (!_pose) {
-            if (window.__aiMode === 'local') {
-                try {
-                    let p1 = window.Pose ? Promise.resolve() : loadScript(LOCAL_BASE + 'pose.js');
-                    await p1;
-                    _pose = new window.Pose({locateFile: (file) => `${LOCAL_BASE}${file}`});
-                } catch (e) {
-                    window.__aiMode = 'cdn';
-                }
-            }
-            if (window.__aiMode === 'cdn') {
-                stEl.textContent = '온라인 모드로 AI를 다운로드 중입니다...';
-                if (!window.Pose) {
-                    try { await loadScript(CDN_BASE + 'pose.js'); } 
-                    catch(e) { throw new Error("인터넷 연결 오류입니다."); }
-                }
-                _pose = new window.Pose({locateFile: (file) => `${CDN_BASE}${file}`});
-            }
-            
-            _pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, enableSegmentation: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
-            _pose.onResults(onPoseResults);
-        }
-        
-        stEl.textContent = 'AI가 뼈대를 추출하고 있습니다...';
-        try {
-            const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("TIMEOUT")), 8000));
-            await Promise.race([_pose.send({image: finalImage}), timeout]);
-        } catch (e) {
-            if (e.message === "TIMEOUT" && window.__aiMode === 'local') {
-                window.__aiMode = 'cdn'; _pose = null; await executeAI();
-            } else {
-                let errMsg = e.message === "TIMEOUT" ? "로딩 지연 (인터넷을 확인하세요)" : e.message;
-                stEl.innerHTML = `<span style="color:#C0392B;">❌ 오류: ${errMsg}</span>`;
-                btn.innerHTML = '관절 자동 감지 (AI)'; btn.disabled = false;
-            }
-        }
-    }
-    await executeAI();
-  });
+      async function executeAI() {
+          if (!_pose) {
+              if (window.__aiMode === 'local') {
+                  try {
+                      let p1 = window.Pose ? Promise.resolve() : loadScript(LOCAL_BASE + 'pose.js');
+                      await p1;
+                      _pose = new window.Pose({locateFile: (file) => `${LOCAL_BASE}${file}`});
+                  } catch (e) {
+                      window.__aiMode = 'cdn';
+                  }
+              }
+              if (window.__aiMode === 'cdn') {
+                  stEl.textContent = '온라인 모드로 AI를 다운로드 중입니다...';
+                  if (!window.Pose) {
+                      try { await loadScript(CDN_BASE + 'pose.js'); } 
+                      catch(e) { throw new Error("인터넷 연결 오류입니다."); }
+                  }
+                  _pose = new window.Pose({locateFile: (file) => `${CDN_BASE}${file}`});
+              }
+              
+              _pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, enableSegmentation: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+              _pose.onResults(onPoseResults);
+          }
+          
+          stEl.textContent = 'AI가 뼈대를 추출하고 있습니다...';
+          try {
+              const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("TIMEOUT")), 8000));
+              await Promise.race([_pose.send({image: finalImage}), timeout]);
+          } catch (e) {
+              if (e.message === "TIMEOUT" && window.__aiMode === 'local') {
+                  window.__aiMode = 'cdn'; _pose = null; await executeAI();
+              } else {
+                  let errMsg = e.message === "TIMEOUT" ? "로딩 지연 (인터넷을 확인하세요)" : e.message;
+                  stEl.innerHTML = `<span style="color:#C0392B;">❌ 오류: ${errMsg}</span>`;
+                  btn.innerHTML = '관절 자동 감지 (AI)'; btn.disabled = false;
+              }
+          }
+      }
+      await executeAI();
+    });
+  }
 
   function onPoseResults(results) {
     var btn = G('pa-auto-btn'), stEl = G('pa-auto-st');
@@ -509,7 +483,6 @@
     }
     
     var imM = getImgMetrics();
-    // 🚀 [수정] 스위치가 ON일 때만 무아레(3D 등고선) 레이어를 그림
     if (_showMoire) {
         drawStaticVirtualMoire(ctx, lm, { x: imM.ox, y: imM.oy, width: imM.rw, height: imM.rh });
     }
@@ -696,7 +669,7 @@
       ctx.beginPath(); ctx.moveTo(plumbX_canvas-5,22); ctx.lineTo(plumbX_canvas-2,19); ctx.moveTo(plumbX_canvas-5,22); ctx.lineTo(plumbX_canvas-2,25); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(plumbX_canvas+5,22); ctx.lineTo(plumbX_canvas+2,19); ctx.moveTo(plumbX_canvas+5,22); ctx.lineTo(plumbX_canvas+2,25); ctx.stroke();
       ctx.fillStyle='rgba(217,132,42,0.95)'; ctx.font='700 10px sans-serif'; ctx.textAlign='left';
-      ctx.fillText('중심선', plumbX_canvas + 16, 25);
+      ctx.fillText('중심선', plumbLineX + 16, 25);
       ctx.restore();
 
       if (head && ls.v>0.3 && rs.v>0.3) {
@@ -886,72 +859,76 @@
     c.restore();
   }
 
-  G('pa-save').addEventListener('click', function() {
-      st.slides[st.v].notes = G('pa-notes').value;
-      var lm = st.slides[st.v].landmarks;
-      if(!lm && !st.slides[st.v].img) { alert("사진을 업로드 해주세요."); return; }
-      
-      var sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-      
-      var chk = {}, anyChk = false;
-      document.querySelectorAll('#pa-root .pa-chk-sel').forEach(function(sel){
-        var key = sel.getAttribute('data-chk'), val = sel.value;
-        if (val && val !== 'none') { chk[key] = val; anyChk = true; }
+  if(G('pa-save')) {
+      G('pa-save').addEventListener('click', function() {
+        st.slides[st.v].notes = G('pa-notes').value;
+        var lm = st.slides[st.v].landmarks;
+        if(!lm && !st.slides[st.v].img) { alert("사진을 업로드 해주세요."); return; }
+        
+        var sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+        
+        var chk = {}, anyChk = false;
+        document.querySelectorAll('#pa-root .pa-chk-sel').forEach(function(sel){
+          var key = sel.getAttribute('data-chk'), val = sel.value;
+          if (val && val !== 'none') { chk[key] = val; anyChk = true; }
+        });
+
+        var c = document.createElement('canvas'); c.width = cv.width; c.height = cv.height; var cctx = c.getContext('2d');
+        cctx.fillStyle = '#D8E0EA';
+        cctx.fillRect(0,0, c.width, c.height);
+        
+        if(st.slides[st.v].img && imgEl.naturalWidth) { 
+            var imM = getImgMetrics();
+            cctx.drawImage(imgEl, imM.ox, imM.oy, imM.rw, imM.rh); 
+        }
+        cctx.drawImage(cv, 0,0);
+        
+        var todayStr = new Date().toLocaleDateString('ko-KR');
+
+        if (sessions.length > 0) {
+            var lastSession = sessions[sessions.length - 1];
+            if (lastSession.date !== todayStr) { lastSession.isCompleted = true; }
+        }
+        
+        var currentSession;
+        if (sessions.length === 0 || sessions[sessions.length-1].isCompleted) {
+            currentSession = { id: Date.now(), label: (sessions.length + 1) + '회차', date: todayStr, views: {}, checklist: {}, isCompleted: false };
+        } else { currentSession = sessions[sessions.length-1]; }
+        
+        currentSession.views[st.v] = { imgData: c.toDataURL('image/jpeg', 0.8), metrics: JSON.parse(JSON.stringify(st.metrics)), notes: st.slides[st.v].notes };
+        if(anyChk) currentSession.checklist = chk;
+
+        if(!sessions.find(x => x.id === currentSession.id)) { sessions.push(currentSession); } 
+        else { sessions[sessions.findIndex(x => x.id === currentSession.id)] = currentSession; }
+
+        localStorage.setItem(STORE_KEY, JSON.stringify(sessions));
+        alert(`[${currentSession.label}] ${VIEWS[st.v].name} 데이터가 성공적으로 저장되었습니다.`);
+        renderHistory(); initCmpSelects();
       });
+  }
 
-      var c = document.createElement('canvas'); c.width = cv.width; c.height = cv.height; var cctx = c.getContext('2d');
-      cctx.fillStyle = '#D8E0EA';
-      cctx.fillRect(0,0, c.width, c.height);
-      
-      if(st.slides[st.v].img && imgEl.naturalWidth) { 
-          var imM = getImgMetrics();
-          cctx.drawImage(imgEl, imM.ox, imM.oy, imM.rw, imM.rh); 
-      }
-      cctx.drawImage(cv, 0,0);
-      
-      var todayStr = new Date().toLocaleDateString('ko-KR');
-
-      if (sessions.length > 0) {
-          var lastSession = sessions[sessions.length - 1];
-          if (lastSession.date !== todayStr) { lastSession.isCompleted = true; }
-      }
-      
-      var currentSession;
-      if (sessions.length === 0 || sessions[sessions.length-1].isCompleted) {
-          currentSession = { id: Date.now(), label: (sessions.length + 1) + '회차', date: todayStr, views: {}, checklist: {}, isCompleted: false };
-      } else { currentSession = sessions[sessions.length-1]; }
-      
-      currentSession.views[st.v] = { imgData: c.toDataURL('image/jpeg', 0.8), metrics: JSON.parse(JSON.stringify(st.metrics)), notes: st.slides[st.v].notes };
-      if(anyChk) currentSession.checklist = chk;
-
-      if(!sessions.find(x => x.id === currentSession.id)) { sessions.push(currentSession); } 
-      else { sessions[sessions.findIndex(x => x.id === currentSession.id)] = currentSession; }
-
-      localStorage.setItem(STORE_KEY, JSON.stringify(sessions));
-      alert(`[${currentSession.label}] ${VIEWS[st.v].name} 데이터가 성공적으로 저장되었습니다.`);
-      renderHistory(); initCmpSelects();
-  });
-
-  G('pa-new-session-btn').addEventListener('click', function(){
-      var sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-      if (sessions.length > 0) {
-          if (sessions[sessions.length - 1].isCompleted) {
-              alert("이미 마감된 상태입니다. [분석] 탭에서 새 사진을 분석하고 저장하면 자동으로 다음 회차가 생성됩니다."); return;
-          }
-          if(!confirm("현재 측정 중인 회차를 마감하고, 새로운 측정을 시작하시겠습니까?")) return;
-          
-          sessions[sessions.length - 1].isCompleted = true;
-          localStorage.setItem(STORE_KEY, JSON.stringify(sessions));
-          alert("새로운 회차 측정 준비가 완료되었습니다.");
-          
-          st.slides = { front: { img: null, notes: '', landmarks: null, shapes: [] }, side: { img: null, notes: '', landmarks: null, shapes: [] }, back: { img: null, notes: '', landmarks: null, shapes: [] } };
-          imgEl.style.display = 'none'; G('pa-ph').style.display = 'flex';
-          ctx.clearRect(0,0,cv.width,cv.height);
-          
-          renderHistory(); initCmpSelects();
-          document.querySelectorAll('#pa-root .pa-nav-btn')[0].click();
-      } else { alert("저장된 기록이 없습니다. [분석] 탭에서 첫 측정을 먼저 진행해주세요."); }
-  });
+  if(G('pa-new-session-btn')) {
+      G('pa-new-session-btn').addEventListener('click', function(){
+        var sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+        if (sessions.length > 0) {
+            if (sessions[sessions.length - 1].isCompleted) {
+                alert("이미 마감된 상태입니다. [분석] 탭에서 새 사진을 분석하고 저장하면 자동으로 다음 회차가 생성됩니다."); return;
+            }
+            if(!confirm("현재 측정 중인 회차를 마감하고, 새로운 측정을 시작하시겠습니까?")) return;
+            
+            sessions[sessions.length - 1].isCompleted = true;
+            localStorage.setItem(STORE_KEY, JSON.stringify(sessions));
+            alert("새로운 회차 측정 준비가 완료되었습니다.");
+            
+            st.slides = { front: { img: null, notes: '', landmarks: null, shapes: [] }, side: { img: null, notes: '', landmarks: null, shapes: [] }, back: { img: null, notes: '', landmarks: null, shapes: [] } };
+            imgEl.style.display = 'none'; G('pa-ph').style.display = 'flex';
+            ctx.clearRect(0,0,cv.width,cv.height);
+            
+            renderHistory(); initCmpSelects();
+            document.querySelectorAll('#pa-root .pa-nav-btn')[0].click();
+        } else { alert("저장된 기록이 없습니다. [분석] 탭에서 첫 측정을 먼저 진행해주세요."); }
+      });
+  }
 
   function renderHistory() {
       var sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); var el = G('pa-slist');
@@ -1068,24 +1045,35 @@
       var sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
       var opts = '<option value="">선택 안함</option>';
       sessions.forEach(function(s){ opts += `<option value="${s.id}">${s.label}</option>`; });
-      G('pa-ca').innerHTML = opts; G('pa-cb').innerHTML = opts;
-      if(sessions.length >= 2) { G('pa-ca').value = sessions[0].id; G('pa-cb').value = sessions[sessions.length-1].id; }
-      else if(sessions.length === 1) { G('pa-ca').value = sessions[0].id; }
-      G('pa-ca').addEventListener('change', renderCmp); G('pa-cb').addEventListener('change', renderCmp);
+      if(G('pa-ca')) G('pa-ca').innerHTML = opts; 
+      if(G('pa-cb')) G('pa-cb').innerHTML = opts;
+      if(sessions.length >= 2) { 
+          if(G('pa-ca')) G('pa-ca').value = sessions[0].id; 
+          if(G('pa-cb')) G('pa-cb').value = sessions[sessions.length-1].id; 
+      }
+      else if(sessions.length === 1) { 
+          if(G('pa-ca')) G('pa-ca').value = sessions[0].id; 
+      }
+      if(G('pa-ca')) G('pa-ca').addEventListener('change', renderCmp); 
+      if(G('pa-cb')) G('pa-cb').addEventListener('change', renderCmp);
       renderCmp();
   }
   
   function renderCmp() {
       var sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
       function fill(side, val) {
-          var s = sessions.find(x => String(x.id) === val); var box = G('pa-ci'+side);
+          var box = G('pa-ci'+side);
+          if(!box) return;
+          var s = sessions.find(x => String(x.id) === val); 
           if(!s || !s.views[cmpView]) { 
               box.innerHTML = '<div class="pa-cinner" style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#8595AD; font-size:12px; font-weight:600;"><span class="material-icons" style="font-size:32px; margin-bottom:4px; opacity:0.4;">photo_size_select_actual</span>선택 대기중</div>'; 
               return; 
           }
           box.innerHTML = `<div class="pa-cinner" style="position:absolute; top:0; left:0; width:100%; height:100%;"><img src="${s.views[cmpView].imgData}" style="width:100%; height:100%; object-fit:contain; display:block;"></div>`;
       }
-      fill('a', G('pa-ca').value); fill('b', G('pa-cb').value);
+      if(G('pa-ca') && G('pa-cb')) {
+          fill('a', G('pa-ca').value); fill('b', G('pa-cb').value);
+      }
   }
   
   document.querySelectorAll('#pa-compare .pa-cvt').forEach(function(btn) {
@@ -1096,91 +1084,93 @@
     });
   });
 
-  G('pa-cpdf').addEventListener('click', function(){
-      var sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-      var sA = sessions.find(x => String(x.id) === G('pa-ca').value);
-      var sB = sessions.find(x => String(x.id) === G('pa-cb').value);
-      if(!sA || !sB || !sA.views[cmpView] || !sB.views[cmpView]) { alert(`비교할 두 회차의 ${VIEWS[cmpView].name} 분석 데이터가 모두 필요합니다.`); return; }
+  if(G('pa-cpdf')) {
+      G('pa-cpdf').addEventListener('click', function(){
+          var sessions = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+          var sA = sessions.find(x => String(x.id) === G('pa-ca').value);
+          var sB = sessions.find(x => String(x.id) === G('pa-cb').value);
+          if(!sA || !sB || !sA.views[cmpView] || !sB.views[cmpView]) { alert(`비교할 두 회차의 ${VIEWS[cmpView].name} 분석 데이터가 모두 필요합니다.`); return; }
 
-      var vA = sA.views[cmpView]; var vB = sB.views[cmpView];
-      
-      function getComparisonRoutineHtml(vB) {
-          var mSide = vB.metrics && vB.metrics.side ? vB.metrics.side : {};
-          var mFront = vB.metrics && vB.metrics.front ? vB.metrics.front : {};
-          var mBack = vB.metrics && vB.metrics.back ? vB.metrics.back : {};
-          var chk = vB.checklist || {};
+          var vA = sA.views[cmpView]; var vB = sB.views[cmpView];
           
-          var selectedRoutines = [];
-          
-          if (mSide.cva > 3) selectedRoutines.push(EXERCISE_DB.cva);
-          if (mSide.roundedShoulder > 3 || chk.roundedShoulder === 'moderate' || chk.roundedShoulder === 'severe') {
-              if(!selectedRoutines.includes(EXERCISE_DB.roundedShoulder)) selectedRoutines.push(EXERCISE_DB.roundedShoulder);
-          }
-          if (chk.thoracicKyphosis === 'moderate' || chk.thoracicKyphosis === 'severe') selectedRoutines.push(EXERCISE_DB.thoracicKyphosis);
-          if (chk.anteriorPelvicTilt === 'moderate' || chk.anteriorPelvicTilt === 'severe' || chk.lumbarLordosis === 'moderate' || chk.lumbarLordosis === 'severe') {
-              selectedRoutines.push(EXERCISE_DB.anteriorPelvicTilt);
-          }
-          if (mSide.pelvisPos && mSide.pelvisPos.includes('스웨이백') || chk.swayBack === 'present') {
-              if(!selectedRoutines.includes(EXERCISE_DB.swayBack)) selectedRoutines.push(EXERCISE_DB.swayBack);
-          } else if (mSide.pelvisPos && mSide.pelvisPos !== '골반 중립' && !selectedRoutines.includes(EXERCISE_DB.anteriorPelvicTilt)) {
-              selectedRoutines.push(EXERCISE_DB.pelvis);
+          function getComparisonRoutineHtml(vB) {
+              var mSide = vB.metrics && vB.metrics.side ? vB.metrics.side : {};
+              var mFront = vB.metrics && vB.metrics.front ? vB.metrics.front : {};
+              var mBack = vB.metrics && vB.metrics.back ? vB.metrics.back : {};
+              var chk = vB.checklist || {};
+              
+              var selectedRoutines = [];
+              
+              if (mSide.cva > 3) selectedRoutines.push(EXERCISE_DB.cva);
+              if (mSide.roundedShoulder > 3 || chk.roundedShoulder === 'moderate' || chk.roundedShoulder === 'severe') {
+                  if(!selectedRoutines.includes(EXERCISE_DB.roundedShoulder)) selectedRoutines.push(EXERCISE_DB.roundedShoulder);
+              }
+              if (chk.thoracicKyphosis === 'moderate' || chk.thoracicKyphosis === 'severe') selectedRoutines.push(EXERCISE_DB.thoracicKyphosis);
+              if (chk.anteriorPelvicTilt === 'moderate' || chk.anteriorPelvicTilt === 'severe' || chk.lumbarLordosis === 'moderate' || chk.lumbarLordosis === 'severe') {
+                  selectedRoutines.push(EXERCISE_DB.anteriorPelvicTilt);
+              }
+              if (mSide.pelvisPos && mSide.pelvisPos.includes('스웨이백') || chk.swayBack === 'present') {
+                  if(!selectedRoutines.includes(EXERCISE_DB.swayBack)) selectedRoutines.push(EXERCISE_DB.swayBack);
+              } else if (mSide.pelvisPos && mSide.pelvisPos !== '골반 중립' && !selectedRoutines.includes(EXERCISE_DB.anteriorPelvicTilt)) {
+                  selectedRoutines.push(EXERCISE_DB.pelvis);
+              }
+
+              if (mFront.headTilt && Math.abs(mFront.headTilt) > 3) selectedRoutines.push(EXERCISE_DB.neckFlexion);
+              if ((mFront.shoulder && Math.abs(mFront.shoulder) >= 2.0) || (mBack.shoulder && Math.abs(mBack.shoulder) >= 2.0)) {
+                  selectedRoutines.push(EXERCISE_DB.shoulderAsymmetry);
+              }
+              if ((mFront.pelvis && Math.abs(mFront.pelvis) >= 2.0) || (mBack.pelvis && Math.abs(mBack.pelvis) >= 2.0)) {
+                  selectedRoutines.push(EXERCISE_DB.pelvicElevation);
+              }
+              
+              if ((mBack.upperShift && Math.abs(mBack.upperShift) > 5) || (mBack.lowerShift && Math.abs(mBack.lowerShift) > 5)) {
+                  selectedRoutines.push(EXERCISE_DB.lateralShift);
+              }
+
+              if (mFront.legAlign !== undefined && mFront.legAlign !== null) {
+                  if (mFront.legAlign >= 4) selectedRoutines.push(EXERCISE_DB.genuValgum);
+                  else if (mFront.legAlign <= -4) selectedRoutines.push(EXERCISE_DB.genuVarum);
+              }
+              
+              if (selectedRoutines.length === 0) selectedRoutines.push(EXERCISE_DB.general);
+
+              return selectedRoutines.map((ex, idx) => `
+                  <div style="margin-bottom: 10px; margin-left: 15px;">
+                      <div style="font-weight:700; font-size:14.5px; color:#1E293B; margin-bottom:4px;"><span>[${idx+1}] ${ex.title}</span></div>
+                      <div style="font-size:13.5px; color:#475569; line-height:1.4;">${ex.routines.map(r => `• ${r}`).join('<br>')}</div>
+                  </div>`).join('');
           }
 
-          if (mFront.headTilt && Math.abs(mFront.headTilt) > 3) selectedRoutines.push(EXERCISE_DB.neckFlexion);
-          if ((mFront.shoulder && Math.abs(mFront.shoulder) >= 2.0) || (mBack.shoulder && Math.abs(mBack.shoulder) >= 2.0)) {
-              selectedRoutines.push(EXERCISE_DB.shoulderAsymmetry);
-          }
-          if ((mFront.pelvis && Math.abs(mFront.pelvis) >= 2.0) || (mBack.pelvis && Math.abs(mBack.pelvis) >= 2.0)) {
-              selectedRoutines.push(EXERCISE_DB.pelvicElevation);
-          }
-          
-          if ((mBack.upperShift && Math.abs(mBack.upperShift) > 5) || (mBack.lowerShift && Math.abs(mBack.lowerShift) > 5)) {
-              selectedRoutines.push(EXERCISE_DB.lateralShift);
-          }
-
-          if (mFront.legAlign !== undefined && mFront.legAlign !== null) {
-              if (mFront.legAlign >= 4) selectedRoutines.push(EXERCISE_DB.genuValgum);
-              else if (mFront.legAlign <= -4) selectedRoutines.push(EXERCISE_DB.genuVarum);
-          }
-          
-          if (selectedRoutines.length === 0) selectedRoutines.push(EXERCISE_DB.general);
-
-          return selectedRoutines.map((ex, idx) => `
-              <div style="margin-bottom: 10px; margin-left: 15px;">
-                  <div style="font-weight:700; font-size:14.5px; color:#1E293B; margin-bottom:4px;"><span>[${idx+1}] ${ex.title}</span></div>
-                  <div style="font-size:13.5px; color:#475569; line-height:1.4;">${ex.routines.map(r => `• ${r}`).join('<br>')}</div>
-              </div>`).join('');
-      }
-
-      var printHtml = `
-          <div style="border: 1px solid #E5E7EB; border-radius: 12px; padding: 25px; background: white; height:260mm; box-sizing:border-box; display:flex; flex-direction:column;">
-              <div style="border-bottom: 2px solid #1F3864; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; flex-shrink:0;">
-                  <div><h1 style="font-size: 24px; font-weight: 800; color: #1F3864; margin: 0 0 6px 0;">자세 정밀 분석 리포트 (${VIEWS[cmpView].name})</h1><div style="font-size: 14px; color: #6B7787;">측정 대상: ${userName}</div></div>
-                  <div style="font-size: 12px; font-weight: bold; color: #1F3864;">RE:WALK CENTER</div>
-              </div>
-              <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-shrink:0;">
-                  <div style="flex:1; background:#F8FAFC; border-radius:12px; border:1px solid #E2E8F0; padding:15px; text-align:center;">
-                      <div style="font-size:16px; font-weight:800; color:#1F3864; margin-bottom:10px;">🔵 이전 (${sA.label})</div>
-                      <div style="height:360px; display:flex; align-items:center; justify-content:center; background:#E5E7EB; border-radius:8px; overflow:hidden;"><img src="${vA.imgData}" style="max-width:100%; max-height:100%; object-fit:contain;"></div>
-                      <div style="margin-top:10px; font-size:13px; color:#5A6B82; text-align:left;"><b>소견:</b> ${vA.notes||'-'}</div>
+          var printHtml = `
+              <div style="border: 1px solid #E5E7EB; border-radius: 12px; padding: 25px; background: white; height:260mm; box-sizing:border-box; display:flex; flex-direction:column;">
+                  <div style="border-bottom: 2px solid #1F3864; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end; flex-shrink:0;">
+                      <div><h1 style="font-size: 24px; font-weight: 800; color: #1F3864; margin: 0 0 6px 0;">자세 정밀 분석 리포트 (${VIEWS[cmpView].name})</h1><div style="font-size: 14px; color: #6B7787;">측정 대상: ${userName}</div></div>
+                      <div style="font-size: 12px; font-weight: bold; color: #1F3864;">RE:WALK CENTER</div>
                   </div>
-                  <div style="flex:1; background:#F8FAFC; border-radius:12px; border:1px solid #E2E8F0; padding:15px; text-align:center;">
-                      <div style="font-size:16px; font-weight:800; color:#D9842A; margin-bottom:10px;">🔴 최근 (${sB.label})</div>
-                      <div style="height:360px; display:flex; align-items:center; justify-content:center; background:#E5E7EB; border-radius:8px; overflow:hidden;"><img src="${vB.imgData}" style="max-width:100%; max-height:100%; object-fit:contain;"></div>
-                      <div style="margin-top:10px; font-size:13px; color:#5A6B82; text-align:left;"><b>소견:</b> ${vB.notes||'-'}</div>
+                  <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-shrink:0;">
+                      <div style="flex:1; background:#F8FAFC; border-radius:12px; border:1px solid #E2E8F0; padding:15px; text-align:center;">
+                          <div style="font-size:16px; font-weight:800; color:#1F3864; margin-bottom:10px;">🔵 이전 (${sA.label})</div>
+                          <div style="height:360px; display:flex; align-items:center; justify-content:center; background:#E5E7EB; border-radius:8px; overflow:hidden;"><img src="${vA.imgData}" style="max-width:100%; max-height:100%; object-fit:contain;"></div>
+                          <div style="margin-top:10px; font-size:13px; color:#5A6B82; text-align:left;"><b>소견:</b> ${vA.notes||'-'}</div>
+                      </div>
+                      <div style="flex:1; background:#F8FAFC; border-radius:12px; border:1px solid #E2E8F0; padding:15px; text-align:center;">
+                          <div style="font-size:16px; font-weight:800; color:#D9842A; margin-bottom:10px;">🔴 최근 (${sB.label})</div>
+                          <div style="height:360px; display:flex; align-items:center; justify-content:center; background:#E5E7EB; border-radius:8px; overflow:hidden;"><img src="${vB.imgData}" style="max-width:100%; max-height:100%; object-fit:contain;"></div>
+                          <div style="margin-top:10px; font-size:13px; color:#5A6B82; text-align:left;"><b>소견:</b> ${vB.notes||'-'}</div>
+                      </div>
                   </div>
+                  <div style="background: #EEF3FA; border-radius: 12px; padding: 20px; flex:1; overflow:hidden;">
+                      <div style="font-size: 18px; font-weight: 800; color: #1F3864; border-left: 5px solid #1F3864; padding-left: 10px; margin-bottom: 15px;">AI 맞춤형 자세 교정 솔루션</div>
+                      <div style="display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 700; color: #2E5C9E; margin: 15px 0 10px 0;"><span style="display:inline-block; width:5px; height:5px; border-radius:50%; background:#2E5C9E;"></span>관절 정렬 분석 기반 핵심 교정 루틴</div>
+                      ${getComparisonRoutineHtml(vB)}
+                  </div>
+                  <div style="text-align: center; font-size: 11px; color: #94A3B8; margin-top: 15px; flex-shrink:0;">본 측정 및 리포트는 육안 및 AI 기반 교육/참고용이며 의학적 진단을 대신하지 않습니다. | RE:WALK CENTER</div>
               </div>
-              <div style="background: #EEF3FA; border-radius: 12px; padding: 20px; flex:1; overflow:hidden;">
-                  <div style="font-size: 18px; font-weight: 800; color: #1F3864; border-left: 5px solid #1F3864; padding-left: 10px; margin-bottom: 15px;">AI 맞춤형 자세 교정 솔루션</div>
-                  <div style="display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 700; color: #2E5C9E; margin: 15px 0 10px 0;"><span style="display:inline-block; width:5px; height:5px; border-radius:50%; background:#2E5C9E;"></span>관절 정렬 분석 기반 핵심 교정 루틴</div>
-                  ${getComparisonRoutineHtml(vB)}
-              </div>
-              <div style="text-align: center; font-size: 11px; color: #94A3B8; margin-top: 15px; flex-shrink:0;">본 측정 및 리포트는 육안 및 AI 기반 교육/참고용이며 의학적 진단을 대신하지 않습니다. | RE:WALK CENTER</div>
-          </div>
-      `;
-      document.getElementById('print-area').innerHTML = printHtml;
-      setTimeout(function(){ window.print(); }, 400); 
-  });
+          `;
+          document.getElementById('print-area').innerHTML = printHtml;
+          setTimeout(function(){ window.print(); }, 400); 
+      });
+  }
 
   document.querySelectorAll('#pa-root .pa-nav-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -1190,26 +1180,25 @@
       if(btn.dataset.tab === 'history') renderHistory();
     });
   });
-// 🚀 [신규 추가] 대시보드 복귀 버튼 클릭 이벤트
+
   var dashBtn = G('pa-btn-dash');
   if (dashBtn) {
       dashBtn.addEventListener('click', function() {
           if (confirm("모든 측정을 완료하고 메인 대시보드로 돌아가시겠습니까?")) {
-              // 현재 화면이 iframe(액자) 안에 있다면 부모 창의 주소를 바꿈
               if (window.parent !== window) {
-                  // 프로젝트 구조에 따라 'index.html' 경로는 수정될 수 있습니다.
                   window.parent.location.href = 'index.html'; 
               } else {
-                  // 단독 화면일 경우의 이동
                   window.location.href = 'index.html'; 
               }
           }
       });
   }
+  
   init();
 })();
+
 // =========================================================================
-// [기능] 정적 자세 가상 무아레 & 🚨 생체역학적 부하 히트맵 (Stress Heatmap) 융합 엔진
+// [기능] 정적 자세 가상 무아레 & 🚨 생체역학적 부하 히트맵 융합 엔진
 // =========================================================================
 function drawStaticVirtualMoire(ctx, landmarks, metrics) {
     if (!landmarks || !metrics) return;
@@ -1250,41 +1239,33 @@ function drawStaticVirtualMoire(ctx, landmarks, metrics) {
     });
 
     // 2. 🚨 생체역학적 부하 히트맵 (AI 분석 데이터 연동)
-    // 현재 전역 상태 객체(st)에서 분석된 각도/편차 데이터를 불러옵니다.
     const st = window.__paState;
     if (st && st.metrics && st.metrics[st.v]) {
         const mData = st.metrics[st.v];
 
         // [정면(Front) 분석 시 부하 맵핑]
         if (st.v === 'front') {
-            // ① 골반 비대칭 부하 (요방형근 단축 & 반대쪽 무릎 체중 쏠림)
             if (mData.pelvis && Math.abs(mData.pelvis) >= 1.5) {
-                const tiltVal = mData.pelvis; // 양수: 우측 하강, 음수: 좌측 하강
+                const tiltVal = mData.pelvis; 
                 const isRightLower = tiltVal > 0;
-                const lh = landmarks[23], rh = landmarks[24]; // 좌우 고관절(골반)
-                const lk = landmarks[25], rk = landmarks[26]; // 좌우 무릎
+                const lh = landmarks[23], rh = landmarks[24]; 
+                const lk = landmarks[25], rk = landmarks[26]; 
 
                 if (lh && rh && lh.visibility > 0.4 && rh.visibility > 0.4) {
                     const highHip = isRightLower ? lh : rh; 
                     const overloadedKnee = isRightLower ? rk : lk;
-                    
-                    const stressLevel = Math.min(Math.abs(tiltVal) / 6.0, 1.0); // 6도 이상이면 100% 붉은색
+                    const stressLevel = Math.min(Math.abs(tiltVal) / 6.0, 1.0); 
 
-                    // 솟아오른 쪽 허리(요추 측면)에 강한 텐션 부하 발생
                     drawStressWave(ctx, highHip.x, highHip.y - 0.08, metrics, stressLevel * 1.2);
-                    
-                    // 낮아진 쪽 무릎(체중 지지)에 관절 부하 집중
                     if (overloadedKnee && overloadedKnee.visibility > 0.4) {
                         drawStressWave(ctx, overloadedKnee.x, overloadedKnee.y, metrics, stressLevel * 0.9);
                     }
                 }
             }
-
-            // ② 어깨 비대칭 부하 (솟아오른 쪽 승모근 긴장)
             if (mData.shoulder && Math.abs(mData.shoulder) >= 1.5) {
                 const ls = landmarks[11], rs = landmarks[12];
                 if (ls && rs && ls.visibility > 0.4 && rs.visibility > 0.4) {
-                    const highSho = mData.shoulder > 0 ? ls : rs; // 양수면 우측 하강이므로 좌측이 높음
+                    const highSho = mData.shoulder > 0 ? ls : rs; 
                     const stressLevel = Math.min(Math.abs(mData.shoulder) / 5.0, 1.0);
                     drawStressWave(ctx, highSho.x + (highSho === ls ? 0.02 : -0.02), highSho.y - 0.03, metrics, stressLevel * 0.9);
                 }
@@ -1293,27 +1274,21 @@ function drawStaticVirtualMoire(ctx, landmarks, metrics) {
 
         // [측면(Side) 분석 시 부하 맵핑]
         if (st.v === 'side') {
-            // ① 거북목 부하 (CVA) - 하부 경추, 승모근 집중 타격
             if (mData.earDev !== undefined && mData.earDev !== null) {
-                if (mData.earDev > 3.0) { // 귀가 어깨보다 3% 이상 앞으로 빠짐
-                    const c7 = landmarks[11] || landmarks[12]; // 어깨 근처(경추 7번)
+                if (mData.earDev > 3.0) { 
+                    const c7 = landmarks[11] || landmarks[12]; 
                     if (c7 && c7.visibility > 0.4) {
                         const stressLevel = Math.min(mData.earDev / 8.0, 1.0);
                         drawStressWave(ctx, c7.x, c7.y - 0.06, metrics, stressLevel * 1.5);
                     }
                 }
             }
-
-            // ② 스웨이백(골반 전방 이동) 및 백니(무릎 과신전) 부하
             if (mData.hipDev !== undefined && mData.hipDev > 2.0) {
                 const hip = landmarks[23] || landmarks[24];
                 const knee = landmarks[25] || landmarks[26];
                 if (hip && hip.visibility > 0.4) {
                     const stressLevel = Math.min(mData.hipDev / 6.0, 1.0);
-                    // 서혜부 앞쪽 인대 스트레스
                     drawStressWave(ctx, hip.x + 0.02, hip.y, metrics, stressLevel);
-                    
-                    // 무릎 후방 관절낭 압박
                     if (knee && knee.visibility > 0.4) {
                         drawStressWave(ctx, knee.x - 0.02, knee.y, metrics, stressLevel * 0.8);
                     }
@@ -1321,35 +1296,26 @@ function drawStaticVirtualMoire(ctx, landmarks, metrics) {
             }
         }
     }
-
     ctx.restore();
 }
 
-// 🚨 특정 좌표에 경고 파동(레드/오렌지)을 그려주는 헬퍼 함수
+// 🚨 특정 좌표에 경고 파동을 부드러운 그라데이션(열화상 느낌)으로 그려주는 헬퍼 함수
 function drawStressWave(ctx, normX, normY, metrics, intensity) {
-    if (intensity <= 0.1) return; // 부하가 약하면 그리지 않음
+    if (intensity <= 0.1) return; 
     
     const px = metrics.x + (normX * metrics.width);
     const py = metrics.y + (normY * metrics.height);
     const radius = metrics.width * 0.06 * (0.5 + intensity);
     
-    // 시뻘겋게 타오르는 히트맵 그라디언트
     const gradient = ctx.createRadialGradient(px, py, 0, px, py, radius);
-    gradient.addColorStop(0, `rgba(220, 38, 38, ${0.8 * intensity})`); // 강렬한 Red 중심
-    gradient.addColorStop(0.5, `rgba(234, 88, 12, ${0.5 * intensity})`); // Orange 확산
-    gradient.addColorStop(1, `rgba(251, 146, 60, 0)`); // 투명하게 끝남
+    gradient.addColorStop(0, `rgba(220, 38, 38, ${0.8 * intensity})`); 
+    gradient.addColorStop(0.5, `rgba(234, 88, 12, ${0.5 * intensity})`); 
+    gradient.addColorStop(1, `rgba(251, 146, 60, 0)`); 
     
     ctx.beginPath();
     ctx.arc(px, py, radius, 0, 2 * Math.PI);
     ctx.fillStyle = gradient;
     ctx.fill();
     
-    // 맥박(통증 파동)이 퍼져나가는 듯한 3중 원형 선 효과
-    ctx.strokeStyle = `rgba(239, 68, 68, ${0.8 * intensity})`;
-    ctx.lineWidth = 1.5;
-    for (let i = 1; i <= 3; i++) {
-        ctx.beginPath();
-        ctx.arc(px, py, radius * (i / 3), 0, 2 * Math.PI);
-        ctx.stroke();
-    }
+    // 🚀 선명했던 3중 선을 삭제하여 지저분한 느낌을 지우고 퀄리티를 높였습니다.
 }

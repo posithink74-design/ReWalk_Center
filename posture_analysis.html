@@ -50,6 +50,7 @@
         </div>
 
         <div class="pa-cvbox">
+          <!-- 🚀 [수정 완] 서랍과 사진을 분리하기 위해 껍데기(pa-cvi) 구조 재배치 -->
           <div class="pa-cvi" id="pa-cvi">
             <div class="pa-ph" id="pa-ph">
               <span class="material-icons" style="font-size:48px; color:#B9C7DC;">add_photo_alternate</span>
@@ -58,62 +59,61 @@
             <img id="pa-img" style="display:none" alt="자세 사진"/>
             <canvas id="pa-cv"></canvas>
             <div class="pa-cvhint" id="pa-cvhint" style="display:none;"></div>
+          </div> <!-- 🚀 사진 회전 구역은 여기서 닫힘 -->
 
-            <div class="pa-overlay-drawer" id="pa-overlay-drawer">
-              
-              <button type="button" class="pa-drawer-handle" id="pa-drawer-handle" title="도구함 열기/닫기">
-                <span class="material-icons" id="pa-drawer-icon">chevron_left</span>
-              </button>
+          <!-- 🚀 서랍은 바깥에 두어 회전 영향을 전혀 받지 않음 -->
+          <div class="pa-overlay-drawer" id="pa-overlay-drawer">
+            <button type="button" class="pa-drawer-handle" id="pa-drawer-handle" title="도구함 열기/닫기">
+              <span class="material-icons" id="pa-drawer-icon">chevron_left</span>
+            </button>
 
-              <div class="pa-drawer-content">
-                <div class="pa-ot-group">
-                  <button type="button" id="pa-grid-density-btn" class="pa-ot-btn" title="격자 순환">
-                    <span class="material-icons">grid_off</span>
-                    <span class="ot-txt">격자 OFF</span>
-                  </button>
-                  <button type="button" id="pa-lbl-btn" class="pa-ot-btn on" title="측정값">
-                    <span class="material-icons">straighten</span>
-                    <span class="ot-txt">측정값</span>
-                  </button>
-                  <button type="button" id="pa-moire-btn" class="pa-ot-btn" title="등고선">
-                    <span class="material-icons">3d_rotation</span>
-                    <span class="ot-txt">등고선</span>
-                  </button>
-                </div>
-
-                <div class="pa-ot-divider"></div>
-
-                <div class="pa-ot-group">
-                  <button type="button" class="pa-ot-btn pa-sh-btn on" data-tool="edit" title="선택/이동">
-                    <span class="material-icons">open_with</span>
-                  </button>
-                  <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="rect" title="사각형">
-                    <span class="material-icons">crop_square</span>
-                  </button>
-                  <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="circle" title="원">
-                    <span class="material-icons">panorama_fish_eye</span>
-                  </button>
-                  <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="arrow" title="화살표">
-                    <span class="material-icons">north_east</span>
-                  </button>
-                  <button type="button" id="pa-undo" class="pa-ot-btn" title="되돌리기">
-                    <span class="material-icons">undo</span>
-                  </button>
-                  <button type="button" id="pa-clear" class="pa-ot-btn danger" title="삭제">
-                    <span class="material-icons">delete_outline</span>
-                  </button>
-                </div>
-
-                <div class="pa-ot-divider"></div>
-
-                <div class="pa-ot-colors">
-                  <button type="button" class="pa-dot on" data-c="#D9842A" style="background:#D9842A"></button>
-                  <button type="button" class="pa-dot" data-c="#C0392B" style="background:#C0392B"></button>
-                  <button type="button" class="pa-dot" data-c="#2E5C9E" style="background:#2E5C9E"></button>
-                  <button type="button" class="pa-dot" data-c="#2E8B57" style="background:#2E8B57"></button>
-                </div>
+            <div class="pa-drawer-content">
+              <div class="pa-ot-group">
+                <button type="button" id="pa-grid-density-btn" class="pa-ot-btn" title="격자 순환">
+                  <span class="material-icons">grid_off</span>
+                  <span class="ot-txt">격자 OFF</span>
+                </button>
+                <button type="button" id="pa-lbl-btn" class="pa-ot-btn on" title="측정값">
+                  <span class="material-icons">straighten</span>
+                  <span class="ot-txt">측정값</span>
+                </button>
+                <button type="button" id="pa-moire-btn" class="pa-ot-btn" title="등고선">
+                  <span class="material-icons">3d_rotation</span>
+                  <span class="ot-txt">등고선</span>
+                </button>
               </div>
 
+              <div class="pa-ot-divider"></div>
+
+              <div class="pa-ot-group">
+                <button type="button" class="pa-ot-btn pa-sh-btn on" data-tool="edit" title="선택/이동">
+                  <span class="material-icons">open_with</span>
+                </button>
+                <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="rect" title="사각형">
+                  <span class="material-icons">crop_square</span>
+                </button>
+                <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="circle" title="원">
+                  <span class="material-icons">panorama_fish_eye</span>
+                </button>
+                <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="arrow" title="화살표">
+                  <span class="material-icons">north_east</span>
+                </button>
+                <button type="button" id="pa-undo" class="pa-ot-btn" title="되돌리기">
+                  <span class="material-icons">undo</span>
+                </button>
+                <button type="button" id="pa-clear" class="pa-ot-btn danger" title="삭제">
+                  <span class="material-icons">delete_outline</span>
+                </button>
+              </div>
+
+              <div class="pa-ot-divider"></div>
+
+              <div class="pa-ot-colors">
+                <button type="button" class="pa-dot on" data-c="#D9842A" style="background:#D9842A"></button>
+                <button type="button" class="pa-dot" data-c="#C0392B" style="background:#C0392B"></button>
+                <button type="button" class="pa-dot" data-c="#2E5C9E" style="background:#2E5C9E"></button>
+                <button type="button" class="pa-dot" data-c="#2E8B57" style="background:#2E8B57"></button>
+              </div>
             </div>
           </div>
         </div>  
@@ -204,8 +204,8 @@
 <button class="btn-save-dash" id="pa-btn-dash">
     <span class="material-icons" style="vertical-align:middle;">check_circle</span> 모든 측정 완료 및 대시보드 복귀
 </button>
-<script src="mediapipe/pose.js"></script>
 
+<script src="mediapipe/pose.js"></script>
 <script src="js/data.js"></script>
 <script src="js/posture_app.js"></script>
 
