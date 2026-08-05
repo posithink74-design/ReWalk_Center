@@ -33,7 +33,6 @@
         }
         .header-title { font-size: 18px; font-weight: 700; flex: 1; text-align: center; }
         
-        /* 뒤로가기 버튼 */
         .btn-back {
             background: rgba(255,255,255,0.2); border: none; color: white;
             padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;
@@ -41,21 +40,10 @@
         }
         .btn-logout { visibility: hidden; } 
 
-        /* 🖥 메인 컨테이너 */
-        main { 
-            height: calc(100vh - 60px); 
-            display: flex; 
-            flex-direction: column;
-            position: relative; 
-            overflow: hidden; 
-        }
-        
+        main { height: calc(100vh - 60px); display: flex; flex-direction: column; position: relative; overflow: hidden; }
         iframe { flex: 1; width: 100%; height: 100%; border: none; display: block; background: var(--bg-color); }
 
-        /* 📊 대시보드 뷰 (Hub) */
-        #dashboard-view { 
-            flex: 1; overflow-y: auto; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); 
-        }
+        #dashboard-view { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
 
         /* 회원 관리 바 UI */
         .user-management-bar {
@@ -69,9 +57,7 @@
         .highlight-sub { color: var(--text-muted); font-size: 13px; display: block; margin-top: 4px; font-weight: 500;}
         
         .user-actions { display: flex; gap: 8px; }
-        .user-actions button {
-            padding: 8px 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px;
-        }
+        .user-actions button { padding: 8px 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; }
         .btn-select { background-color: #E5E8E8; color: var(--text-main); }
         .btn-register { background-color: var(--action-color); color: white; }
 
@@ -81,16 +67,11 @@
             background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
         .modal-overlay.hidden { display: none; }
-        .modal-content {
-            background: white; width: 90%; max-width: 350px; padding: 24px;
-            border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
+        .modal-content { background: white; width: 90%; max-width: 350px; padding: 24px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-content h2 { margin-bottom: 20px; font-size: 18px; text-align: center; color: var(--primary-color); }
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-main); font-size: 13px;}
-        .input-group input, .input-group select {
-            width: 100%; padding: 12px; border: 1px solid #BDC3C7; border-radius: 8px; font-size: 15px; outline: none;
-        }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border: 1px solid #BDC3C7; border-radius: 8px; font-size: 15px; outline: none; }
         .input-group input:focus { border-color: var(--action-color); }
         .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
         .modal-buttons.center { justify-content: center; }
@@ -107,16 +88,11 @@
         .grid-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; }
         .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
         .tool-card {
-            background: var(--card-bg); border-radius: 16px; padding: 20px 15px;
-            text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-            border: 2px solid transparent; cursor: pointer; transition: 0.2s;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--card-bg); border-radius: 16px; padding: 20px 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+            border: 2px solid transparent; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .tool-card:active { transform: scale(0.96); }
-        .tool-icon { 
-            width: 48px; height: 48px; border-radius: 12px; background: #F1F4F8; 
-            display: flex; align-items: center; justify-content: center; margin-bottom: 12px; color: var(--action-color);
-        }
+        .tool-icon { width: 48px; height: 48px; border-radius: 12px; background: #F1F4F8; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; color: var(--action-color); }
         .tool-name { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
         .tool-status { font-size: 12px; font-weight: 600; color: #BDC3C7; background: #F8F9F9; padding: 4px 10px; border-radius: 10px; }
         
@@ -255,21 +231,23 @@
         let users = [];
         let currentUser = null;
 
-        // 페이지 로드 시 기존 회원 정보 불러오기
         window.addEventListener('DOMContentLoaded', () => {
             loadUsersFromStorage();
             updateUserBarUI();
         });
 
         function loadUsersFromStorage() {
-            const storedUsers = localStorage.getItem('rewalk_users');
-            if (storedUsers) users = JSON.parse(storedUsers);
-            
-            const storedCurrentUser = localStorage.getItem('rewalk_current_user');
-            if (storedCurrentUser) currentUser = JSON.parse(storedCurrentUser);
+            try {
+                const storedUsers = localStorage.getItem('rewalk_users');
+                if (storedUsers) users = JSON.parse(storedUsers);
+                
+                const storedCurrentUser = localStorage.getItem('rewalk_current_user');
+                if (storedCurrentUser) currentUser = JSON.parse(storedCurrentUser);
+            } catch (e) {
+                console.error("데이터 로드 오류:", e);
+            }
         }
 
-        // 상단 바 UI 업데이트 (전화번호 뒷자리 표시 추가)
         function updateUserBarUI() {
             const statusDiv = document.getElementById('currentUserStatus');
             if (currentUser) {
@@ -284,27 +262,33 @@
             }
         }
 
-        // 모달창 열기/닫기 제어 함수 (이 함수가 지워지면 버튼이 안 눌립니다!)
-        function openRegisterUserModal() { document.getElementById('registerModal').classList.remove('hidden'); }
+        // 모달 제어 함수
+        window.openRegisterUserModal = function() { 
+            document.getElementById('registerModal').classList.remove('hidden'); 
+        };
         
-        function openSelectUserModal() {
-            document.getElementById('searchUser').value = ''; // 모달 열 때 검색창 초기화
+        window.openSelectUserModal = function() {
+            document.getElementById('searchUser').value = '';
             renderUserList();
             document.getElementById('selectModal').classList.remove('hidden');
-        }
+        };
         
-        function closeModals() {
+        window.closeModals = function() {
             document.getElementById('registerModal').classList.add('hidden');
             document.getElementById('selectModal').classList.add('hidden');
             document.getElementById('registerForm').reset();
-        }
+        };
 
-        // 신규 회원 등록 (만 나이 자동 계산 및 전화번호 기반 ID 생성)
-        function handleRegisterUser(event) {
+        // 신규 등록
+        window.handleRegisterUser = function(event) {
             event.preventDefault();
             
-            // 생년월일 기반 '만 나이' 계산
             const birthInput = document.getElementById('regBirthDate').value;
+            if(!birthInput) {
+                alert("생년월일을 입력해주세요.");
+                return;
+            }
+
             const birthDate = new Date(birthInput);
             const today = new Date();
             let calculatedAge = today.getFullYear() - birthDate.getFullYear();
@@ -322,18 +306,18 @@
                 birthDate: birthInput,
                 age: calculatedAge,
                 phone4: phone4,
-                height: parseInt(document.getElementById('regHeight').value),
+                height: parseInt(document.getElementById('regHeight').value) || 160,
                 gender: document.getElementById('regGender').value,
                 createdAt: new Date().toISOString()
             };
 
             users.push(newUser);
             localStorage.setItem('rewalk_users', JSON.stringify(users));
-            selectUser(newUser);
-            closeModals();
-        }
+            window.selectUser(newUser);
+            window.closeModals();
+        };
 
-        // 리스트 그리기 (검색 기능을 위해 data-search 속성 추가)
+        // 리스트 렌더링
         function renderUserList() {
             const container = document.getElementById('userListContainer');
             container.innerHTML = '';
@@ -346,7 +330,6 @@
                 const genderStr = user.gender === 'male' ? '남' : '여';
                 const phoneTag = user.phone4 ? `(${user.phone4})` : '';
                 
-                // 검색어 매칭용 숨김 데이터
                 li.setAttribute('data-search', `${user.name} ${user.phone4 || ''}`);
                 li.innerHTML = `
                     <div>
@@ -359,8 +342,8 @@
             });
         }
 
-        // 실시간 검색(필터링) 함수
-        function filterUserList() {
+        // 검색 필터
+        window.filterUserList = function() {
             const query = document.getElementById('searchUser').value.toLowerCase().trim();
             const items = document.querySelectorAll('#userListContainer li');
             
@@ -372,19 +355,19 @@
                     li.style.display = 'none';
                 }
             });
-        }
+        };
 
-        function selectUserById(userId) {
+        window.selectUserById = function(userId) {
             const user = users.find(u => u.id === userId);
-            if (user) selectUser(user);
-        }
+            if (user) window.selectUser(user);
+        };
 
-        function selectUser(user) {
+        window.selectUser = function(user) {
             currentUser = user;
             localStorage.setItem('rewalk_current_user', JSON.stringify(user));
             updateUserBarUI();
-            closeModals();
-        }
+            window.closeModals();
+        };
 
         // =========================================
         // 2. 도구 화면 전환 제어 로직
@@ -393,3 +376,80 @@
         const dashboardView = document.getElementById('dashboard-view');
         const btnBack = document.getElementById('btn-back');
         const headerTitle = document.getElementById('header-title');
+
+        window.showDashboard = function() {
+            updateUserBarUI();
+            iframe.style.display = 'none';
+            dashboardView.style.display = 'block';
+            iframe.src = ""; 
+            btnBack.style.visibility = 'hidden';
+            headerTitle.textContent = 'RE:WALK CENTER';
+        };
+
+        window.openTool = function(url, title) {
+            if (!currentUser) {
+                alert("대상자를 먼저 등록하거나 선택해 주세요!");
+                window.openSelectUserModal();
+                return;
+            }
+            dashboardView.style.display = 'none';
+            iframe.src = url; 
+            iframe.style.display = 'block';
+            btnBack.style.visibility = 'visible';
+            headerTitle.textContent = title;
+        };
+
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.action === 'NEXT_STEP') window.showDashboard();
+            if (event.data && event.data.action === 'MEASUREMENT_DONE') window.showDashboard();
+        });
+
+        // =========================================
+        // 3. 오프라인 다운로드 제어 시스템 (유지)
+        // =========================================
+        document.addEventListener("DOMContentLoaded", function() {
+            if (localStorage.getItem('rewalk_offline_ready') === 'true') {
+                const card = document.getElementById('download-card');
+                if (card) card.style.display = 'none';
+            }
+        });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').then(reg => {
+                console.log('✅ RE:WALK 서비스 워커 구동 성공:', reg.scope);
+            }).catch(error => {
+                console.log('❌ 서비스 워커 구동 실패:', error);
+            });
+
+            navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data.type === 'PROGRESS') {
+                    document.getElementById('progress-bar').style.width = event.data.percent + '%';
+                    document.getElementById('progress-text').innerText = event.data.percent + '% 다운로드 중...';
+                } 
+                else if (event.data.type === 'COMPLETE') {
+                    localStorage.setItem('rewalk_offline_ready', 'true');
+                    const card = document.getElementById('download-card');
+                    if (card) card.style.display = 'none';
+                } 
+            });
+        }
+
+        window.startOfflineDownload = function() {
+            if ('serviceWorker' in navigator) {
+                const btn = document.getElementById('download-btn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 5px; font-size:18px;">hourglass_empty</i>다운로드 진행 중...';
+                document.getElementById('progress-container').style.display = 'block';
+
+                navigator.serviceWorker.ready.then(registration => {
+                    if (registration.active) {
+                        registration.active.postMessage({ type: 'START_DOWNLOAD' });
+                    }
+                });
+            } else {
+                alert("이 브라우저는 오프라인 다운로드를 지원하지 않습니다.");
+            }
+        };
+    </script>
+</body>
+</html>
