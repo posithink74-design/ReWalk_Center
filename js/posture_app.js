@@ -1208,10 +1208,8 @@
   }
   init();
 })();
-
 // =========================================================================
-// [기능] 정적 자세 전용 가상 무아레 (Static Z-Depth Heatmap) 렌더링 엔진
-// 튜닝: 은은한 파스텔톤 적용 및 민감도 완화 (대안 A)
+// [기능] 정적 자세 가상 무아레 & 🚨 생체역학적 부하 히트맵 (Stress Heatmap) 융합 엔진
 // =========================================================================
 function drawStaticVirtualMoire(ctx, landmarks, metrics) {
     if (!landmarks || !metrics) return;
@@ -1227,25 +1225,23 @@ function drawStaticVirtualMoire(ctx, landmarks, metrics) {
     const zRange = maxZ - minZ || 1;
 
     ctx.save();
-    // screen 모드 대신 일반 덮어쓰기 모드를 사용하여 너무 눈부시게 타오르는 현상 방지
-    ctx.globalCompositeOperation = "source-over"; 
+    ctx.globalCompositeOperation = "source-over";
 
+    // 1. 기본 체형 굴곡 등고선 (파스텔톤 베이스)
     landmarks.forEach(lm => {
+        if(lm.visibility < 0.2) return;
         const pointX = metrics.x + (lm.x * metrics.width);
         const pointY = metrics.y + (lm.y * metrics.height);
         const normZ = (lm.z - minZ) / zRange; 
         const invertedZ = 1 - normZ;
         const hue = 240 * normZ; 
         
-        // 크기 변화폭도 약간 줄여서 덜 과장되게 조절
         const radius = (metrics.width * 0.04) + ((metrics.width * 0.04) * invertedZ);
 
         const gradient = ctx.createRadialGradient(pointX, pointY, 0, pointX, pointY, radius);
-        
-        // 🚀 [핵심 튜닝] 채도(Saturation)를 100%->70%로, 투명도(Alpha)를 대폭 낮춤
-        gradient.addColorStop(0, `hsla(${hue}, 70%, 65%, 0.35)`); // 중심부 은은하게
-        gradient.addColorStop(0.5, `hsla(${hue}, 70%, 65%, 0.1)`); // 자연스럽게 퍼짐
-        gradient.addColorStop(1, `hsla(${hue}, 70%, 65%, 0)`); 
+        gradient.addColorStop(0, `hsla(${hue}, 70%, 65%, 0.25)`);
+        gradient.addColorStop(0.5, `hsla(${hue}, 70%, 65%, 0.08)`);
+        gradient.addColorStop(1, `hsla(${hue}, 70%, 65%, 0)`);
 
         ctx.beginPath();
         ctx.arc(pointX, pointY, radius, 0, 2 * Math.PI);
@@ -1253,5 +1249,107 @@ function drawStaticVirtualMoire(ctx, landmarks, metrics) {
         ctx.fill();
     });
 
+    // 2. 🚨 생체역학적 부하 히트맵 (AI 분석 데이터 연동)
+    // 현재 전역 상태 객체(st)에서 분석된 각도/편차 데이터를 불러옵니다.
+    const st = window.__paState;
+    if (st && st.metrics && st.metrics[st.v]) {
+        const mData = st.metrics[st.v];
+
+        // [정면(Front) 분석 시 부하 맵핑]
+        if (st.v === 'front') {
+            // ① 골반 비대칭 부하 (요방형근 단축 & 반대쪽 무릎 체중 쏠림)
+            if (mData.pelvis && Math.abs(mData.pelvis) >= 1.5) {
+                const tiltVal = mData.pelvis; // 양수: 우측 하강, 음수: 좌측 하강
+                const isRightLower = tiltVal > 0;
+                const lh = landmarks[23], rh = landmarks[24]; // 좌우 고관절(골반)
+                const lk = landmarks[25], rk = landmarks[26]; // 좌우 무릎
+
+                if (lh && rh && lh.visibility > 0.4 && rh.visibility > 0.4) {
+                    const highHip = isRightLower ? lh : rh; 
+                    const overloadedKnee = isRightLower ? rk : lk;
+                    
+                    const stressLevel = Math.min(Math.abs(tiltVal) / 6.0, 1.0); // 6도 이상이면 100% 붉은색
+
+                    // 솟아오른 쪽 허리(요추 측면)에 강한 텐션 부하 발생
+                    drawStressWave(ctx, highHip.x, highHip.y - 0.08, metrics, stressLevel * 1.2);
+                    
+                    // 낮아진 쪽 무릎(체중 지지)에 관절 부하 집중
+                    if (overloadedKnee && overloadedKnee.visibility > 0.4) {
+                        drawStressWave(ctx, overloadedKnee.x, overloadedKnee.y, metrics, stressLevel * 0.9);
+                    }
+                }
+            }
+
+            // ② 어깨 비대칭 부하 (솟아오른 쪽 승모근 긴장)
+            if (mData.shoulder && Math.abs(mData.shoulder) >= 1.5) {
+                const ls = landmarks[11], rs = landmarks[12];
+                if (ls && rs && ls.visibility > 0.4 && rs.visibility > 0.4) {
+                    const highSho = mData.shoulder > 0 ? ls : rs; // 양수면 우측 하강이므로 좌측이 높음
+                    const stressLevel = Math.min(Math.abs(mData.shoulder) / 5.0, 1.0);
+                    drawStressWave(ctx, highSho.x + (highSho === ls ? 0.02 : -0.02), highSho.y - 0.03, metrics, stressLevel * 0.9);
+                }
+            }
+        }
+
+        // [측면(Side) 분석 시 부하 맵핑]
+        if (st.v === 'side') {
+            // ① 거북목 부하 (CVA) - 하부 경추, 승모근 집중 타격
+            if (mData.earDev !== undefined && mData.earDev !== null) {
+                if (mData.earDev > 3.0) { // 귀가 어깨보다 3% 이상 앞으로 빠짐
+                    const c7 = landmarks[11] || landmarks[12]; // 어깨 근처(경추 7번)
+                    if (c7 && c7.visibility > 0.4) {
+                        const stressLevel = Math.min(mData.earDev / 8.0, 1.0);
+                        drawStressWave(ctx, c7.x, c7.y - 0.06, metrics, stressLevel * 1.5);
+                    }
+                }
+            }
+
+            // ② 스웨이백(골반 전방 이동) 및 백니(무릎 과신전) 부하
+            if (mData.hipDev !== undefined && mData.hipDev > 2.0) {
+                const hip = landmarks[23] || landmarks[24];
+                const knee = landmarks[25] || landmarks[26];
+                if (hip && hip.visibility > 0.4) {
+                    const stressLevel = Math.min(mData.hipDev / 6.0, 1.0);
+                    // 서혜부 앞쪽 인대 스트레스
+                    drawStressWave(ctx, hip.x + 0.02, hip.y, metrics, stressLevel);
+                    
+                    // 무릎 후방 관절낭 압박
+                    if (knee && knee.visibility > 0.4) {
+                        drawStressWave(ctx, knee.x - 0.02, knee.y, metrics, stressLevel * 0.8);
+                    }
+                }
+            }
+        }
+    }
+
     ctx.restore();
+}
+
+// 🚨 특정 좌표에 경고 파동(레드/오렌지)을 그려주는 헬퍼 함수
+function drawStressWave(ctx, normX, normY, metrics, intensity) {
+    if (intensity <= 0.1) return; // 부하가 약하면 그리지 않음
+    
+    const px = metrics.x + (normX * metrics.width);
+    const py = metrics.y + (normY * metrics.height);
+    const radius = metrics.width * 0.06 * (0.5 + intensity);
+    
+    // 시뻘겋게 타오르는 히트맵 그라디언트
+    const gradient = ctx.createRadialGradient(px, py, 0, px, py, radius);
+    gradient.addColorStop(0, `rgba(220, 38, 38, ${0.8 * intensity})`); // 강렬한 Red 중심
+    gradient.addColorStop(0.5, `rgba(234, 88, 12, ${0.5 * intensity})`); // Orange 확산
+    gradient.addColorStop(1, `rgba(251, 146, 60, 0)`); // 투명하게 끝남
+    
+    ctx.beginPath();
+    ctx.arc(px, py, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    
+    // 맥박(통증 파동)이 퍼져나가는 듯한 3중 원형 선 효과
+    ctx.strokeStyle = `rgba(239, 68, 68, ${0.8 * intensity})`;
+    ctx.lineWidth = 1.5;
+    for (let i = 1; i <= 3; i++) {
+        ctx.beginPath();
+        ctx.arc(px, py, radius * (i / 3), 0, 2 * Math.PI);
+        ctx.stroke();
+    }
 }
