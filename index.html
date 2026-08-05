@@ -111,30 +111,28 @@
 <body>
     
     <div id="download-card" style="margin: 20px; padding: 18px; border-radius: 12px; background: #f8f9fa; border: 1px solid #e9ecef; text-align: center;">
-        <div id="download-init-view">
-            <h3 style="margin-top:0; font-size: 15px; color:#333;">오프라인 현장 평가 준비</h3>
-            <p style="font-size: 12px; color:#666; margin-bottom: 12px;">인터넷 없이 구동되도록 AI 데이터를 기기에 다운로드합니다.</p>
-            
-            <button id="download-btn" onclick="startOfflineDownload()" style="background:#0056b3; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">
-                <i class="material-icons" style="vertical-align: middle; margin-right: 5px; font-size:18px;">cloud_download</i>데이터 다운로드 시작
-            </button>
+        <h3 style="margin-top:0; font-size: 15px; color:#333;">오프라인 현장 평가 준비</h3>
+        <p style="font-size: 12px; color:#666; margin-bottom: 12px;">인터넷 없이 구동되도록 AI 데이터를 기기에 다운로드합니다.</p>
+        
+        <button id="download-btn" onclick="startOfflineDownload()" style="background:#0056b3; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">
+            <i class="material-icons" style="vertical-align: middle; margin-right: 5px; font-size:18px;">cloud_download</i>데이터 다운로드 시작
+        </button>
 
-            <div id="progress-container" style="display: none; margin-top: 12px;">
-                <div style="background: #e9ecef; border-radius: 10px; height: 8px; width: 100%; overflow: hidden;">
-                    <div id="progress-bar" style="background: #28a745; width: 0%; height: 100%; transition: width 0.2s;"></div>
-                </div>
-                <div id="progress-text" style="margin-top: 6px; font-size: 13px; font-weight: bold; color: #0056b3;">0% 다운로드 중...</div>
+        <div id="progress-container" style="display: none; margin-top: 12px;">
+            <div style="background: #e9ecef; border-radius: 10px; height: 8px; width: 100%; overflow: hidden;">
+                <div id="progress-bar" style="background: #28a745; width: 0%; height: 100%; transition: width 0.2s;"></div>
             </div>
+            <div id="progress-text" style="margin-top: 6px; font-size: 13px; font-weight: bold; color: #0056b3;">0% 다운로드 중...</div>
         </div>
+    </div>
 
-        <div id="download-complete-view" style="display: none; padding: 5px 0;">
+    <div id="download-complete-view" style="display: none; padding: 5px 0;">
             <span style="font-size: 14px; font-weight: bold; color: #28a745;">
                 <i class="material-icons" style="vertical-align: middle; margin-right: 4px; font-size:20px;">check_circle</i>오프라인 데이터 준비 완료
             </span>
             <span onclick="resetDownloadState()" style="display:inline-block; margin-left: 10px; font-size: 11px; color: #888; text-decoration: underline; cursor: pointer;">
                 (재다운로드)
             </span>
-        </div>
     </div>
     <header>
         <button class="btn-back" id="btn-back" onclick="showDashboard()">
@@ -237,65 +235,55 @@
         });
 
         // ==== 오프라인 다운로드 제어 시스템 ====
-        document.addEventListener("DOMContentLoaded", function() {
-            // 접속 시 완료 상태 체크
-            if (localStorage.getItem('rewalk_offline_ready') === 'true') {
-                document.getElementById('download-init-view').style.display = 'none';
-                document.getElementById('download-complete-view').style.display = 'block';
-            }
+        // ==== 오프라인 다운로드 제어 시스템 ====
+    document.addEventListener("DOMContentLoaded", function() {
+        // 접속 시 이미 완료된 기기라면 다운로드 카드 상자 전체를 완벽히 숨깁니다.
+        if (localStorage.getItem('rewalk_offline_ready') === 'true') {
+            const card = document.getElementById('download-card');
+            if (card) card.style.display = 'none';
+        }
+    });
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            console.log('✅ RE:WALK 서비스 워커 구동 성공:', reg.scope);
+        }).catch(error => {
+            console.log('❌ 서비스 워커 구동 실패:', error);
         });
 
-        if ('serviceWorker' in navigator) {
-            // 중복 없이 한 번만 워커 등록
-            navigator.serviceWorker.register('./sw.js').then(reg => {
-                console.log('✅ RE:WALK 서비스 워커 구동 성공:', reg.scope);
-            }).catch(error => {
-                console.log('❌ 서비스 워커 구동 실패:', error);
-            });
-
-            // 다운로드 진행률 메시지 수신
-            navigator.serviceWorker.addEventListener('message', event => {
-                if (event.data.type === 'PROGRESS') {
-                    document.getElementById('progress-bar').style.width = event.data.percent + '%';
-                    document.getElementById('progress-text').innerText = event.data.percent + '% 다운로드 중...';
-                } 
-                else if (event.data.type === 'COMPLETE') {
-                    localStorage.setItem('rewalk_offline_ready', 'true');
-                    document.getElementById('download-init-view').style.display = 'none';
-                    document.getElementById('download-complete-view').style.display = 'block';
-                } 
-            });
-        }
-
-        function startOfflineDownload() {
-            if ('serviceWorker' in navigator) {
-                const btn = document.getElementById('download-btn');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 5px; font-size:18px;">hourglass_empty</i>다운로드 진행 중...';
-                document.getElementById('progress-container').style.display = 'block';
-
-                navigator.serviceWorker.ready.then(registration => {
-                    if (registration.active) {
-                        registration.active.postMessage({ type: 'START_DOWNLOAD' });
-                    }
-                });
-            } else {
-                alert("이 브라우저는 오프라인 다운로드를 지원하지 않습니다.");
-            }
-        }
-
-        function resetDownloadState() {
-            if (confirm("오프라인 데이터를 다시 다운로드하시겠습니까?")) {
-                localStorage.removeItem('rewalk_offline_ready');
-                document.getElementById('download-init-view').style.display = 'block';
-                document.getElementById('download-complete-view').style.display = 'none';
-                document.getElementById('progress-container').style.display = 'none';
+        // 서비스 워커로부터 수신되는 다운로드 진행률 처리
+        navigator.serviceWorker.addEventListener('message', event => {
+            if (event.data.type === 'PROGRESS') {
+                document.getElementById('progress-bar').style.width = event.data.percent + '%';
+                document.getElementById('progress-text').innerText = event.data.percent + '% 다운로드 중...';
+            } 
+            else if (event.data.type === 'COMPLETE') {
+                // 1. 다운로드 완료 상태 기록
+                localStorage.setItem('rewalk_offline_ready', 'true');
                 
-                const btn = document.getElementById('download-btn');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 5px; font-size:18px;">cloud_download</i>데이터 다운로드 시작';
-            }
+                // 2. 완료 즉시 다운로드 카드 상자 전체를 화면에서 완전히 숨깁니다!
+                const card = document.getElementById('download-card');
+                if (card) card.style.display = 'none';
+            } 
+        });
+    }
+
+    function startOfflineDownload() {
+        if ('serviceWorker' in navigator) {
+            const btn = document.getElementById('download-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 5px; font-size:18px;">hourglass_empty</i>다운로드 진행 중...';
+            document.getElementById('progress-container').style.display = 'block';
+
+            navigator.serviceWorker.ready.then(registration => {
+                if (registration.active) {
+                    registration.active.postMessage({ type: 'START_DOWNLOAD' });
+                }
+            });
+        } else {
+            alert("이 브라우저는 오프라인 다운로드를 지원하지 않습니다.");
         }
+    }
     </script>
 </body>
 </html>
