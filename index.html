@@ -288,8 +288,11 @@
             const statusDiv = document.getElementById('currentUserStatus');
             if (currentUser) {
                 const genderText = currentUser.gender === 'male' ? '남성' : '여성';
+                // 전화번호 뒷자리가 있으면 표시
+                const phoneTag = currentUser.phone4 ? `<span style="color:#4A90E2;">(${currentUser.phone4})</span>` : '';
+                
                 statusDiv.innerHTML = `
-                    <span class="highlight-name">${currentUser.name} 님</span>
+                    <span class="highlight-name">${currentUser.name} 님 ${phoneTag}</span>
                     <span class="highlight-sub">만 ${currentUser.age}세 / ${currentUser.height}cm / ${genderText}</span>
                 `;
             } else {
@@ -297,9 +300,9 @@
             }
         }
 
-        // 모달창 열기/닫기
-        function openRegisterUserModal() { document.getElementById('registerModal').classList.remove('hidden'); }
+        // 회원 선택 모달창 열 때 검색창 초기화
         function openSelectUserModal() {
+            document.getElementById('searchUser').value = ''; // 검색어 초기화
             renderUserList();
             document.getElementById('selectModal').classList.remove('hidden');
         }
@@ -308,18 +311,50 @@
             document.getElementById('selectModal').classList.add('hidden');
             document.getElementById('registerForm').reset();
         }
-
-        // 신규 회원 등록
+        // ✅ 새로 추가된 실시간 검색(필터링) 함수
+        function filterUserList() {
+            const query = document.getElementById('searchUser').value.toLowerCase().trim();
+            const items = document.querySelectorAll('#userListContainer li');
+            
+            items.forEach(li => {
+                // 요소에 저장해둔 이름+전화번호 속성을 가져와 검색
+                const searchText = li.getAttribute('data-search') || '';
+                if (searchText.includes(query)) {
+                    li.style.display = 'flex'; // 일치하면 보여줌
+                } else {
+                    li.style.display = 'none'; // 일치하지 않으면 숨김
+                }
+            });
+        }
+        // 신규 회원 등록 (생년월일로 만 나이 자동 계산)
         function handleRegisterUser(event) {
             event.preventDefault();
+            
+            // 1. 생년월일 기반 '만 나이' 계산
+            const birthInput = document.getElementById('regBirthDate').value;
+            const birthDate = new Date(birthInput);
+            const today = new Date();
+            let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                calculatedAge--; // 아직 생일이 안 지났으면 1살 빼기
+            }
+
+            const phone4 = document.getElementById('regPhone').value;
+            const name = document.getElementById('regName').value;
+
             const newUser = {
-                id: 'user_' + Date.now(),
-                name: document.getElementById('regName').value,
-                age: parseInt(document.getElementById('regAge').value),
+                // ID에 전화번호 뒷자리를 넣어 식별력을 높임 (예: user_1234_1691234567)
+                id: 'user_' + phone4 + '_' + Date.now(), 
+                name: name,
+                birthDate: birthInput,
+                age: calculatedAge,    // 자동 계산된 나이 저장
+                phone4: phone4,        // 전화번호 뒷자리 저장
                 height: parseInt(document.getElementById('regHeight').value),
                 gender: document.getElementById('regGender').value,
                 createdAt: new Date().toISOString()
             };
+
             users.push(newUser);
             localStorage.setItem('rewalk_users', JSON.stringify(users));
             selectUser(newUser);
@@ -337,9 +372,13 @@
             [...users].reverse().forEach(user => {
                 const li = document.createElement('li');
                 const genderStr = user.gender === 'male' ? '남' : '여';
+                const phoneTag = user.phone4 ? `(${user.phone4})` : '';
+                
+                // 검색(filter)을 위해 회원 정보를 속성으로 숨겨둠
+                li.setAttribute('data-search', `${user.name} ${user.phone4 || ''}`);
                 li.innerHTML = `
                     <div>
-                        <div style="font-size: 15px; font-weight: 700; color: #2C3E50;">${user.name} 님</div>
+                        <div style="font-size: 15px; font-weight: 700; color: #2C3E50;">${user.name} 님 <span style="color:#4A90E2; font-size:13px;">${phoneTag}</span></div>
                         <div style="font-size: 12px; color: #7F8C8D;">만 ${user.age}세 | ${user.height}cm | ${genderStr}</div>
                     </div>
                     <button class="btn-pick" onclick="selectUserById('${user.id}')">선택</button>
