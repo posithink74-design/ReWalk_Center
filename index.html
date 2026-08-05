@@ -284,13 +284,9 @@
             }
         }
 
-        // 4. 재다운로드 링크 클릭 시 초기화 함수 (이 부분이 누락되었습니다!)
         function resetDownloadState() {
             if (confirm("오프라인 데이터를 다시 다운로드하시겠습니까?")) {
-                // 저장된 완료 기록 삭제
                 localStorage.removeItem('rewalk_offline_ready');
-                
-                // 화면 초기화 (다운로드 시작 버튼 다시 보이기)
                 document.getElementById('download-init-view').style.display = 'block';
                 document.getElementById('download-complete-view').style.display = 'none';
                 document.getElementById('progress-container').style.display = 'none';
