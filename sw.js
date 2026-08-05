@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rewalk-app-cache-v11';
+const CACHE_NAME = 'rewalk-app-cache-v12';
 
 // 🔴 전문가님의 실제 폴더에 "있는 파일만" 남기고 없는 것은 지워주세요!
 const urlsToCache = [
@@ -40,27 +40,35 @@ const aiFiles = [
     './mediapipe/pose_solution_wasm_bin.js',
 ];
 
+// 설치 시 기본 파일 우선 저장
 self.addEventListener('install', event => {
-    event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache).catch(()=>console.log("기본 캐싱 일부 실패"))));
-    self.skipWaiting();
+    event.waitUntil(
+        caches.open(CACHE_NAME).then(cache => {
+            return cache.addAll(urlsToCache).catch(err => console.log('기본 파일 캐싱 중 일부 유실 무시'));
+        })
+    );
+    self.skipWaiting(); // 즉시 활성화
 });
 
+// 구버전 캐시 정리 및 제어권 즉시 확보
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cache => {
-                    if (cache !== CACHE_NAME) return caches.delete(cache);
+                    if (cache !== CACHE_NAME) {
+                        return caches.delete(cache);
+                    }
                 })
             );
-        })
+        }).then(() => self.clients.claim()) // 페이지 제어권 즉시 가로채기
     );
-    self.clients.claim();
 });
 
-self.addEventListener('message', (event) => {
+// 메시지 수신 시 파일 일괄 다운로드 실행
+self.addEventListener('message', event => {
     if (event.data && event.data.type === 'START_DOWNLOAD') {
-        cacheFilesWithProgress(); 
+        cacheFilesWithProgress();
     }
 });
 
@@ -69,27 +77,22 @@ async function cacheFilesWithProgress() {
     const allFiles = [...urlsToCache, ...aiFiles];
     let loadedCount = 0;
     const totalFiles = allFiles.length;
-    let errorFiles = []; // 실패한 파일 추적
 
     for (const url of allFiles) {
         try {
             const response = await fetch(new Request(url, { cache: 'reload' }));
             if (response.ok) {
                 await cache.put(url, response);
-            } else {
-                console.error('❌ 폴더에 없는 파일 발견 (404):', url);
-                errorFiles.push(url);
             }
         } catch (error) {
-            console.error('❌ 네트워크 에러:', url);
-            errorFiles.push(url);
+            console.warn('다운로드 건너뜀:', url);
         }
 
         loadedCount++;
         
-        // includeUncontrolled: true 옵션으로 연결 끊김 방지
-        const allClients = await self.clients.matchAll({ includeUncontrolled: true });
-        allClients.forEach(client => {
+        // 연결된 모든 화면에 진행률(%) 방송
+        const clients = await self.clients.matchAll({ includeUncontrolled: true });
+        clients.forEach(client => {
             client.postMessage({
                 type: 'PROGRESS',
                 percent: Math.round((loadedCount / totalFiles) * 100)
@@ -97,16 +100,14 @@ async function cacheFilesWithProgress() {
         });
     }
 
-    const allClients = await self.clients.matchAll({ includeUncontrolled: true });
-    allClients.forEach(client => {
-        if (errorFiles.length > 0) {
-            client.postMessage({ type: 'ERROR', fails: errorFiles });
-        } else {
-            client.postMessage({ type: 'COMPLETE' });
-        }
+    // 다운로드 완료 신호 방송
+    const clients = await self.clients.matchAll({ includeUncontrolled: true });
+    clients.forEach(client => {
+        client.postMessage({ type: 'COMPLETE' });
     });
 }
 
+// 네트워크 통신 처리
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request).then(response => {

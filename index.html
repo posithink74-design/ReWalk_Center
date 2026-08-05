@@ -41,7 +41,7 @@
         }
         .btn-logout { visibility: hidden; } 
 
-        /* 🖥 메인 컨테이너 (Flexbox로 iframe 찌그러짐 방지) */
+        /* 🖥 메인 컨테이너 */
         main { 
             height: calc(100vh - 60px); 
             display: flex; 
@@ -99,9 +99,6 @@
         .tool-name { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
         .tool-status { font-size: 12px; font-weight: 600; color: #BDC3C7; background: #F8F9F9; padding: 4px 10px; border-radius: 10px; }
         
-        /* 상태별 스타일 */
-        .status-done { color: #27AE60; background: #EAFAF1; }
-
         /* 종합 리포트 버튼 */
         .btn-report {
             width: 100%; background: var(--primary-color); color: white;
@@ -112,19 +109,31 @@
     </style>
 </head>
 <body>
-    <div id="download-card" style="margin: 20px; padding: 20px; border-radius: 12px; background: #f8f9fa; border: 1px solid #e9ecef; text-align: center;">
-        <h3 style="margin-top:0; font-size: 16px; color:#333;">오프라인 현장 평가 준비</h3>
-        <p style="font-size: 13px; color:#666; margin-bottom: 15px;">인터넷이 없는 곳에서도 작동하도록 AI 데이터를 기기에 다운로드합니다.</p>
-        
-        <button id="download-btn" onclick="startOfflineDownload()" style="background:#0056b3; color:white; border:none; padding:12px 24px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">
-            <i class="material-icons" style="vertical-align: middle; margin-right: 5px;">cloud_download</i>데이터 다운로드 시작
-        </button>
+    
+    <div id="download-card" style="margin: 20px; padding: 18px; border-radius: 12px; background: #f8f9fa; border: 1px solid #e9ecef; text-align: center;">
+        <div id="download-init-view">
+            <h3 style="margin-top:0; font-size: 15px; color:#333;">오프라인 현장 평가 준비</h3>
+            <p style="font-size: 12px; color:#666; margin-bottom: 12px;">인터넷 없이 구동되도록 AI 데이터를 기기에 다운로드합니다.</p>
+            
+            <button id="download-btn" onclick="startOfflineDownload()" style="background:#0056b3; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; width:100%; cursor:pointer;">
+                <i class="material-icons" style="vertical-align: middle; margin-right: 5px; font-size:18px;">cloud_download</i>데이터 다운로드 시작
+            </button>
 
-        <div id="progress-container" style="display: none; margin-top: 15px;">
-            <div style="background: #e9ecef; border-radius: 10px; height: 10px; width: 100%; overflow: hidden;">
-                <div id="progress-bar" style="background: #28a745; width: 0%; height: 100%; transition: width 0.3s;"></div>
+            <div id="progress-container" style="display: none; margin-top: 12px;">
+                <div style="background: #e9ecef; border-radius: 10px; height: 8px; width: 100%; overflow: hidden;">
+                    <div id="progress-bar" style="background: #28a745; width: 0%; height: 100%; transition: width 0.2s;"></div>
+                </div>
+                <div id="progress-text" style="margin-top: 6px; font-size: 13px; font-weight: bold; color: #0056b3;">0% 다운로드 중...</div>
             </div>
-            <div id="progress-text" style="margin-top: 8px; font-size: 14px; font-weight: bold; color: #28a745;">0%</div>
+        </div>
+
+        <div id="download-complete-view" style="display: none; padding: 5px 0;">
+            <span style="font-size: 14px; font-weight: bold; color: #28a745;">
+                <i class="material-icons" style="vertical-align: middle; margin-right: 4px; font-size:20px;">check_circle</i>오프라인 데이터 준비 완료
+            </span>
+            <span onclick="resetDownloadState()" style="display:inline-block; margin-left: 10px; font-size: 11px; color: #888; text-decoration: underline; cursor: pointer;">
+                (재다운로드)
+            </span>
         </div>
     </div>
     <header>
@@ -179,13 +188,14 @@
             </button>
         </div>
     </main>
+
     <script>
         const iframe = document.getElementById('tool-frame');
         const dashboardView = document.getElementById('dashboard-view');
         const btnBack = document.getElementById('btn-back');
         const headerTitle = document.getElementById('header-title');
 
-        // 1. 대시보드 화면 띄우기
+        // ==== UI 제어 함수 ====
         function showDashboard() {
             try {
                 const currentUser = JSON.parse(localStorage.getItem('rewalk_current_user'));
@@ -197,18 +207,14 @@
 
             iframe.style.display = 'none';
             dashboardView.style.display = 'block';
-            iframe.src = ""; // 메모리 해제
+            iframe.src = ""; 
             
             btnBack.style.visibility = 'hidden';
             headerTitle.textContent = '회원 대시보드';
-            updateToolStatus();
         }
 
-        // 2. 측정 도구 열기 (캐시 방지 적용)
         function openTool(url, title) {
             dashboardView.style.display = 'none';
-            
-            // 현재 시간을 URL 뒤에 붙여 브라우저가 과거 파일을 재사용하지 못하도록 강제함
             iframe.src = url; 
             iframe.style.display = 'block';
             btnBack.style.visibility = 'visible';
@@ -225,76 +231,71 @@
             }
         }
 
-        // 3. 자식 창(iframe)에서 보내는 신호 감지
         window.addEventListener('message', (event) => {
-            // basic_info.html에서 "입력 완료"를 눌렀을 때
-            if (event.data && event.data.action === 'NEXT_STEP') {
-                showDashboard();
-            }
-            // 발 스크리닝 등에서 "측정 완료 및 대시보드 복귀"를 눌렀을 때
-            if (event.data && event.data.action === 'MEASUREMENT_DONE') {
-                showDashboard();
+            if (event.data && event.data.action === 'NEXT_STEP') showDashboard();
+            if (event.data && event.data.action === 'MEASUREMENT_DONE') showDashboard();
+        });
+
+        // ==== 오프라인 다운로드 제어 시스템 ====
+        document.addEventListener("DOMContentLoaded", function() {
+            // 접속 시 완료 상태 체크
+            if (localStorage.getItem('rewalk_offline_ready') === 'true') {
+                document.getElementById('download-init-view').style.display = 'none';
+                document.getElementById('download-complete-view').style.display = 'block';
             }
         });
 
-        function updateToolStatus() {
-            // 차후 스토어(상태 관리) 연동 부분
+        if ('serviceWorker' in navigator) {
+            // 중복 없이 한 번만 워커 등록
+            navigator.serviceWorker.register('./sw.js').then(reg => {
+                console.log('✅ RE:WALK 서비스 워커 구동 성공:', reg.scope);
+            }).catch(error => {
+                console.log('❌ 서비스 워커 구동 실패:', error);
+            });
+
+            // 다운로드 진행률 메시지 수신
+            navigator.serviceWorker.addEventListener('message', event => {
+                if (event.data.type === 'PROGRESS') {
+                    document.getElementById('progress-bar').style.width = event.data.percent + '%';
+                    document.getElementById('progress-text').innerText = event.data.percent + '% 다운로드 중...';
+                } 
+                else if (event.data.type === 'COMPLETE') {
+                    localStorage.setItem('rewalk_offline_ready', 'true');
+                    document.getElementById('download-init-view').style.display = 'none';
+                    document.getElementById('download-complete-view').style.display = 'block';
+                } 
+            });
+        }
+
+        function startOfflineDownload() {
+            if ('serviceWorker' in navigator) {
+                const btn = document.getElementById('download-btn');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 5px; font-size:18px;">hourglass_empty</i>다운로드 진행 중...';
+                document.getElementById('progress-container').style.display = 'block';
+
+                navigator.serviceWorker.ready.then(registration => {
+                    if (registration.active) {
+                        registration.active.postMessage({ type: 'START_DOWNLOAD' });
+                    }
+                });
+            } else {
+                alert("이 브라우저는 오프라인 다운로드를 지원하지 않습니다.");
+            }
+        }
+
+        function resetDownloadState() {
+            if (confirm("오프라인 데이터를 다시 다운로드하시겠습니까?")) {
+                localStorage.removeItem('rewalk_offline_ready');
+                document.getElementById('download-init-view').style.display = 'block';
+                document.getElementById('download-complete-view').style.display = 'none';
+                document.getElementById('progress-container').style.display = 'none';
+                
+                const btn = document.getElementById('download-btn');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 5px; font-size:18px;">cloud_download</i>데이터 다운로드 시작';
+            }
         }
     </script>
-    <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-            .then(registration => {
-                console.log('✅ RE:WALK 서비스 워커 구동 성공:', registration.scope);
-            })
-        .catch(error => {
-            console.log('❌ 서비스 워커 구동 실패:', error);
-        });
-    });}
-</script>
-<script>
-    // 1. 서비스 워커 등록 및 다운로드 상태 수신
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(() => {
-            console.log("서비스 워커 등록 완료");
-        });
-
-        navigator.serviceWorker.addEventListener('message', event => {
-            if (event.data.type === 'PROGRESS') {
-                document.getElementById('progress-bar').style.width = event.data.percent + '%';
-                document.getElementById('progress-text').innerText = event.data.percent + '% 다운로드 중...';
-            } 
-            else if (event.data.type === 'COMPLETE') {
-                document.getElementById('progress-text').innerText = '✅ 다운로드 완료! (오프라인 사용 가능)';
-                document.getElementById('progress-text').style.color = '#28a745';
-                document.getElementById('download-btn').style.display = 'none';
-            } 
-            else if (event.data.type === 'ERROR') {
-                document.getElementById('progress-text').innerText = '❌ 누락된 파일이 있습니다. (F12 콘솔창 확인)';
-                document.getElementById('progress-text').style.color = 'red';
-                document.getElementById('progress-bar').style.background = 'red';
-                document.getElementById('download-btn').innerHTML = '새로고침 후 다시 시도';
-                document.getElementById('download-btn').disabled = false;
-                console.warn("다운로드 실패 목록:", event.data.fails);
-            }
-        });
-    }
-
-    // 2. 버튼 클릭 시 실행되는 함수
-    function startOfflineDownload() {
-        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-            const btn = document.getElementById('download-btn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="material-icons" style="vertical-align: middle; margin-right: 5px;">hourglass_empty</i>다운로드 진행 중...';
-            
-            document.getElementById('progress-container').style.display = 'block';
-            
-            navigator.serviceWorker.controller.postMessage({ type: 'START_DOWNLOAD' });
-        } else {
-            alert("앱이 아직 완전히 로딩되지 않았습니다. 새로고침 후 다시 시도해주세요.");
-        }
-    }
-</script>
 </body>
 </html>
