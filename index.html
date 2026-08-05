@@ -138,7 +138,7 @@
         <button class="btn-back" id="btn-back" onclick="showDashboard()">
             <span class="material-icons" style="font-size: 18px;">arrow_back_ios_new</span> 뒤로
         </button>
-        <div class="header-title" id="header-title">RE:WALK CENTER</div>
+        <div class="header-title" id="header-title">Re:WALK CENTER</div>
         <button class="btn-back btn-logout">숨김</button>
     </header>
 
@@ -153,7 +153,57 @@
                 </div>
                 <button class="btn-change-user" onclick="changeUser()">회원 변경</button>
             </div>
+        <div class="user-management-bar">
+            <div class="user-status" id="currentUserStatus">
+                <span class="warning-text">⚠️ 측정을 시작하려면 대상자를 선택하거나 등록해주세요.</span>
+            </div>
+            <div class="user-actions">
+                <button class="btn-select" onclick="openSelectUserModal()">🔄 회원 선택</button>
+                <button class="btn-register" onclick="openRegisterUserModal()">➕ 신규 등록</button>
+            </div>
+        </div>
 
+        <div id="registerModal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2>신규 회원 등록</h2>
+                <form id="registerForm" onsubmit="handleRegisterUser(event)">
+                    <div class="input-group">
+                        <label>이름</label>
+                        <input type="text" id="regName" placeholder="예: 홍길동" required>
+                    </div>
+                    <div class="input-group">
+                        <label>만 나이 (세)</label>
+                        <input type="number" id="regAge" placeholder="예: 58" required>
+                    </div>
+                    <div class="input-group">
+                        <label>신장 (cm)</label>
+                        <input type="number" id="regHeight" placeholder="예: 165" required>
+                    </div>
+                    <div class="input-group">
+                        <label>성별</label>
+                        <select id="regGender" required>
+                            <option value="male">남성</option>
+                            <option value="female">여성</option>
+                        </select>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-cancel" onclick="closeModals()">취소</button>
+                        <button type="submit" class="btn-submit">등록 및 선택</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="selectModal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <h2>측정 대상자 선택</h2>
+                <ul id="userListContainer" class="user-list">
+                    </ul>
+                <div class="modal-buttons center">
+                    <button class="btn-cancel" onclick="closeModals()">닫기</button>
+                </div>
+            </div>
+        </div>
             <div class="grid-title">측정 및 분석 도구</div>
             <div class="tool-grid">
                 <div class="tool-card" onclick="openTool('posture_analysis.html', '정적 자세 분석')">
@@ -234,7 +284,6 @@
             if (event.data && event.data.action === 'MEASUREMENT_DONE') showDashboard();
         });
 
-        // ==== 오프라인 다운로드 제어 시스템 ====
         // ==== 오프라인 다운로드 제어 시스템 ====
     document.addEventListener("DOMContentLoaded", function() {
         // 접속 시 이미 완료된 기기라면 다운로드 카드 상자 전체를 완벽히 숨깁니다.
