@@ -1306,15 +1306,15 @@ function drawStressWave(ctx, normX, normY, metrics, intensity) {
     const px = metrics.x + (normX * metrics.width);
     const py = metrics.y + (normY * metrics.height);
     
-    // 파동의 크기 (눈에 더 잘 띄도록 기본 반경을 약간 키움)
+    // 파동의 크기 
     const radius = metrics.width * 0.08 * (0.5 + intensity);
     
     ctx.save();
     ctx.globalCompositeOperation = "source-over";
     
-    // 🚀 [핵심] 투명도(Alpha) 최솟값 보장: 강도가 낮아도 색상이 배경에 묻히지 않도록 강제 끌어올림
-    const coreAlpha = Math.min(0.7 + (intensity * 0.3), 1.0); // 최소 70% ~ 100% 진하기 유지
-    const midAlpha  = Math.min(0.5 + (intensity * 0.4), 0.9); // 최소 50% ~ 90% 진하기 유지
+    // 투명도(Alpha) 최솟값 보장: 강도가 낮아도 색상이 배경에 묻히지 않도록 강제 끌어올림
+    const coreAlpha = Math.min(0.7 + (intensity * 0.3), 1.0); 
+    const midAlpha  = Math.min(0.5 + (intensity * 0.4), 0.9); 
     
     // 시뻘겋게 타오르는 고대비(High Contrast) 열화상 그라디언트
     const gradient = ctx.createRadialGradient(px, py, 0, px, py, radius);
@@ -1328,10 +1328,11 @@ function drawStressWave(ctx, normX, normY, metrics, intensity) {
     ctx.fillStyle = gradient;
     ctx.fill();
     
-    // 🔥 포인트: 통증의 정확한 '원인점(타점)'을 콕 짚어주기 위해 중심에 빛나는 핫스팟 추가
+    // 🚀 [수정] 너무 튀지 않게 중앙 발광점을 은은하고 부드럽게 조절
     ctx.beginPath();
-    ctx.arc(px, py, radius * 0.12, 0, 2 * Math.PI);
-    ctx.fillStyle = `rgba(255, 255, 200, ${coreAlpha})`; // 밝은 형광 노랑
+    ctx.arc(px, py, radius * 0.1, 0, 2 * Math.PI); // 크기를 0.12에서 0.1로 약간 축소
+    // 색상을 눈부신 형광 노랑에서 따뜻한 금빛으로 바꾸고, 투명도를 45% 수준으로 대폭 낮춤
+    ctx.fillStyle = `rgba(255, 215, 0, ${coreAlpha * 0.45})`; 
     ctx.fill();
     
     ctx.restore();
