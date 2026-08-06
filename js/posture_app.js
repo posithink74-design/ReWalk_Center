@@ -1295,43 +1295,86 @@ function drawStaticVirtualMoire(ctx, landmarks, metrics) {
                 }
             }
         }
+
+        // 🚀🚀 [신규 추가: 후면(Back) 분석 시 부하 맵핑] 🚀🚀
+        if (st.v === 'back') {
+            // ① 어깨 비대칭 부하 (솟아오른 쪽 상부 승모근 긴장 타격)
+            if (mData.shoulder && Math.abs(mData.shoulder) >= 1.5) {
+                const ls = landmarks[11], rs = landmarks[12];
+                if (ls && rs && ls.visibility > 0.4 && rs.visibility > 0.4) {
+                    const highSho = mData.shoulder > 0 ? ls : rs; // 양수면 우측 하강 -> 좌측 높음
+                    const stressLevel = Math.min(Math.abs(mData.shoulder) / 5.0, 1.0);
+                    drawStressWave(ctx, highSho.x + (highSho === ls ? 0.02 : -0.02), highSho.y - 0.04, metrics, stressLevel * 1.2);
+                }
+            }
+
+            // ② 골반 비대칭 부하 (솟아오른 쪽 요방형근 허리통증 & 체중 실린 반대쪽 무릎 타격)
+            if (mData.pelvis && Math.abs(mData.pelvis) >= 1.5) {
+                const tiltVal = mData.pelvis; 
+                const isRightLower = tiltVal > 0;
+                const lh = landmarks[23], rh = landmarks[24]; 
+                const lk = landmarks[25], rk = landmarks[26]; 
+
+                if (lh && rh && lh.visibility > 0.4 && rh.visibility > 0.4) {
+                    const highHip = isRightLower ? lh : rh; 
+                    const overloadedKnee = isRightLower ? rk : lk;
+                    const stressLevel = Math.min(Math.abs(tiltVal) / 6.0, 1.0); 
+
+                    // 솟아오른 허리 측면에 강렬한 타점
+                    drawStressWave(ctx, highHip.x + (isRightLower ? 0.03 : -0.03), highHip.y - 0.08, metrics, stressLevel * 1.2);
+                    
+                    // 낮아진 무릎에 타점
+                    if (overloadedKnee && overloadedKnee.visibility > 0.4) {
+                        drawStressWave(ctx, overloadedKnee.x, overloadedKnee.y, metrics, stressLevel * 0.9);
+                    }
+                }
+            }
+
+            // ③ 척추 쏠림 부하 (몸통이 우측으로 쏠리면 넘어지지 않으려 좌측 척추기립근이 밧줄처럼 팽팽해짐)
+            if (mData.upperShift && Math.abs(mData.upperShift) > 4.0) {
+                const shiftVal = mData.upperShift;
+                const ls = landmarks[11], rs = landmarks[12];
+                if (ls && rs && ls.visibility > 0.4 && rs.visibility > 0.4) {
+                    const midX = (ls.x + rs.x) / 2;
+                    const stressLevel = Math.min(Math.abs(shiftVal) / 10.0, 1.0);
+                    // 우측 쏠림(양수)이면 버티는 쪽은 좌측(-0.04) 척추기립근
+                    const shiftDir = shiftVal > 0 ? -0.04 : 0.04; 
+                    drawStressWave(ctx, midX + shiftDir, (ls.y + landmarks[23].y)/2, metrics, stressLevel * 1.0);
+                }
+            }
+        }
     }
     ctx.restore();
 }
 
-// 🚨 특정 좌표에 경고 파동을 '고대비 열화상' 느낌으로 매우 선명하게 그려주는 함수
+// 🚨 특정 좌표에 경고 파동을 은은한 '고대비 열화상' 느낌으로 그려주는 헬퍼 함수
 function drawStressWave(ctx, normX, normY, metrics, intensity) {
-    if (intensity <= 0.1) return; // 부하가 너무 약하면 패스
+    if (intensity <= 0.1) return; 
     
     const px = metrics.x + (normX * metrics.width);
     const py = metrics.y + (normY * metrics.height);
-    
-    // 파동의 크기 
     const radius = metrics.width * 0.08 * (0.5 + intensity);
     
     ctx.save();
     ctx.globalCompositeOperation = "source-over";
     
-    // 투명도(Alpha) 최솟값 보장: 강도가 낮아도 색상이 배경에 묻히지 않도록 강제 끌어올림
     const coreAlpha = Math.min(0.7 + (intensity * 0.3), 1.0); 
     const midAlpha  = Math.min(0.5 + (intensity * 0.4), 0.9); 
     
-    // 시뻘겋게 타오르는 고대비(High Contrast) 열화상 그라디언트
     const gradient = ctx.createRadialGradient(px, py, 0, px, py, radius);
-    gradient.addColorStop(0, `rgba(255, 0, 0, ${coreAlpha})`);          // 1. 아주 진한 순수 빨강 (코어 통증)
-    gradient.addColorStop(0.3, `rgba(255, 80, 0, ${midAlpha})`);        // 2. 강렬한 주황
-    gradient.addColorStop(0.7, `rgba(255, 160, 0, ${midAlpha * 0.4})`); // 3. 밝은 노랑주황빛 확산
-    gradient.addColorStop(1, `rgba(255, 200, 0, 0)`);                   // 4. 자연스럽게 투명해짐
+    gradient.addColorStop(0, `rgba(255, 0, 0, ${coreAlpha})`);          
+    gradient.addColorStop(0.3, `rgba(255, 80, 0, ${midAlpha})`);        
+    gradient.addColorStop(0.7, `rgba(255, 160, 0, ${midAlpha * 0.4})`); 
+    gradient.addColorStop(1, `rgba(255, 200, 0, 0)`);                   
     
     ctx.beginPath();
     ctx.arc(px, py, radius, 0, 2 * Math.PI);
     ctx.fillStyle = gradient;
     ctx.fill();
     
-    // 🚀 [수정] 너무 튀지 않게 중앙 발광점을 은은하고 부드럽게 조절
+    // 중앙 금빛 발광점
     ctx.beginPath();
-    ctx.arc(px, py, radius * 0.1, 0, 2 * Math.PI); // 크기를 0.12에서 0.1로 약간 축소
-    // 색상을 눈부신 형광 노랑에서 따뜻한 금빛으로 바꾸고, 투명도를 45% 수준으로 대폭 낮춤
+    ctx.arc(px, py, radius * 0.1, 0, 2 * Math.PI);
     ctx.fillStyle = `rgba(255, 215, 0, ${coreAlpha * 0.45})`; 
     ctx.fill();
     
