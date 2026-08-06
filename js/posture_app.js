@@ -1299,23 +1299,40 @@ function drawStaticVirtualMoire(ctx, landmarks, metrics) {
     ctx.restore();
 }
 
-// 🚨 특정 좌표에 경고 파동을 부드러운 그라데이션(열화상 느낌)으로 그려주는 헬퍼 함수
+// 🚨 특정 좌표에 경고 파동을 '고대비 열화상' 느낌으로 매우 선명하게 그려주는 함수
 function drawStressWave(ctx, normX, normY, metrics, intensity) {
-    if (intensity <= 0.1) return; 
+    if (intensity <= 0.1) return; // 부하가 너무 약하면 패스
     
     const px = metrics.x + (normX * metrics.width);
     const py = metrics.y + (normY * metrics.height);
-    const radius = metrics.width * 0.06 * (0.5 + intensity);
     
+    // 파동의 크기 (눈에 더 잘 띄도록 기본 반경을 약간 키움)
+    const radius = metrics.width * 0.08 * (0.5 + intensity);
+    
+    ctx.save();
+    ctx.globalCompositeOperation = "source-over";
+    
+    // 🚀 [핵심] 투명도(Alpha) 최솟값 보장: 강도가 낮아도 색상이 배경에 묻히지 않도록 강제 끌어올림
+    const coreAlpha = Math.min(0.7 + (intensity * 0.3), 1.0); // 최소 70% ~ 100% 진하기 유지
+    const midAlpha  = Math.min(0.5 + (intensity * 0.4), 0.9); // 최소 50% ~ 90% 진하기 유지
+    
+    // 시뻘겋게 타오르는 고대비(High Contrast) 열화상 그라디언트
     const gradient = ctx.createRadialGradient(px, py, 0, px, py, radius);
-    gradient.addColorStop(0, `rgba(220, 38, 38, ${0.8 * intensity})`); 
-    gradient.addColorStop(0.5, `rgba(234, 88, 12, ${0.5 * intensity})`); 
-    gradient.addColorStop(1, `rgba(251, 146, 60, 0)`); 
+    gradient.addColorStop(0, `rgba(255, 0, 0, ${coreAlpha})`);          // 1. 아주 진한 순수 빨강 (코어 통증)
+    gradient.addColorStop(0.3, `rgba(255, 80, 0, ${midAlpha})`);        // 2. 강렬한 주황
+    gradient.addColorStop(0.7, `rgba(255, 160, 0, ${midAlpha * 0.4})`); // 3. 밝은 노랑주황빛 확산
+    gradient.addColorStop(1, `rgba(255, 200, 0, 0)`);                   // 4. 자연스럽게 투명해짐
     
     ctx.beginPath();
     ctx.arc(px, py, radius, 0, 2 * Math.PI);
     ctx.fillStyle = gradient;
     ctx.fill();
     
-    // 🚀 선명했던 3중 선을 삭제하여 지저분한 느낌을 지우고 퀄리티를 높였습니다.
+    // 🔥 포인트: 통증의 정확한 '원인점(타점)'을 콕 짚어주기 위해 중심에 빛나는 핫스팟 추가
+    ctx.beginPath();
+    ctx.arc(px, py, radius * 0.12, 0, 2 * Math.PI);
+    ctx.fillStyle = `rgba(255, 255, 200, ${coreAlpha})`; // 밝은 형광 노랑
+    ctx.fill();
+    
+    ctx.restore();
 }
