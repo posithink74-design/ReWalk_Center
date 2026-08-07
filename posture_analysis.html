@@ -23,91 +23,54 @@
     <button class="pa-nav-btn" data-tab="history"><span class="material-icons" style="font-size:16px;vertical-align:middle;">folder</span> 기록관리</button>
   </div>
 
-  <div class="pa-panel on" id="pa-analyze">
-    <div class="pa-wrap">
-      
-      <div class="pa-card">
-        <div class="pa-vtabs">
-          <button class="pa-vtab on" data-v="front">정면</button>
-          <button class="pa-vtab" data-v="side">측면</button>
-          <button class="pa-vtab" data-v="back">후면</button>
-        </div>
-        <div class="pa-vhdr">
-          <div>
-            <div class="pa-vname" id="pa-vname">정면</div>
-            <div class="pa-veng" id="pa-veng">Anterior View</div>
-          </div>
-          <div style="display:flex; gap:8px;">
-            <label class="pa-upbtn">
-              <span id="pa-upbtn-txt">사진 선택</span>
-              <input type="file" id="pa-file" accept="image/*" style="display:none;">
-            </label>
-            <label class="pa-upbtn pa-cambtn">
-              <span>카메라 촬영</span>
-              <input type="file" id="pa-camfile" accept="image/*" capture="environment" style="display:none;">
-            </label>
-          </div>
-        </div>
-
-        <div class="pa-cvbox">
-          <!-- 🚀 [수정 완] 서랍과 사진을 분리하기 위해 껍데기(pa-cvi) 구조 재배치 -->
-          <div class="pa-cvi" id="pa-cvi">
-            <div class="pa-ph" id="pa-ph">
-              <span class="material-icons" style="font-size:48px; color:#B9C7DC;">add_photo_alternate</span>
-              <div class="pa-ph-txt">사진을 업로드해주세요</div>
+<div class="pa-panel on" id="pa-analyze">
+    <!-- 📌 카메라 & 분석 뷰 (화면 꽉 차게) -->
+    <div class="pa-camera-container" style="position: relative; background: #000; height: 60vh; display: flex; flex-direction: column;">
+        
+        <!-- 상단 뷰 선택 및 상태 (정면/측면/후면) -->
+        <div class="pa-vhdr" style="position: absolute; top: 0; width: 100%; z-index: 10; background: rgba(0,0,0,0.5); padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="pa-vtabs" style="display: flex; gap: 5px;">
+                <button class="pa-vtab on" data-v="front">정면</button>
+                <button class="pa-vtab" data-v="side">측면</button>
+                <button class="pa-vtab" data-v="back">후면</button>
             </div>
-            <img id="pa-img" style="display:none" alt="자세 사진"/>
-            <canvas id="pa-cv"></canvas>
+            <div style="color: #fff; font-size: 12px; font-weight: bold;">
+                <span id="pa-vname">정면</span> 분석
+            </div>
+        </div>
+
+        <!-- 🚀 메인 캔버스 및 이미지 영역 -->
+        <div class="pa-cvi" id="pa-cvi" style="flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+            <div class="pa-ph" id="pa-ph" style="color: rgba(255,255,255,0.5); text-align: center;">
+                <span class="material-icons" style="font-size:48px;">add_photo_alternate</span>
+                <div class="pa-ph-txt">사진을 촬영하거나 업로드하세요</div>
+            </div>
+            <img id="pa-img" style="display:none; max-width: 100%; max-height: 100%; object-fit: contain;" alt="자세 사진"/>
+            <canvas id="pa-cv" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
             <div class="pa-cvhint" id="pa-cvhint" style="display:none;"></div>
-          </div> <!-- 🚀 사진 회전 구역은 여기서 닫힘 -->
+        </div>
 
-          <!-- 🚀 서랍은 바깥에 두어 회전 영향을 전혀 받지 않음 -->
-          <div class="pa-overlay-drawer" id="pa-overlay-drawer">
-            <button type="button" class="pa-drawer-handle" id="pa-drawer-handle" title="도구함 열기/닫기">
-              <span class="material-icons" id="pa-drawer-icon">chevron_left</span>
+        <!-- 🚀 그리기 도구 서랍 (카메라 우측에 플로팅 됨) -->
+        <div class="pa-overlay-drawer" id="pa-overlay-drawer" style="position: absolute; right: 0; top: 50px; z-index: 20;">
+            <button type="button" class="pa-drawer-handle" id="pa-drawer-handle">
+                <span class="material-icons" id="pa-drawer-icon">chevron_left</span>
             </button>
-
-            <div class="pa-drawer-content">
+            <div class="pa-drawer-content" style="background: rgba(0,0,0,0.7); border-radius: 8px;">
               <div class="pa-ot-group">
-                <button type="button" id="pa-grid-density-btn" class="pa-ot-btn" title="격자 순환">
-                  <span class="material-icons">grid_off</span>
-                  <span class="ot-txt">격자 OFF</span>
-                </button>
-                <button type="button" id="pa-lbl-btn" class="pa-ot-btn on" title="측정값">
-                  <span class="material-icons">straighten</span>
-                  <span class="ot-txt">측정값</span>
-                </button>
-                <button type="button" id="pa-moire-btn" class="pa-ot-btn" title="등고선">
-                  <span class="material-icons">3d_rotation</span>
-                  <span class="ot-txt">등고선</span>
-                </button>
+                <button type="button" id="pa-grid-density-btn" class="pa-ot-btn" title="격자 순환"><span class="material-icons">grid_off</span><span class="ot-txt">격자 OFF</span></button>
+                <button type="button" id="pa-lbl-btn" class="pa-ot-btn on" title="측정값"><span class="material-icons">straighten</span><span class="ot-txt">측정값</span></button>
+                <button type="button" id="pa-moire-btn" class="pa-ot-btn" title="등고선"><span class="material-icons">3d_rotation</span><span class="ot-txt">등고선</span></button>
               </div>
-
               <div class="pa-ot-divider"></div>
-
               <div class="pa-ot-group">
-                <button type="button" class="pa-ot-btn pa-sh-btn on" data-tool="edit" title="선택/이동">
-                  <span class="material-icons">open_with</span>
-                </button>
-                <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="rect" title="사각형">
-                  <span class="material-icons">crop_square</span>
-                </button>
-                <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="circle" title="원">
-                  <span class="material-icons">panorama_fish_eye</span>
-                </button>
-                <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="arrow" title="화살표">
-                  <span class="material-icons">north_east</span>
-                </button>
-                <button type="button" id="pa-undo" class="pa-ot-btn" title="되돌리기">
-                  <span class="material-icons">undo</span>
-                </button>
-                <button type="button" id="pa-clear" class="pa-ot-btn danger" title="삭제">
-                  <span class="material-icons">delete_outline</span>
-                </button>
+                <button type="button" class="pa-ot-btn pa-sh-btn on" data-tool="edit" title="선택/이동"><span class="material-icons">open_with</span></button>
+                <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="rect" title="사각형"><span class="material-icons">crop_square</span></button>
+                <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="circle" title="원"><span class="material-icons">panorama_fish_eye</span></button>
+                <button type="button" class="pa-ot-btn pa-sh-btn" data-tool="arrow" title="화살표"><span class="material-icons">north_east</span></button>
+                <button type="button" id="pa-undo" class="pa-ot-btn" title="되돌리기"><span class="material-icons">undo</span></button>
+                <button type="button" id="pa-clear" class="pa-ot-btn danger" title="삭제"><span class="material-icons">delete_outline</span></button>
               </div>
-
               <div class="pa-ot-divider"></div>
-
               <div class="pa-ot-colors">
                 <button type="button" class="pa-dot on" data-c="#D9842A" style="background:#D9842A"></button>
                 <button type="button" class="pa-dot" data-c="#C0392B" style="background:#C0392B"></button>
@@ -115,47 +78,71 @@
                 <button type="button" class="pa-dot" data-c="#2E8B57" style="background:#2E8B57"></button>
               </div>
             </div>
-          </div>
-        </div>  
-        <div class="pa-rotbar" id="pa-rotbar" style="display:none">
-          <span class="pa-rotlbl">사진 회전</span>
-          <button class="pa-rotbtn" id="pa-rot-l" type="button">↺</button>
-          <input type="range" id="pa-rot" min="-15" max="15" step="0.5" value="0" class="pa-rotrange">
-          <button class="pa-rotbtn" id="pa-rot-r" type="button">↻</button>
-          <span class="pa-rotval" id="pa-rotval">0°</span>
         </div>
-
-        <button class="pa-auto-btn" id="pa-auto-btn" disabled>관절 자동 감지 (AI)</button>
-        <div class="pa-auto-st" id="pa-auto-st">사진을 올리고 앵글을 맞춘 후 AI 버튼을 누르세요.</div>
-          
-        <label style="font-size: 13px; font-weight: bold; color: #5A6B82; margin-top: 15px; display: block;">📝 소견 메모</label>
-        <textarea class="pa-ntxt" id="pa-notes" placeholder="예) 우측 어깨 하강, 거북목 심화 등"></textarea>
-      </div>
-
-      <div class="pa-card" id="pa-checklist-card">
-        <button class="pa-chk-toggle" id="pa-chk-toggle" type="button">
-          <span class="pa-chk-toggle-lbl">🔍 지도자 관찰 소견 <span class="pa-chk-count" id="pa-chk-count"></span></span>
-          <span class="pa-chk-arrow" id="pa-chk-arrow">▾</span>
-        </button>
-        <div class="pa-chk-body pa-chk-collapsed" id="pa-chk-body">
-          <div style="font-size:11.5px; color:#8595AD; margin:8px 0 14px;">2D 측정으로 정량화 어려운 항목 · 육안 관찰 소견</div>
-          <div class="pa-chk-grid">
-            <div class="pa-chk-item"><label>라운드 숄더</label><select class="pa-chk-sel" data-chk="roundedShoulder"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
-            <div class="pa-chk-item"><label>흉추후만</label><select class="pa-chk-sel" data-chk="thoracicKyphosis"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
-            <div class="pa-chk-item"><label>요추전만</label><select class="pa-chk-sel" data-chk="lumbarLordosis"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
-            <div class="pa-chk-item"><label>골반 전방경사</label><select class="pa-chk-sel" data-chk="anteriorPelvicTilt"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
-            <div class="pa-chk-item"><label>골반 후방경사</label><select class="pa-chk-sel" data-chk="posteriorPelvicTilt"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
-            <div class="pa-chk-item"><label>스웨이백</label><select class="pa-chk-sel" data-chk="swayBack"><option value="none">해당 없음</option><option value="present">관찰됨</option></select></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="pa-card">
-        <button class="pa-btn pa-teal" id="pa-save">💾 현재 화면 분석 데이터 저장</button>
-        <div style="font-size:12px; color:#8595AD; text-align:center; margin-top:8px;">정면, 측면, 후면을 각각 분석 후 누적 저장하세요.</div>
-      </div>
     </div>
-  </div>
+
+    <!-- 📌 AI 상태 및 사진 회전 바 -->
+    <div style="background: #111; padding: 10px;">
+        <div class="pa-auto-st" id="pa-auto-st" style="color: #4A90E2; font-size: 13px; text-align: center; margin-bottom: 5px;">
+            안내: 하단의 버튼을 눌러 이미지를 불러오세요.
+        </div>
+        <div class="pa-rotbar" id="pa-rotbar" style="display:none; justify-content: center; align-items: center; gap: 10px; color: #fff;">
+            <button class="pa-rotbtn" id="pa-rot-l" type="button">↺</button>
+            <input type="range" id="pa-rot" min="-15" max="15" step="0.5" value="0" class="pa-rotrange">
+            <button class="pa-rotbtn" id="pa-rot-r" type="button">↻</button>
+        </div>
+    </div>
+
+    <!-- 📌 하단 플로팅 컨트롤 패널 -->
+    <div class="control-panel" style="background: #FFFFFF; padding: 15px; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-around; align-items: center;">
+        
+        <label class="btn" style="text-align: center; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+            <div class="btn-icon" style="background: #F1F4F8; color: #2C3E50; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center;"><span class="material-icons">photo_library</span></div>
+            <span style="font-size: 11px; margin-top: 4px; color: #2C3E50; font-weight:bold;">갤러리</span>
+            <input type="file" id="pa-file" accept="image/*" style="display:none;">
+        </label>
+
+        <label class="btn" style="text-align: center; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+            <div class="btn-icon" style="background: #F1F4F8; color: #2C3E50; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center;"><span class="material-icons">photo_camera</span></div>
+            <span style="font-size: 11px; margin-top: 4px; color: #2C3E50; font-weight:bold;">카메라</span>
+            <input type="file" id="pa-camfile" accept="image/*" capture="environment" style="display:none;">
+        </label>
+
+        <button class="btn pa-auto-btn" id="pa-auto-btn" style="border: none; background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center;" disabled>
+            <div class="btn-icon" style="background: #4A90E2; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(74, 144, 226, 0.4);"><span class="material-icons" style="font-size: 28px;">auto_awesome</span></div>
+            <span style="font-size: 12px; font-weight: bold; margin-top: 6px; color: #4A90E2;">AI 자동 분석</span>
+        </button>
+
+        <button class="btn" id="pa-save" style="border: none; background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center;">
+            <div class="btn-icon" style="background: #F1F4F8; color: #2E8B57; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center;"><span class="material-icons">save</span></div>
+            <span style="font-size: 11px; margin-top: 4px; color: #2C3E50; font-weight:bold;">화면 저장</span>
+        </button>
+    </div>
+
+    <!-- 📌 부가 기능 영역 (스크롤해서 확인) -->
+    <div style="padding: 20px; background: #F4F7FA;">
+        <label style="font-size: 13px; font-weight: bold; color: #2C3E50; display: block;">📝 소견 메모</label>
+        <textarea class="pa-ntxt" id="pa-notes" placeholder="예) 우측 어깨 하강, 거북목 심화 등" style="width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-top: 5px; height: 60px; font-family:inherit;"></textarea>
+        
+        <div class="pa-card" id="pa-checklist-card" style="margin-top: 15px; background:#fff; border-radius:12px; padding:15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+            <button class="pa-chk-toggle" id="pa-chk-toggle" type="button" style="width:100%; background:none; border:none; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                <span class="pa-chk-toggle-lbl" style="font-weight:bold; font-size:14px; color:#1F3864;">🔍 지도자 관찰 소견 <span class="pa-chk-count" id="pa-chk-count"></span></span>
+                <span class="pa-chk-arrow" id="pa-chk-arrow">▾</span>
+            </button>
+            <div class="pa-chk-body pa-chk-collapsed" id="pa-chk-body">
+                <div style="font-size:11.5px; color:#8595AD; margin:8px 0 14px;">2D 측정으로 정량화 어려운 항목 · 육안 관찰 소견</div>
+                <div class="pa-chk-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div class="pa-chk-item"><label style="font-size:12px; color:#555;">라운드 숄더</label><select class="pa-chk-sel" data-chk="roundedShoulder" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+                    <div class="pa-chk-item"><label style="font-size:12px; color:#555;">흉추후만</label><select class="pa-chk-sel" data-chk="thoracicKyphosis" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+                    <div class="pa-chk-item"><label style="font-size:12px; color:#555;">요추전만</label><select class="pa-chk-sel" data-chk="lumbarLordosis" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+                    <div class="pa-chk-item"><label style="font-size:12px; color:#555;">골반 전방경사</label><select class="pa-chk-sel" data-chk="anteriorPelvicTilt" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+                    <div class="pa-chk-item"><label style="font-size:12px; color:#555;">골반 후방경사</label><select class="pa-chk-sel" data-chk="posteriorPelvicTilt" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+                    <div class="pa-chk-item"><label style="font-size:12px; color:#555;">스웨이백</label><select class="pa-chk-sel" data-chk="swayBack" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="present">관찰됨</option></select></div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>  
 
   <div class="pa-panel" id="pa-compare">
     <div class="pa-wrap">
