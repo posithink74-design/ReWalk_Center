@@ -20,22 +20,27 @@
 
 <div class="pa-panel on" id="pa-analyze" style="background: #000; min-height: 100vh; display: flex; flex-direction: column;">
     
-    <!-- 📌 상단 헤더 (이름 중복 제거 및 우측 배치로 1줄로 깔끔하게 통합) -->
+    <!-- 📌 상단 헤더 (뒤로 가기 버튼 추가 및 이름 배치) -->
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #111; border-bottom: 1px solid #333;">
         
-        <!-- 🚨 1. 해결됨: 대상자 이름을 좌측(Left)으로 이동하여 직관성 확보 -->
-        <div id="display-name" style="color: #4A90E2; font-size: 15px; font-weight: bold; z-index: 100;">
-            👤 대상자 로딩중
+        <!-- 🚨 뒤로 가기 버튼 & 대상자 이름 묶음 -->
+        <div style="display: flex; align-items: center; gap: 12px; z-index: 100;">
+            <button onclick="window.history.back();" style="background: transparent; border: none; color: #fff; cursor: pointer; padding: 0; display: flex; align-items: center;" title="이전 화면으로">
+                <span class="material-icons" style="font-size: 22px;">arrow_back_ios_new</span>
+            </button>
+            <div id="display-name" style="color: #4A90E2; font-size: 15px; font-weight: bold;">
+                👤 대상자 로딩중
+            </div>
         </div>
 
-        <!-- 🚨 2. 해결됨: 뷰 선택 탭(정면/측면/후면)을 우측(Right)으로 자연스럽게 밀어냄 -->
+        <!-- 뷰 선택 탭(정면/측면/후면) -->
         <div class="pa-vtabs" style="display: flex; gap: 5px; margin: 0; z-index: 100;">
             <button class="pa-vtab on" data-v="front" style="padding: 6px 12px; font-size: 13px; border-radius: 8px;">정면</button>
             <button class="pa-vtab" data-v="side" style="padding: 6px 12px; font-size: 13px; border-radius: 8px;">측면</button>
             <button class="pa-vtab" data-v="back" style="padding: 6px 12px; font-size: 13px; border-radius: 8px;">후면</button>
         </div>
         
-        <!-- 🚨 JS 에러 방지용 숨김 데이터 (절대 지우지 마세요!) -->
+        <!-- JS 에러 방지용 숨김 데이터 -->
         <div style="display: none;">
             <span id="pa-vname">정면</span>
             <span id="pa-veng">Anterior View</span>
@@ -44,7 +49,7 @@
     </div>
 
     <!-- 📌 메인 캔버스 및 카메라 영역 -->
-     <div class="pa-cvi" id="pa-cvi" style="position: relative; flex: 1; min-height: 55vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000;">
+    <div class="pa-cvi" id="pa-cvi" style="position: relative; flex: 1; min-height: 55vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000;">
         <div class="pa-ph" id="pa-ph" style="color: rgba(255,255,255,0.5); text-align: center;">
             <span class="material-icons" style="font-size:48px;">add_photo_alternate</span>
             <div class="pa-ph-txt">사진을 촬영하거나 업로드하세요</div>
@@ -123,71 +128,76 @@
         </button>
     </div>
 
-    <!-- 📌 부가 기능 영역 (메모, 체크리스트) -->
+    <!-- 📌 부가 기능 영역 (체크리스트를 위로, 메모를 아래로 배치) -->
     <div style="padding: 20px; background: #0f172a; flex: 1;">
-        <label style="font-size: 13px; font-weight: bold; color: #e2e8f0; display: block;">📝 소견 메모</label>
-        <textarea class="pa-ntxt" id="pa-notes" placeholder="예) 우측 어깨 하강, 거북목 심화 등" style="width: 100%; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-top: 5px; height: 60px; font-family:inherit; background: rgba(255,255,255,0.05); color: #fff;"></textarea>
-        <div class="pa-card" id="pa-checklist-card" style="margin-top: 15px; background:#fff; border-radius:12px; padding:15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-            <button class="pa-chk-toggle" id="pa-chk-toggle" type="button" style="width:100%; background:none; border:none; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
-                <span class="pa-chk-toggle-lbl" style="font-weight:bold; font-size:14px; color:#1F3864;">🔍 지도자 관찰 소견 <span class="pa-chk-count" id="pa-chk-count"></span></span>
-                <span class="pa-chk-arrow" id="pa-chk-arrow">▾</span>
-            </button>
-        <div class="pa-card" id="pa-checklist-card" style="margin-top: 15px; background:rgba(255,255,255,0.05); border-radius:12px; padding:15px; border: 1px solid #334155;">
-          <div class="pa-chk-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">라운드 숄더</label><select class="pa-chk-sel" data-chk="roundedShoulder" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
-              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">흉추후만</label><select class="pa-chk-sel" data-chk="thoracicKyphosis" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
-              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">요추전만</label><select class="pa-chk-sel" data-chk="lumbarLordosis" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
-              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">골반 전방경사</label><select class="pa-chk-sel" data-chk="anteriorPelvicTilt" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
-              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">골반 후방경사</label><select class="pa-chk-sel" data-chk="posteriorPelvicTilt" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
-              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">스웨이백</label><select class="pa-chk-sel" data-chk="swayBack" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="present">관찰됨</option></select></div>
-            </div>
-        </div>
-    </div>
-  </div>  
-
-  <div class="pa-panel" id="pa-compare">
-    <div class="pa-wrap">
-      <div class="pa-card">
-        <div class="pa-sellbl">🔵 이전 회차 (Before)</div>
-        <select class="pa-csel" id="pa-ca"></select>
-        <div class="pa-sellbl">🔴 최근 회차 (After)</div>
-        <select class="pa-csel" id="pa-cb"></select>
-
-        <div class="pa-vtabs" style="margin-top:10px;">
-          <button class="pa-cvt on" data-cv="front">정면</button>
-          <button class="pa-cvt" data-cv="side">측면</button>
-          <button class="pa-cvt" data-cv="back">후면</button>
-        </div>
-
-        <div class="pa-cgrid">
-          <div>
-            <div class="pa-chdr" style="background:#1F3864">이전</div>
-            <div class="pa-cwrap-comp" id="pa-cia"><div class="pa-cinner-comp" style="color:#888; font-size:12px;">선택 대기중</div></div>
-          </div>
-          <div>
-            <div class="pa-chdr" style="background:#D9842A">최근</div>
-            <div class="pa-cwrap-comp" id="pa-cib"><div class="pa-cinner-comp" style="color:#888; font-size:12px;">선택 대기중</div></div>
-          </div>
-        </div>
         
-        <button class="pa-btn pa-green" id="pa-cpdf">
-            <span class="material-icons" style="vertical-align:middle; font-size:18px;">print</span> Before/After 맞춤 리포트 출력
-        </button>
+        <!-- 1. 지도자 관찰 체크 (이름 변경 및 위로 배치) -->
+        <div class="pa-card" id="pa-checklist-card" style="background:rgba(255,255,255,0.05); border-radius:12px; padding:15px; border: 1px solid #334155; margin-bottom: 20px;">
+          <button class="pa-chk-toggle" id="pa-chk-toggle" type="button" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: transparent; border: none; color: #e2e8f0; font-size: 14px; font-weight: bold; cursor: pointer; padding: 0;">
+            <span class="pa-chk-toggle-lbl">🔍 지도자 관찰 체크 <span class="pa-chk-count" id="pa-chk-count" style="display:none; margin-left:6px; background:#D9842A; color:#fff; padding:2px 6px; border-radius:10px; font-size:11px;"></span></span>
+            <span class="pa-chk-arrow" id="pa-chk-arrow" style="transition: transform 0.3s ease; font-size: 20px;">▾</span>
+          </button>
+          <div class="pa-chk-body pa-chk-collapsed" id="pa-chk-body">
+            <div style="font-size:11.5px; color:#8595AD; margin:12px 0 14px;">2D 측정으로 정량화 어려운 항목 · 육안 관찰 체크</div>
+            <div class="pa-chk-grid">
+              <div class="pa-chk-item"><label style="color:#e2e8f0;">라운드 숄더</label><select class="pa-chk-sel" data-chk="roundedShoulder"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+              <div class="pa-chk-item"><label style="color:#e2e8f0;">흉추후만</label><select class="pa-chk-sel" data-chk="thoracicKyphosis"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+              <div class="pa-chk-item"><label style="color:#e2e8f0;">요추전만</label><select class="pa-chk-sel" data-chk="lumbarLordosis"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+              <div class="pa-chk-item"><label style="color:#e2e8f0;">골반 전방경사</label><select class="pa-chk-sel" data-chk="anteriorPelvicTilt"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+              <div class="pa-chk-item"><label style="color:#e2e8f0;">골반 후방경사</label><select class="pa-chk-sel" data-chk="posteriorPelvicTilt"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+              <div class="pa-chk-item"><label style="color:#e2e8f0;">스웨이백</label><select class="pa-chk-sel" data-chk="swayBack"><option value="none">해당 없음</option><option value="present">관찰됨</option></select></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 소견 메모 (체크리스트 아래로 이동 및 바탕색 흰색 유지) -->
+        <label style="font-size: 13px; font-weight: bold; color: #e2e8f0; display: block;">📝 소견 메모</label>
+        <textarea class="pa-ntxt" id="pa-notes" placeholder="예) 우측 어깨 하강, 거북목 심화 등" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-top: 5px; height: 80px; font-family:inherit; background: #ffffff; color: #000000;"></textarea>
+    </div>
+
+    <div class="pa-panel" id="pa-compare">
+      <div class="pa-wrap">
+        <div class="pa-card">
+          <div class="pa-sellbl">🔵 이전 회차 (Before)</div>
+          <select class="pa-csel" id="pa-ca"></select>
+          <div class="pa-sellbl">🔴 최근 회차 (After)</div>
+          <select class="pa-csel" id="pa-cb"></select>
+
+          <div class="pa-vtabs" style="margin-top:10px;">
+            <button class="pa-cvt on" data-cv="front">정면</button>
+            <button class="pa-cvt" data-cv="side">측면</button>
+            <button class="pa-cvt" data-cv="back">후면</button>
+          </div>
+
+          <div class="pa-cgrid">
+            <div>
+              <div class="pa-chdr" style="background:#1F3864">이전</div>
+              <div class="pa-cwrap-comp" id="pa-cia"><div class="pa-cinner-comp" style="color:#888; font-size:12px;">선택 대기중</div></div>
+            </div>
+            <div>
+              <div class="pa-chdr" style="background:#D9842A">최근</div>
+              <div class="pa-cwrap-comp" id="pa-cib"><div class="pa-cinner-comp" style="color:#888; font-size:12px;">선택 대기중</div></div>
+            </div>
+          </div>
+          
+          <button class="pa-btn pa-green" id="pa-cpdf">
+              <span class="material-icons" style="vertical-align:middle; font-size:18px;">print</span> Before/After 맞춤 리포트 출력
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="pa-panel" id="pa-history">
-    <div class="pa-wrap">
-      <button class="pa-btn pa-teal" id="pa-new-session-btn" style="margin-bottom: 8px; box-shadow: 0 4px 12px rgba(46,92,158,0.2);">
-          <span class="material-icons" style="vertical-align:middle; font-size:18px;">add_circle_outline</span> 새로운 측정(회차) 시작하기
-      </button>
-      <div style="font-size:12px; color:#8595AD; text-align:center; margin-bottom:15px; word-break:keep-all;">같은 날 연속 측정 시, 위 버튼을 눌러 이전 기록을 보존하고 새 회차를 만드세요.</div>
-      
-      <div class="pa-card" id="pa-slist" style="background:transparent; box-shadow:none; padding:0;"></div>
-     </div>
+    <div class="pa-panel" id="pa-history">
+      <div class="pa-wrap">
+        <button class="pa-btn pa-teal" id="pa-new-session-btn" style="margin-bottom: 8px; box-shadow: 0 4px 12px rgba(46,92,158,0.2);">
+            <span class="material-icons" style="vertical-align:middle; font-size:18px;">add_circle_outline</span> 새로운 측정(회차) 시작하기
+        </button>
+        <div style="font-size:12px; color:#8595AD; text-align:center; margin-bottom:15px; word-break:keep-all;">같은 날 연속 측정 시, 위 버튼을 눌러 이전 기록을 보존하고 새 회차를 만드세요.</div>
+        
+        <div class="pa-card" id="pa-slist" style="background:transparent; box-shadow:none; padding:0;"></div>
+      </div>
+      </div>
     </div>
-  </div>
 
 <button class="btn-save-dash" id="pa-btn-dash">
     <span class="material-icons" style="vertical-align:middle;">check_circle</span> 모든 측정 완료 및 대시보드 복귀
@@ -225,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <!-- 🚀 지도자 관찰 소견 접기/펼치기 강제 작동 스크립트 -->
 <script>
+// 🚀 지도자 관찰 체크 펼치기/접기 및 화살표 애니메이션 스크립트
 document.addEventListener('DOMContentLoaded', function() {
     const toggleBtn = document.getElementById('pa-chk-toggle');
     const chkBody = document.getElementById('pa-chk-body');
@@ -232,14 +243,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if(toggleBtn && chkBody) {
         toggleBtn.addEventListener('click', function(e) {
-            e.preventDefault(); // 기본 클릭 동작 방지
+            e.preventDefault(); // 화면 튕김 방지
             const isCollapsed = chkBody.classList.toggle('pa-chk-collapsed');
             
-            // 화살표 방향 변경
+            // 화살표 빙글 도는 애니메이션
             if(chkArrow) {
                 chkArrow.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)';
-                chkArrow.style.display = 'inline-block';
-                chkArrow.style.transition = 'transform 0.3s';
             }
         });
     }
