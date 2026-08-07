@@ -418,60 +418,87 @@ body { margin: 0; padding: 15px; background-color: #F4F7FA; padding-bottom: 20px
 .btn-pick { background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
 
 /* ========================================================================= */
-/* 🚀 [네이티브 카메라 앱 스타일 덮어쓰기 (다크 테마 & 풀스크린)] 🚀 */
+/* 🚀 [네이티브 카메라 앱 스타일 덮어쓰기 (완벽 교정본)] 🚀 */
 /* ========================================================================= */
 
-/* 1. 분석 탭 전체를 꽉 찬 검은색 화면으로 변경 */
+/* 1. 가로 폭 팽창 차단 (우측 핸들바 가로 흔들림 완벽 차단) */
+body, html {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+}
+#pa-root {
+    overflow-x: hidden !important;
+    position: relative;
+}
+
+/* 2. 분석 탭 전용 다크 테마 및 스크롤 허용 (체크리스트 확인용) */
 #pa-root #pa-analyze {
     padding: 0 !important;
     background-color: #000 !important; 
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto !important; /* 세로 스크롤 허용 */
+    overflow-x: hidden !important;
     border-radius: 0;
 }
 
-/* 2. 기존 컴팩트 스타일(48vh, absolute)을 무력화하고 꽉 찬 뷰로 해제 */
+/* 3. 🚨 상단 헤더 겹침 및 정면/측면 버튼 먹통 해결 🚨 */
+#pa-analyze > div:first-child {
+    display: flex !important;
+    flex-wrap: wrap !important; /* 공간이 부족하면 탭이 자연스럽게 아래로 내려감 */
+    justify-content: center !important;
+    gap: 12px !important;
+    position: relative;
+    z-index: 100; /* 버튼이 눌리도록 최상단 배치 */
+    padding: 15px !important;
+}
+#pa-analyze .pa-vtabs { 
+    margin: 0 auto !important; 
+    position: relative;
+    z-index: 100;
+}
+#pa-analyze .pa-vtab {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #ddd !important;
+    border: none !important;
+    border-radius: 20px !important;
+    padding: 8px 16px !important;
+    cursor: pointer !important;
+}
+#pa-analyze .pa-vtab.on {
+    background: #4A90E2 !important;
+    color: #fff !important;
+    font-weight: bold !important;
+}
+
+/* 4. 카메라 및 캔버스 영역 최적화 */
 #pa-root .pa-camera-container {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-height: 55vh !important;
 }
-
 #pa-root .pa-cvbox {
     height: auto !important;
-    min-height: unset !important;
-    max-height: none !important;
+    min-height: 55vh !important;
     background: transparent !important;
     border: none !important;
     margin: 0 !important;
     flex: 1;
     display: flex;
 }
-
 #pa-root .pa-cvi {
-    position: relative !important; /* 기존 absolute 강제 해제 */
+    position: relative !important; /* absolute 강제 해제 */
     flex: 1 !important;
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    z-index: 10;
 }
 
-/* 3. 상단 뷰 탭(정면/측면/후면) 다크 테마 조화 */
-#pa-analyze .pa-vtabs { margin-bottom: 0; display: flex; gap: 5px; }
-#pa-analyze .pa-vtab {
-    background: rgba(255, 255, 255, 0.2) !important;
-    color: #ddd !important;
-    border: none !important;
-    border-radius: 20px !important;
-}
-#pa-analyze .pa-vtab.on {
-    background: #4A90E2 !important;
-    color: #fff !important;
-}
-
-/* 4. 빼꼼 서랍(Drawer) 다크 모드 동기화 */
+/* 5. 우측 서랍 다크 테마 연동 */
 #pa-analyze .pa-drawer-handle {
     background: rgba(0, 0, 0, 0.7) !important;
     color: white !important;
@@ -484,36 +511,7 @@ body { margin: 0; padding: 15px; background-color: #F4F7FA; padding-bottom: 20px
     border-right: none !important;
 }
 
-/* 5. 하단 플로팅 컨트롤 패널 버튼 애니메이션 및 비활성화 처리 */
-.control-panel .btn {
-    transition: transform 0.2s ease;
-}
-.control-panel .btn:active {
-    transform: scale(0.92);
-}
-.control-panel .pa-auto-btn:disabled .btn-icon {
-    background: #ccc !important;
-    box-shadow: none !important;
-}
-.control-panel .pa-auto-btn:disabled span {
-    color: #999 !important;
-}
-
-/* 🚀 가로 폭 팽창 차단 및 네이티브 앱 뷰 고정 */
-body, html {
-    overflow-x: hidden !important; /* 우측 서랍이 화면을 밀어내는 것을 100% 차단 */
-    width: 100vw !important;
-    max-width: 100% !important;
-}
-
-#pa-root {
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-    position: relative; /* 서랍이 이 안에서만 움직이도록 기준점 설정 */
-}
-
-/* 🚀 메인 탭(분석/회차비교/기록관리)을 모바일 앱 하단 바(Bottom Nav)로 이동 */
+/* 6. 메인 탭(분석/회차비교/기록관리) 모바일 하단 바 고정 */
 #pa-root .pa-nav {
     position: fixed !important;
     bottom: 0 !important;
@@ -523,15 +521,14 @@ body, html {
     border-top: 1px solid #E4EAF2 !important;
     border-bottom: none !important;
     border-radius: 20px 20px 0 0 !important;
-    box-shadow: 0 -4px 15px rgba(0,0,0,0.05) !important;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.1) !important;
     z-index: 9999 !important;
     display: flex;
     justify-content: space-around;
-    padding-bottom: env(safe-area-inset-bottom); /* 아이폰 하단 바 대응 */
+    padding-bottom: env(safe-area-inset-bottom) !important;
 }
-
-/* 탭 버튼 스타일 앱처럼 통통하게 변경 */
 #pa-root .pa-nav-btn {
+    flex: 1;
     padding: 12px 0 !important;
     border: none !important;
     border-radius: 12px !important;
@@ -539,10 +536,42 @@ body, html {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    background: transparent !important;
+    color: #8595AD !important;
+}
+#pa-root .pa-nav-btn.on {
+    color: #1F3864 !important;
+    font-weight: 800 !important;
+    background: #EEF3FA !important;
 }
 
-/* 분석 뷰 하단에 탭바만큼의 여백(약 70px)을 주어 컨텐츠가 가려지지 않게 함 */
+/* 7. 🚨 회차 비교 탭 붕괴 100% 복원 🚨 */
 #pa-root .pa-panel {
-    padding-bottom: 80px !important; 
+    padding-bottom: 90px !important; /* 하단 탭에 컨텐츠 가림 방지 */
 }
+#pa-root #pa-compare .pa-cgrid {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    gap: 10px !important;
+}
+#pa-root #pa-compare .pa-cgrid > div {
+    flex: 1 !important;
+    width: 50% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+#pa-root #pa-compare .pa-cwrap,
+#pa-root #pa-compare .pa-cwrap-comp {
+    aspect-ratio: 3/4 !important;
+    height: auto !important;
+    position: relative !important;
+    display: flex !important;
+    width: 100% !important;
+}
+
+/* 하단 플로팅 컨트롤 패널 버튼 효과 */
+.control-panel .btn { transition: transform 0.2s ease; }
+.control-panel .btn:active { transform: scale(0.92); }
+.control-panel .pa-auto-btn:disabled .btn-icon { background: #ccc !important; box-shadow: none !important; }
+.control-panel .pa-auto-btn:disabled span { color: #999 !important; }
