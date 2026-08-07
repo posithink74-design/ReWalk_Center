@@ -871,3 +871,86 @@ body, html {
     z-index: 100 !important;
     display: flex !important;
 }
+/* ========================================================================= */
+/* 🚀 [갤럭시 S24+ 등 모바일 화면 비율 완벽 대응 및 정렬 교정] 🚀 */
+/* ========================================================================= */
+
+/* 1. 상단 헤더 1줄 정렬 강제 (이름과 탭이 위아래로 꺾이는 현상 방지) */
+#pa-analyze > div:first-child {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important; /* 절대 줄바꿈 금지 */
+    padding: 12px 10px !important;
+    gap: 5px !important;
+}
+
+/* 좌측 이름 영역이 너무 길어질 경우 말줄임표(...) 처리하여 탭 영역 보호 */
+#pa-analyze > div:first-child > div:first-child {
+    display: flex !important;
+    align-items: center !important;
+    flex: 1 !important;
+    min-width: 0 !important; 
+}
+#display-name {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 14px !important; /* 모바일에 맞게 폰트 미세 조정 */
+}
+
+/* 탭 버튼들이 화면 우측에 한 줄로 예쁘게 안착하도록 세팅 */
+.pa-vtabs {
+    flex: 0 0 auto !important;
+    gap: 4px !important;
+}
+.pa-vtab {
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+}
+
+/* ------------------------------------------------------------------------- */
+
+/* 2. 하단 컨트롤 패널 (갤러리, 카메라, AI, 저장) 높이 및 간격 완벽 정렬 */
+.control-panel {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important; /* 아이콘 크기가 달라도 글자 바닥선을 일치시킴 */
+    padding: 15px 5px 12px 5px !important;
+    gap: 4px !important;
+}
+
+.control-panel .btn {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    min-width: 0 !important; 
+}
+
+/* 중앙 AI 분석 버튼에만 공간을 약간 더 주어 균형감 확보 */
+.control-panel .pa-auto-btn {
+    flex: 1.2 !important; 
+}
+
+.control-panel .btn-icon {
+    margin-bottom: 8px !important; /* 아이콘과 글자 사이 간격 통일 */
+}
+
+/* 텍스트 줄바꿈 방지 및 겹침 방지 */
+.control-panel .btn span {
+    font-size: 11px !important;
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    letter-spacing: -0.5px !important; /* 자간을 살짝 좁혀 1줄에 쏙 들어가게 함 */
+}
+
+/* ------------------------------------------------------------------------- */
+
+/* 3. 대시보드 복귀 버튼 하단 간격 세밀 조정 (60px -> 50px) */
+.btn-save-dash {
+    margin-bottom: 50px !important; /* 요청하신 50px 간격 정확히 적용 */
+}
