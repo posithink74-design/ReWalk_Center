@@ -953,4 +953,58 @@ body, html {
 /* 3. 대시보드 복귀 버튼 하단 간격 세밀 조정 (60px -> 50px) */
 .btn-save-dash {
     margin-bottom: 50px !important; /* 요청하신 50px 간격 정확히 적용 */
+    width: calc(100% - 40px) !important; /* 양옆 20px씩 여백 확보 */
+    margin: 0 auto 30px auto !important; /* 중앙 정렬 및 탭바와 간격 유지 */
+    border-radius: 16px !important;
+    padding: 16px !important;
+}
+
+/* ========================================================================= */
+/* 🚀 [갤럭시 S24+ 최적화: UI 비율 통일 및 플로팅 디자인 적용] 🚀 */
+/* ========================================================================= */
+
+/* 1. 갤러리, 카메라, AI, 화면저장 (4등분 유니폼 디자인) */
+.control-panel {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 15px 20px !important; /* 좌우 여백 넉넉히 확보 */
+    gap: 10px !important; /* 버튼 사이 간격 일정하게 */
+}
+
+.control-panel .btn {
+    flex: 1 !important; /* 4개 버튼이 모두 동일한 1:1:1:1 비율을 가짐 */
+    min-width: 0 !important;
+    background: rgba(255, 255, 255, 0.05) !important; /* 은은한 카드형 배경 */
+    border-radius: 14px !important; /* 부드러운 모서리 */
+    padding: 12px 5px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid transparent !important;
+}
+
+/* AI 버튼은 크기가 아닌 색상으로 고급스럽게 강조 */
+.control-panel .pa-auto-btn {
+    background: rgba(74, 144, 226, 0.1) !important;
+    border: 1px solid rgba(74, 144, 226, 0.4) !important;
+}
+
+/* 아이콘 크기 완벽 통일 */
+.control-panel .btn-icon {
+    width: 32px !important;
+    height: 32px !important;
+    margin-bottom: 6px !important;
+    background: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: none !important;
+}
+.control-panel .btn-icon .material-icons {
+    font-size: 24px !important;
+}
+.control-panel .pa-auto-btn .btn-icon {
+    color: #4A90E2 !important; /* AI 아이콘만 파란색 포인트 */
 }
