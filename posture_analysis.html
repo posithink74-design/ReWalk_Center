@@ -209,5 +209,28 @@
 <script src="js/data.js"></script>
 <script src="js/posture_app.js"></script>
 
+<!-- 🚀 지도자 관찰 소견 접기/펼치기 강제 작동 스크립트 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('pa-chk-toggle');
+    const chkBody = document.getElementById('pa-chk-body');
+    const chkArrow = document.getElementById('pa-chk-arrow');
+
+    if(toggleBtn && chkBody) {
+        toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault(); // 기본 클릭 동작 방지
+            const isCollapsed = chkBody.classList.toggle('pa-chk-collapsed');
+            
+            // 화살표 방향 변경
+            if(chkArrow) {
+                chkArrow.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)';
+                chkArrow.style.display = 'inline-block';
+                chkArrow.style.transition = 'transform 0.3s';
+            }
+        });
+    }
+});
+</script>
+
 </body>
 </html>
