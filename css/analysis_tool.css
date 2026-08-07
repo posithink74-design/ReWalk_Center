@@ -609,3 +609,31 @@ body, html {
 .control-panel .btn:active { transform: scale(0.92); }
 .control-panel .pa-auto-btn:disabled .btn-icon { background: #ccc !important; box-shadow: none !important; }
 .control-panel .pa-auto-btn:disabled span { color: #999 !important; }
+/* 🚀 태블릿/PC 가로 모드에서도 완벽한 세로(Portrait) 앱 비율 강제 고정 */
+body, html {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    background-color: #333; /* 앱 바깥쪽 여백은 어두운 회색으로 처리 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 전체 앱을 화면 정중앙에 배치 */
+}
+
+#pa-root {
+    width: 100% !important;
+    max-width: 500px !important; /* 🚨 핵심: 아이패드에서도 스마트폰 세로 비율(최대 폭 500px) 강제 유지 */
+    min-height: 100vh;
+    margin: 0 auto;
+    position: relative;
+    overflow-x: hidden !important;
+    background-color: #000; /* 앱 내부 다크 테마 유지 */
+    box-shadow: 0 0 20px rgba(0,0,0,0.8); /* 스마트폰 형태를 돋보이게 하는 그림자 효과 */
+}
+
+/* 하단 탭바(Bottom Nav) 길이도 세로 화면 폭에 맞게 강제 고정 */
+#pa-root .pa-nav {
+    max-width: 500px !important; 
+    left: 50% !important;
+    transform: translateX(-50%);
+}
