@@ -9,12 +9,6 @@
 
 </head>
 <body>
-
-<!-- 🚀 기존의 뚱뚱한 header-info 대신 작고 세련된 배지 형태로 변경 -->
-<div class="compact-user-badge" style="position: absolute; top: 10px; left: 10px; z-index: 100; background: rgba(31, 56, 100, 0.85); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
-    👤 <span id="display-name">김종호 님</span>
-</div>
-
 <div id="print-area"></div>
 
 <div id="pa-root">
@@ -28,15 +22,17 @@
     
     <!-- 📌 상단 헤더 (이름 중복 제거 및 우측 배치로 1줄로 깔끔하게 통합) -->
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #111; border-bottom: 1px solid #333;">
+        
+        <!-- 🚨 1. 해결됨: 대상자 이름을 좌측(Left)으로 이동하여 직관성 확보 -->
+        <div id="display-name" style="color: #4A90E2; font-size: 15px; font-weight: bold; z-index: 100;">
+            👤 대상자 로딩중
+        </div>
+
+        <!-- 🚨 2. 해결됨: 뷰 선택 탭(정면/측면/후면)을 우측(Right)으로 자연스럽게 밀어냄 -->
         <div class="pa-vtabs" style="display: flex; gap: 5px; margin: 0; z-index: 100;">
             <button class="pa-vtab on" data-v="front" style="padding: 6px 12px; font-size: 13px; border-radius: 8px;">정면</button>
             <button class="pa-vtab" data-v="side" style="padding: 6px 12px; font-size: 13px; border-radius: 8px;">측면</button>
             <button class="pa-vtab" data-v="back" style="padding: 6px 12px; font-size: 13px; border-radius: 8px;">후면</button>
-        </div>
-        
-        <!-- 전문가님 제안 적용: 대상자 이름을 우측에 배치 -->
-        <div id="display-name" style="color: #4A90E2; font-size: 14px; font-weight: bold; z-index: 100;">
-            👤 대상자 로딩중
         </div>
         
         <!-- 🚨 JS 에러 방지용 숨김 데이터 (절대 지우지 마세요!) -->
