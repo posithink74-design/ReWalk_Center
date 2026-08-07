@@ -637,3 +637,68 @@ body, html {
     left: 50% !important;
     transform: translateX(-50%);
 }
+
+/* ========================================================================= */
+/* 🚀 [화면 우측 쏠림 및 하단 버튼 균형 완벽 해결] 🚀 */
+/* ========================================================================= */
+
+/* 1. 화면 우측 쏠림 및 여백 불균형 원천 차단 */
+body, html {
+    margin: 0 !important;
+    padding: 0 !important; /* 🚨 핵심: 숨어있던 15px 패딩을 삭제하여 쏠림 현상 완벽 해결 */
+    overflow-x: hidden !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+#pa-root {
+    width: 100% !important;
+    max-width: 834px !important; /* 아이패드 등 태블릿 최대 크기 유지 */
+    margin: 0 auto !important; /* 화면을 정확히 정중앙에 고정 */
+    position: relative !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* 2. 하단 컨트롤 패널(갤러리, 카메라, AI, 저장) 완벽한 균형 맞추기 */
+.control-panel {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 5px !important; /* 버튼 사이 겹침 방지 여백 */
+    padding: 15px 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* 3. 좌우 보조 버튼 (갤러리, 카메라, 저장) 크기 강제 고정 */
+/* -> AI 버튼의 글씨가 짧아지거나 길어져도 절대 밀리거나 찌그러지지 않음 */
+.control-panel .btn:not(.pa-auto-btn) {
+    flex: 0 0 55px !important; /* 가로폭 절대 고정 */
+    min-width: 55px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
+
+/* 4. 중앙 AI 감지 버튼: 남는 중앙 공간을 독점하도록 설정 */
+.control-panel .pa-auto-btn {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    margin: 0 10px !important; /* 양옆으로 안전 공간 확보 */
+}
+
+/* 5. 텍스트 줄바꿈 방지 */
+.control-panel .btn span {
+    font-size: 11px !important;
+    white-space: nowrap !important; /* 글자가 두 줄로 쪼개지는 현상 방지 */
+}
+
+/* 6. 모바일 좁은 화면 최적화 */
+@media (max-width: 600px) {
+    .control-panel { padding: 12px 5px !important; }
+    .control-panel .btn-icon { width: 40px !important; height: 40px !important; }
+    .control-panel .pa-auto-btn .btn-icon { width: 48px !important; height: 48px !important; }
+}
