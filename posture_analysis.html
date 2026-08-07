@@ -26,15 +26,17 @@
 
 <div class="pa-panel on" id="pa-analyze" style="background: #000; min-height: 100vh; display: flex; flex-direction: column;">
     
-<!-- 📌 상단 헤더 (겹침 방지를 위해 좌측 여백 추가) -->
+    <!-- 📌 상단 헤더 (이름 중복 제거 및 우측 배치로 1줄로 깔끔하게 통합) -->
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #111; border-bottom: 1px solid #333;">
-        <div class="compact-user-badge" style="margin-left: 30px; background: rgba(255,255,255,0.15); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; z-index: 10;">
-            👤 <span id="display-name">대상자 로딩중</span>
-        </div>
-        <div class="pa-vtabs" style="display: flex; gap: 5px; margin: 0;">
+        <div class="pa-vtabs" style="display: flex; gap: 5px; margin: 0; z-index: 100;">
             <button class="pa-vtab on" data-v="front" style="padding: 6px 12px; font-size: 13px; border-radius: 8px;">정면</button>
             <button class="pa-vtab" data-v="side" style="padding: 6px 12px; font-size: 13px; border-radius: 8px;">측면</button>
             <button class="pa-vtab" data-v="back" style="padding: 6px 12px; font-size: 13px; border-radius: 8px;">후면</button>
+        </div>
+        
+        <!-- 전문가님 제안 적용: 대상자 이름을 우측에 배치 -->
+        <div id="display-name" style="color: #4A90E2; font-size: 14px; font-weight: bold; z-index: 100;">
+            👤 대상자 로딩중
         </div>
         
         <!-- 🚨 JS 에러 방지용 숨김 데이터 (절대 지우지 마세요!) -->
@@ -46,13 +48,15 @@
     </div>
 
     <!-- 📌 메인 캔버스 및 카메라 영역 -->
-    <div class="pa-cvi" id="pa-cvi" style="position: relative; flex: 1; min-height: 55vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000;">
+     <div class="pa-cvi" id="pa-cvi" style="position: relative; flex: 1; min-height: 55vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000;">
         <div class="pa-ph" id="pa-ph" style="color: rgba(255,255,255,0.5); text-align: center;">
             <span class="material-icons" style="font-size:48px;">add_photo_alternate</span>
             <div class="pa-ph-txt">사진을 촬영하거나 업로드하세요</div>
         </div>
         <img id="pa-img" style="display:none; max-width: 100%; max-height: 100%; object-fit: contain;" alt="자세 사진"/>
-        <canvas id="pa-cv" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
+        
+        <!-- 🚨 핵심 수정: pointer-events: none; 삭제 및 z-index 부여로 드래그 완벽 복구 -->
+        <canvas id="pa-cv" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;"></canvas>
         <div class="pa-cvhint" id="pa-cvhint" style="display:none;"></div>
 
         <!-- 그리기 도구 서랍 -->
@@ -148,22 +152,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const navBtns = document.querySelectorAll('.pa-nav-btn');
     const panels = document.querySelectorAll('.pa-panel');
 
-    navBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // 1. 모든 탭 버튼과 화면에서 'on' 표시를 끕니다.
-            navBtns.forEach(b => b.classList.remove('on'));
-            panels.forEach(p => p.classList.remove('on'));
+    if(navBtns.length > 0) {
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 1. 모든 탭 버튼과 화면 끄기
+                navBtns.forEach(b => b.classList.remove('on'));
+                panels.forEach(p => p.classList.remove('on'));
 
-            // 2. 내가 클릭한 탭에 불(on)을 켜고, 연결된 화면을 보여줍니다.
-            this.classList.add('on');
-            const targetId = 'pa-' + this.getAttribute('data-tab');
-            const targetPanel = document.getElementById(targetId);
-            if(targetPanel) targetPanel.classList.add('on');
-            
-            // 3. 탭을 이동할 때 화면이 맨 위로 부드럽게 올라가도록 합니다.
-            window.scrollTo({top: 0, behavior: 'smooth'});
+                // 2. 클릭한 탭 켜기 및 연결된 화면 보여주기
+                this.classList.add('on');
+                const targetId = 'pa-' + this.getAttribute('data-tab');
+                const targetPanel = document.getElementById(targetId);
+                if(targetPanel) targetPanel.classList.add('on');
+                
+                // 3. 화면 최상단으로 부드럽게 스크롤
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            });
         });
-    });
+    }
 });
 </script>
 </body>
