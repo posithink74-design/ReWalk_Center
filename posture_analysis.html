@@ -127,10 +127,65 @@
     <div style="padding: 20px; background: #0f172a; flex: 1;">
         <label style="font-size: 13px; font-weight: bold; color: #e2e8f0; display: block;">📝 소견 메모</label>
         <textarea class="pa-ntxt" id="pa-notes" placeholder="예) 우측 어깨 하강, 거북목 심화 등" style="width: 100%; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-top: 5px; height: 60px; font-family:inherit; background: rgba(255,255,255,0.05); color: #fff;"></textarea>
-        <!-- 기존 체크리스트 코드 유지 -->
+        <div class="pa-card" id="pa-checklist-card" style="margin-top: 15px; background:#fff; border-radius:12px; padding:15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+            <button class="pa-chk-toggle" id="pa-chk-toggle" type="button" style="width:100%; background:none; border:none; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                <span class="pa-chk-toggle-lbl" style="font-weight:bold; font-size:14px; color:#1F3864;">🔍 지도자 관찰 소견 <span class="pa-chk-count" id="pa-chk-count"></span></span>
+                <span class="pa-chk-arrow" id="pa-chk-arrow">▾</span>
+            </button>
         <div class="pa-card" id="pa-checklist-card" style="margin-top: 15px; background:rgba(255,255,255,0.05); border-radius:12px; padding:15px; border: 1px solid #334155;">
-            <!-- 기존 체크리스트 항목들... -->
+          <div class="pa-chk-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">라운드 숄더</label><select class="pa-chk-sel" data-chk="roundedShoulder" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">흉추후만</label><select class="pa-chk-sel" data-chk="thoracicKyphosis" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">요추전만</label><select class="pa-chk-sel" data-chk="lumbarLordosis" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">골반 전방경사</label><select class="pa-chk-sel" data-chk="anteriorPelvicTilt" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">골반 후방경사</label><select class="pa-chk-sel" data-chk="posteriorPelvicTilt" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
+              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">스웨이백</label><select class="pa-chk-sel" data-chk="swayBack" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="present">관찰됨</option></select></div>/div>
+            </div>
         </div>
+    </div>
+  </div>  
+
+  <div class="pa-panel" id="pa-compare">
+    <div class="pa-wrap">
+      <div class="pa-card">
+        <div class="pa-sellbl">🔵 이전 회차 (Before)</div>
+        <select class="pa-csel" id="pa-ca"></select>
+        <div class="pa-sellbl">🔴 최근 회차 (After)</div>
+        <select class="pa-csel" id="pa-cb"></select>
+
+        <div class="pa-vtabs" style="margin-top:10px;">
+          <button class="pa-cvt on" data-cv="front">정면</button>
+          <button class="pa-cvt" data-cv="side">측면</button>
+          <button class="pa-cvt" data-cv="back">후면</button>
+        </div>
+
+        <div class="pa-cgrid">
+          <div>
+            <div class="pa-chdr" style="background:#1F3864">이전</div>
+            <div class="pa-cwrap-comp" id="pa-cia"><div class="pa-cinner-comp" style="color:#888; font-size:12px;">선택 대기중</div></div>
+          </div>
+          <div>
+            <div class="pa-chdr" style="background:#D9842A">최근</div>
+            <div class="pa-cwrap-comp" id="pa-cib"><div class="pa-cinner-comp" style="color:#888; font-size:12px;">선택 대기중</div></div>
+          </div>
+        </div>
+        
+        <button class="pa-btn pa-green" id="pa-cpdf">
+            <span class="material-icons" style="vertical-align:middle; font-size:18px;">print</span> Before/After 맞춤 리포트 출력
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pa-panel" id="pa-history">
+    <div class="pa-wrap">
+      <button class="pa-btn pa-teal" id="pa-new-session-btn" style="margin-bottom: 8px; box-shadow: 0 4px 12px rgba(46,92,158,0.2);">
+          <span class="material-icons" style="vertical-align:middle; font-size:18px;">add_circle_outline</span> 새로운 측정(회차) 시작하기
+      </button>
+      <div style="font-size:12px; color:#8595AD; text-align:center; margin-bottom:15px; word-break:keep-all;">같은 날 연속 측정 시, 위 버튼을 눌러 이전 기록을 보존하고 새 회차를 만드세요.</div>
+      
+      <div class="pa-card" id="pa-slist" style="background:transparent; box-shadow:none; padding:0;"></div>
+     </div>
     </div>
   </div>
 
