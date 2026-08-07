@@ -416,56 +416,6 @@ body { margin: 0; padding: 15px; background-color: #F4F7FA; padding-bottom: 20px
 .user-info-text { font-size: 15px; font-weight: 600; color: #334155; }
 .user-sub-text { font-size: 12px; color: #94a3b8; }
 .btn-pick { background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
-<<<<<<< HEAD
-/* ========================================================================= */
-/* 🚀 [화면 비율 대응 및 UI 디테일 완벽 교정] 🚀 */
-/* ========================================================================= */
-
-/* 1. 우측 핸들바 잘림 방지(스크롤 추가) 및 투명도 조절 */
-#pa-root .pa-drawer-content {
-    background: rgba(0, 0, 0, 0.6) !important; /* 기존 0.85에서 0.6으로 투명도 낮춤 */
-    max-height: 65vh !important; /* 기기 세로 높이의 65%까지만 차지하도록 제한 */
-    overflow-y: auto !important; /* 높이를 초과하여 색상 버튼이 가려질 경우 스크롤 생성 */
-    padding-right: 2px !important;
-}
-/* 핸들바 내부 스크롤바 디자인 숨기기 (깔끔함 유지) */
-#pa-root .pa-drawer-content::-webkit-scrollbar { width: 0px; background: transparent; }
-
-/* 2. 상단 정면/측면/후면 탭 간격 우측으로 넓히기 */
-#pa-analyze .pa-vtabs {
-    gap: 12px !important; /* 기존 5px에서 12px로 간격 대폭 확장 */
-    justify-content: flex-end !important; /* 탭 전체를 우측으로 정렬 */
-    margin-left: auto !important;
-}
-#pa-analyze .pa-vtab {
-    padding: 8px 16px !important; /* 버튼 자체의 여백도 늘려 터치 영역 확보 */
-}
-
-/* 3-1. 소견 메모 박스 색상 변경 (흰 바탕 / 검은 글씨) */
-#pa-root .pa-ntxt {
-    background: #ffffff !important; /* 바탕색 흰색 */
-    color: #000000 !important; /* 글자색 검정 */
-    border: 1px solid #cbd5e1 !important; /* 테두리를 밝은 회색으로 변경 */
-}
-#pa-root .pa-ntxt::placeholder {
-    color: #94a3b8 !important; /* 안내 문구(placeholder)는 부드러운 회색 유지 */
-}
-
-/* 3-2. 지도자 관찰 소견 펼치기/접기 애니메이션 필수 CSS 보증 */
-#pa-root .pa-chk-body {
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-    max-height: 1000px;
-    opacity: 1;
-}
-#pa-root .pa-chk-collapsed {
-    max-height: 0 !important;
-    opacity: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin: 0 !important;
-    border: none !important;
-=======
 
 /* ========================================================================= */
 /* 🚀 [네이티브 카메라 앱 스타일 덮어쓰기 (완벽 교정본)] 🚀 */
@@ -854,5 +804,53 @@ body, html {
         width: 52px !important; 
         height: 52px !important; 
     }
->>>>>>> 1ca678d6f688ee473c60d488d8399a379266bcb6
+}
+/* ========================================================================= */
+/* 🚀 [화면 비율 대응 및 UI 디테일 완벽 교정] 🚀 */
+/* ========================================================================= */
+
+/* 1. 우측 핸들바 잘림 방지(스크롤 추가) 및 투명도 조절 */
+#pa-root .pa-drawer-content {
+    background: rgba(0, 0, 0, 0.6) !important; /* 기존 0.85에서 0.6으로 투명도 낮춤 */
+    max-height: 65vh !important; /* 기기 세로 높이의 65%까지만 차지하도록 제한 */
+    overflow-y: auto !important; /* 높이를 초과하여 색상 버튼이 가려질 경우 스크롤 생성 */
+    padding-right: 2px !important;
+}
+/* 핸들바 내부 스크롤바 디자인 숨기기 (깔끔함 유지) */
+#pa-root .pa-drawer-content::-webkit-scrollbar { width: 0px; background: transparent; }
+
+/* 2. 상단 정면/측면/후면 탭 간격 우측으로 넓히기 */
+#pa-analyze .pa-vtabs {
+    gap: 12px !important; /* 기존 5px에서 12px로 간격 대폭 확장 */
+    justify-content: flex-end !important; /* 탭 전체를 우측으로 정렬 */
+    margin-left: auto !important;
+}
+#pa-analyze .pa-vtab {
+    padding: 8px 16px !important; /* 버튼 자체의 여백도 늘려 터치 영역 확보 */
+}
+
+/* 3-1. 소견 메모 박스 색상 변경 (흰 바탕 / 검은 글씨) */
+#pa-root .pa-ntxt {
+    background: #ffffff !important; /* 바탕색 흰색 */
+    color: #000000 !important; /* 글자색 검정 */
+    border: 1px solid #cbd5e1 !important; /* 테두리를 밝은 회색으로 변경 */
+}
+#pa-root .pa-ntxt::placeholder {
+    color: #94a3b8 !important; /* 안내 문구(placeholder)는 부드러운 회색 유지 */
+}
+
+/* 3-2. 지도자 관찰 소견 펼치기/접기 애니메이션 필수 CSS 보증 */
+#pa-root .pa-chk-body {
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    max-height: 1000px;
+    opacity: 1;
+}
+#pa-root .pa-chk-collapsed {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+    border: none !important;
 }

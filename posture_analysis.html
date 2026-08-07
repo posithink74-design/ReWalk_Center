@@ -139,7 +139,7 @@
               <div class="pa-chk-item"><label style="font-size:12px; color:#555;">요추전만</label><select class="pa-chk-sel" data-chk="lumbarLordosis" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
               <div class="pa-chk-item"><label style="font-size:12px; color:#555;">골반 전방경사</label><select class="pa-chk-sel" data-chk="anteriorPelvicTilt" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
               <div class="pa-chk-item"><label style="font-size:12px; color:#555;">골반 후방경사</label><select class="pa-chk-sel" data-chk="posteriorPelvicTilt" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="mild">경도</option><option value="moderate">중등도</option><option value="severe">심함</option></select></div>
-              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">스웨이백</label><select class="pa-chk-sel" data-chk="swayBack" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="present">관찰됨</option></select></div>
+              <div class="pa-chk-item"><label style="font-size:12px; color:#555;">스웨이백</label><select class="pa-chk-sel" data-chk="swayBack" style="width:100%; padding:6px; border-radius:4px; border:1px solid #ccc; font-size:12px;"><option value="none">해당 없음</option><option value="present">관찰됨</option></select></div>/div>
             </div>
         </div>
     </div>
@@ -197,29 +197,6 @@
 <script src="js/data.js"></script>
 <script src="js/posture_app.js"></script>
 
-<!-- 🚀 지도자 관찰 소견 접기/펼치기 강제 작동 스크립트 -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const toggleBtn = document.getElementById('pa-chk-toggle');
-    const chkBody = document.getElementById('pa-chk-body');
-    const chkArrow = document.getElementById('pa-chk-arrow');
-
-    if(toggleBtn && chkBody) {
-        toggleBtn.addEventListener('click', function(e) {
-            e.preventDefault(); // 기본 클릭 동작 방지
-            const isCollapsed = chkBody.classList.toggle('pa-chk-collapsed');
-            
-            // 화살표 방향 변경
-            if(chkArrow) {
-                chkArrow.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)';
-                chkArrow.style.display = 'inline-block';
-                chkArrow.style.transition = 'transform 0.3s';
-            }
-        });
-    }
-});
-</script>
-
 <!-- 🚀 탭 메뉴 전환 강제 보증 스크립트 -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -242,6 +219,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 3. 화면 최상단으로 부드럽게 스크롤
                 window.scrollTo({top: 0, behavior: 'smooth'});
             });
+        });
+    }
+});
+</script>
+<!-- 🚀 지도자 관찰 소견 접기/펼치기 강제 작동 스크립트 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('pa-chk-toggle');
+    const chkBody = document.getElementById('pa-chk-body');
+    const chkArrow = document.getElementById('pa-chk-arrow');
+
+    if(toggleBtn && chkBody) {
+        toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault(); // 기본 클릭 동작 방지
+            const isCollapsed = chkBody.classList.toggle('pa-chk-collapsed');
+            
+            // 화살표 방향 변경
+            if(chkArrow) {
+                chkArrow.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)';
+                chkArrow.style.display = 'inline-block';
+                chkArrow.style.transition = 'transform 0.3s';
+            }
         });
     }
 });
