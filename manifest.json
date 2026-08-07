@@ -4,6 +4,7 @@
   "description": "과학적 보행 건강 분석 플랫폼",
   "start_url": "./index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#2E5C9E",
   "icons": [

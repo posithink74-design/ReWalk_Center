@@ -378,6 +378,7 @@
         // =========================================
         // 2. 도구 화면 전환 제어 로직
         // =========================================
+        const toolView = document.getElementById('tool-view'); // 🚨 새로 추가된 감싸개 상자
         const iframe = document.getElementById('tool-frame');
         const dashboardView = document.getElementById('dashboard-view');
         const btnBack = document.getElementById('btn-back');
@@ -385,23 +386,35 @@
 
         window.showDashboard = function() {
             updateUserBarUI();
-            iframe.style.display = 'none';
+            
+            // 🚨 수정됨: iframe 자체를 숨기는 것이 아니라, 부모 상자인 tool-view를 숨김
+            toolView.style.display = 'none'; 
             dashboardView.style.display = 'block';
-            iframe.src = ""; 
-            btnBack.style.visibility = 'hidden';
-            headerTitle.textContent = 'RE:WALK CENTER';
+            
+            iframe.src = ""; // 카메라 및 리소스 해제
+            
+            // 🚨 수정됨: 뒤로가기 버튼 숨김 처리 (CSS display 활용)
+            btnBack.style.display = 'none'; 
+            headerTitle.textContent = 'Re:WALK CENTER';
         };
 
         window.openTool = function(url, title) {
+            // (전문가님의 기존 로직 유지) 대상자 선택 여부 확인
             if (!currentUser) {
                 alert("대상자를 먼저 등록하거나 선택해 주세요!");
                 window.openSelectUserModal();
                 return;
             }
+            
+            // 대시보드 숨기기
             dashboardView.style.display = 'none';
+            
+            // 🚨 수정됨: 툴 상자를 화면에 꽉 차게(flex) 표시
+            toolView.style.display = 'flex'; 
             iframe.src = url; 
-            iframe.style.display = 'block';
-            btnBack.style.visibility = 'visible';
+            
+            // 🚨 수정됨: 뒤로가기 버튼 표시 (헤더 CSS에 맞춰 flex 사용)
+            btnBack.style.display = 'flex'; 
             headerTitle.textContent = title;
         };
 
