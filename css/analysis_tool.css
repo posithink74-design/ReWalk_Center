@@ -1009,40 +1009,61 @@ body, html {
     color: #4A90E2 !important; /* AI 아이콘만 파란색 포인트 */
 }
 /* ========================================================================= */
-/* 🚀 [디자인 리뉴얼: 하단 4개 버튼 시인성 및 입체감 극대화] 🚀 */
+/* 🚀 [디자인 리뉴얼: 하단 4개 버튼 크기 및 비율 완벽 1:1 통일] 🚀 */
 /* ========================================================================= */
 
-/* 1. 버튼 껍데기: 배경과 확실히 분리되는 밝은 색상과 명확한 테두리 */
-.control-panel .btn {
-    background: #2a3b52 !important; /* 패널 배경보다 확실히 밝은 네이비 톤으로 분리 */
-    border: 1px solid #475f80 !important; /* 버튼 테두리를 명확하게 그어줌 */
-    border-radius: 14px !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important; /* 공중에 떠 있는 듯한 입체 그림자 */
-    transition: all 0.2s ease;
+.control-panel {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 15px 20px !important;
+    gap: 8px !important; 
 }
 
-/* 2. AI 자동 분석 버튼: 확실한 주인공 포인트 부여 (글로우 효과) */
+/* 4개 버튼 모두 1:1 비율의 세로 박스 형태로 고정 */
+.control-panel .btn {
+    flex: 1 !important; 
+    height: 90px !important; /* 🚨 핵심: 모든 버튼의 세로 크기를 90px로 강제 고정 */
+    background: #2a3b52 !important; 
+    border: 1px solid #475f80 !important; 
+    border-radius: 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important; 
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+}
+
+/* AI 버튼은 크기가 아닌 색상과 네온 효과로만 주인공 역할 부여 */
 .control-panel .pa-auto-btn {
     background: linear-gradient(145deg, #2a3b52, #1e3a5f) !important;
-    border: 1px solid #4A90E2 !important; /* 뚜렷한 파란색 테두리 */
-    box-shadow: 0 0 12px rgba(74, 144, 226, 0.4) !important; /* 은은하게 빛나는 파란색 네온 효과 */
+    border: 1px solid #4A90E2 !important; 
+    box-shadow: 0 0 12px rgba(74, 144, 226, 0.4) !important; 
 }
 
-/* 3. 버튼 내부 텍스트 시인성 강화 */
-.control-panel .btn span {
-    color: #f8fafc !important; /* 글자색을 더 밝고 선명하게 */
-    font-weight: 600 !important;
-}
-
-/* 4. 버튼 내부 아이콘: 원형 배경을 추가하여 시각적 완성도 상승 */
+/* 아이콘 배경 원 크기도 40px로 4개 모두 동일하게 맞춤 */
 .control-panel .btn-icon {
-    background: rgba(255, 255, 255, 0.08) !important; /* 아이콘 뒤에 둥근 막을 형성 */
+    background: rgba(255, 255, 255, 0.08) !important; 
     border-radius: 50% !important;
-    width: 38px !important;
-    height: 38px !important;
-    margin-bottom: 6px !important;
+    width: 40px !important; 
+    height: 40px !important;
+    margin-bottom: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .control-panel .pa-auto-btn .btn-icon {
-    background: rgba(74, 144, 226, 0.2) !important; /* AI 아이콘만 파란색 배경 막 적용 */
+    background: rgba(74, 144, 226, 0.2) !important; 
+}
+
+/* 텍스트 크기 통일 */
+.control-panel .btn span {
+    color: #f8fafc !important; 
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
 }
