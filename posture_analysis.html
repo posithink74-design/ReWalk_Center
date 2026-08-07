@@ -142,5 +142,29 @@
 <script src="js/data.js"></script>
 <script src="js/posture_app.js"></script>
 
+<!-- 🚀 탭 메뉴 전환 강제 보증 스크립트 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const navBtns = document.querySelectorAll('.pa-nav-btn');
+    const panels = document.querySelectorAll('.pa-panel');
+
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // 1. 모든 탭 버튼과 화면에서 'on' 표시를 끕니다.
+            navBtns.forEach(b => b.classList.remove('on'));
+            panels.forEach(p => p.classList.remove('on'));
+
+            // 2. 내가 클릭한 탭에 불(on)을 켜고, 연결된 화면을 보여줍니다.
+            this.classList.add('on');
+            const targetId = 'pa-' + this.getAttribute('data-tab');
+            const targetPanel = document.getElementById(targetId);
+            if(targetPanel) targetPanel.classList.add('on');
+            
+            // 3. 탭을 이동할 때 화면이 맨 위로 부드럽게 올라가도록 합니다.
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+    });
+});
+</script>
 </body>
 </html>
