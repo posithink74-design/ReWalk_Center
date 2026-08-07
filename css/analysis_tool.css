@@ -854,3 +854,20 @@ body, html {
     margin: 0 !important;
     border: none !important;
 }
+/* ========================================================================= */
+/* 🚀 [모바일 하단 탭바 겹침 방지 및 스크롤 여백 확보] 🚀 */
+/* ========================================================================= */
+
+/* 1. 앱 전체의 맨 아래에 넉넉한 빈 공간을 만들어 스크롤이 더 내려가게 함 */
+#pa-root {
+    padding-bottom: 120px !important; 
+}
+
+/* 2. 대시보드 복귀 버튼을 하단 탭바(약 70px)보다 훨씬 위로 안전하게 띄움 */
+.btn-save-dash {
+    margin-top: 20px !important;
+    margin-bottom: 120px !important; /* 모바일 하단 탭바에 절대 가려지지 않음 */
+    position: relative !important;
+    z-index: 100 !important;
+    display: flex !important;
+}

@@ -233,22 +233,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-<!-- 🚀 지도자 관찰 소견 접기/펼치기 강제 작동 스크립트 -->
 <script>
 // 🚀 지도자 관찰 체크 펼치기/접기 및 화살표 애니메이션 스크립트
-document.addEventListener('DOMContentLoaded', function() {
-    const toggleBtn = document.getElementById('pa-chk-toggle');
-    const chkBody = document.getElementById('pa-chk-body');
-    const chkArrow = document.getElementById('pa-chk-arrow');
+ddocument.addEventListener('DOMContentLoaded', function() {
+    // 버튼, 열릴 본문, 화살표 아이콘을 정확히 찾습니다.
+    var toggleBtn = document.getElementById('pa-chk-toggle');
+    var chkBody = document.getElementById('pa-chk-body');
+    var chkArrow = document.getElementById('pa-chk-arrow');
 
     if(toggleBtn && chkBody) {
         toggleBtn.addEventListener('click', function(e) {
-            e.preventDefault(); // 화면 튕김 방지
-            const isCollapsed = chkBody.classList.toggle('pa-chk-collapsed');
+            e.preventDefault(); // 기본 클릭 시 화면 튕김 방지
+            
+            // pa-chk-collapsed 클래스를 뗐다 붙였다 하면서 접기/펼치기 수행
+            var isCollapsed = chkBody.classList.toggle('pa-chk-collapsed');
             
             // 화살표 빙글 도는 애니메이션
             if(chkArrow) {
                 chkArrow.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)';
+                chkArrow.style.display = 'inline-block';
+                chkArrow.style.transition = 'transform 0.3s';
             }
         });
     }
