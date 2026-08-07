@@ -26,9 +26,9 @@
 
 <div class="pa-panel on" id="pa-analyze" style="background: #000; min-height: 100vh; display: flex; flex-direction: column;">
     
-    <!-- 📌 상단 헤더 (배지와 탭을 가로로 나란히 배치하여 겹침 100% 방지) -->
+<!-- 📌 상단 헤더 (겹침 방지를 위해 좌측 여백 추가) -->
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #111; border-bottom: 1px solid #333;">
-        <div class="compact-user-badge" style="background: rgba(255,255,255,0.15); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold;">
+        <div class="compact-user-badge" style="margin-left: 30px; background: rgba(255,255,255,0.15); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; z-index: 10;">
             👤 <span id="display-name">대상자 로딩중</span>
         </div>
         <div class="pa-vtabs" style="display: flex; gap: 5px; margin: 0;">
