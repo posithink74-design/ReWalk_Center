@@ -416,3 +416,85 @@ body { margin: 0; padding: 15px; background-color: #F4F7FA; padding-bottom: 20px
 .user-info-text { font-size: 15px; font-weight: 600; color: #334155; }
 .user-sub-text { font-size: 12px; color: #94a3b8; }
 .btn-pick { background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+
+/* ========================================================================= */
+/* 🚀 [네이티브 카메라 앱 스타일 덮어쓰기 (다크 테마 & 풀스크린)] 🚀 */
+/* ========================================================================= */
+
+/* 1. 분석 탭 전체를 꽉 찬 검은색 화면으로 변경 */
+#pa-root #pa-analyze {
+    padding: 0 !important;
+    background-color: #000 !important; 
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 0;
+}
+
+/* 2. 기존 컴팩트 스타일(48vh, absolute)을 무력화하고 꽉 찬 뷰로 해제 */
+#pa-root .pa-camera-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#pa-root .pa-cvbox {
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+    background: transparent !important;
+    border: none !important;
+    margin: 0 !important;
+    flex: 1;
+    display: flex;
+}
+
+#pa-root .pa-cvi {
+    position: relative !important; /* 기존 absolute 강제 해제 */
+    flex: 1 !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* 3. 상단 뷰 탭(정면/측면/후면) 다크 테마 조화 */
+#pa-analyze .pa-vtabs { margin-bottom: 0; display: flex; gap: 5px; }
+#pa-analyze .pa-vtab {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #ddd !important;
+    border: none !important;
+    border-radius: 20px !important;
+}
+#pa-analyze .pa-vtab.on {
+    background: #4A90E2 !important;
+    color: #fff !important;
+}
+
+/* 4. 빼꼼 서랍(Drawer) 다크 모드 동기화 */
+#pa-analyze .pa-drawer-handle {
+    background: rgba(0, 0, 0, 0.7) !important;
+    color: white !important;
+    border: 1px solid #333 !important;
+    border-right: none !important;
+}
+#pa-analyze .pa-drawer-content {
+    background: rgba(0, 0, 0, 0.85) !important;
+    border: 1px solid #333 !important;
+    border-right: none !important;
+}
+
+/* 5. 하단 플로팅 컨트롤 패널 버튼 애니메이션 및 비활성화 처리 */
+.control-panel .btn {
+    transition: transform 0.2s ease;
+}
+.control-panel .btn:active {
+    transform: scale(0.92);
+}
+.control-panel .pa-auto-btn:disabled .btn-icon {
+    background: #ccc !important;
+    box-shadow: none !important;
+}
+.control-panel .pa-auto-btn:disabled span {
+    color: #999 !important;
+}
