@@ -757,3 +757,51 @@ body, html {
         height: 40px !important; 
     }
 }
+/* ========================================================================= */
+/* 🚀 [우측 핸들 겹침 해결 및 하단 아이콘 크기 확대] 🚀 */
+/* ========================================================================= */
+
+/* 1. 우측 핸들바(서랍) 위치 상향 및 내부 간격 축소 (하단 침범 방지) */
+#pa-root .pa-overlay-drawer {
+    z-index: 99999 !important; /* 무조건 최상위로 띄움 */
+    top: 5px !important; /* 상단으로 바짝 올려 하단 컨트롤바와의 충돌을 피함 */
+}
+
+/* 도구함 내부 간격을 살짝 줄여 전체 길이를 다이어트 */
+#pa-root .pa-drawer-content {
+    padding: 6px 4px !important;
+    gap: 4px !important;
+}
+#pa-root .pa-ot-btn {
+    min-height: 42px !important; /* 버튼 높이를 살짝 줄여 전체 세로 길이 축소 */
+    padding: 4px 0 !important;
+}
+
+/* 2. 하단 보조 버튼(갤러리, 카메라, 저장) 가로 영역 확장 */
+.control-panel .btn:not(.pa-auto-btn) {
+    flex: 0 0 65px !important; /* 기존 55px -> 65px로 공간 넉넉하게 확보 */
+    min-width: 65px !important;
+}
+
+/* 3. 모바일 환경(폭 600px 이하)에서 아이콘 크기 뻥튀기 */
+@media (max-width: 600px) {
+    /* 주변 아이콘(갤러리, 카메라, 저장) 큼직하게 확대 */
+    .control-panel .btn-icon { 
+        width: 48px !important; /* 기존 40px -> 48px */
+        height: 48px !important; 
+    }
+    .control-panel .btn-icon .material-icons {
+        font-size: 24px !important; /* 내부 아이콘 그림 크기 확대 */
+    }
+    
+    /* 텍스트 크기도 밸런스에 맞춰 살짝 키움 */
+    .control-panel .btn span {
+        font-size: 12px !important; 
+    }
+
+    /* AI 버튼 아이콘은 균형을 위해 조금 더 돋보이게 유지 */
+    .control-panel .pa-auto-btn .btn-icon { 
+        width: 52px !important; 
+        height: 52px !important; 
+    }
+}
