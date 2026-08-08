@@ -48,17 +48,29 @@
         </div>
     </div>
 
-    <!-- 📌 메인 캔버스 및 카메라 영역 -->
-    <div class="pa-cvi" id="pa-cvi" style="position: relative; flex: 1; min-height: 55vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000;">
-        <div class="pa-ph" id="pa-ph" style="color: rgba(255,255,255,0.5); text-align: center;">
-            <span class="material-icons" style="font-size:48px;">add_photo_alternate</span>
-            <div class="pa-ph-txt">사진을 촬영하거나 업로드하세요</div>
-        </div>
-        <img id="pa-img" style="display:none; max-width: 100%; max-height: 100%; object-fit: contain;" alt="자세 사진"/>
-        
-        <!-- 🚨 핵심 수정: pointer-events: none; 삭제 및 z-index 부여로 드래그 완벽 복구 -->
-        <canvas id="pa-cv" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;"></canvas>
-        <div class="pa-cvhint" id="pa-cvhint" style="display:none;"></div>
+    <!-- 📌 메인 캔버스 및 라이브 카메라 영역 -->
+        <div class="pa-cvi" id="pa-cvi" style="position: relative; flex: 1; min-height: 55vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000;">
+            <div class="pa-ph" id="pa-ph" style="color: rgba(255,255,255,0.5); text-align: center; z-index: 1;">
+                <span class="material-icons" style="font-size:48px;">add_photo_alternate</span>
+                <div class="pa-ph-txt">사진을 불러오거나 라이브 촬영을 시작하세요</div>
+            </div>
+            
+            <!-- 🚨 신규 추가: 실시간 카메라 스트리밍 화면 -->
+            <video id="pa-live-video" autoplay playsinline style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; object-fit:contain; z-index:5;"></video>
+            
+            <!-- 캡처 및 갤러리 이미지 표시용 -->
+            <img id="pa-img" style="display:none; max-width: 100%; max-height: 100%; object-fit: contain; z-index:6;" alt="자세 사진"/>
+            
+            <!-- 그리기 및 격자 오버레이용 캔버스 (카메라 위로 겹쳐짐) -->
+            <canvas id="pa-cv" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;"></canvas>
+            <div class="pa-cvhint" id="pa-cvhint" style="display:none;"></div>
+
+            <!-- 🚨 신규 추가: 라이브 카메라 작동 시 나타나는 촬영 컨트롤러 -->
+            <div id="pa-live-controls" style="display:none; position:absolute; bottom:20px; left:50%; transform:translateX(-50%); z-index:20; flex-direction:row; gap:20px; align-items:center;">
+                <button type="button" id="pa-btn-cam-switch" style="width:44px; height:44px; border-radius:50%; background:rgba(0,0,0,0.6); color:#fff; border:1px solid #555; display:flex; justify-content:center; align-items:center;"><span class="material-icons">flip_camera_ios</span></button>
+                <button type="button" id="pa-btn-capture" style="width:64px; height:64px; border-radius:50%; background:#fff; border:4px solid #4A90E2; box-shadow:0 0 15px rgba(0,0,0,0.5);"></button>
+                <button type="button" id="pa-btn-cam-cancel" style="width:44px; height:44px; border-radius:50%; background:rgba(0,0,0,0.6); color:#fff; border:1px solid #555; display:flex; justify-content:center; align-items:center;"><span class="material-icons">close</span></button>
+            </div>
 
         <!-- 그리기 도구 서랍 -->
         <div class="pa-overlay-drawer" id="pa-overlay-drawer" style="position: absolute; right: 0; top: 20px; z-index: 20;">
@@ -114,7 +126,11 @@
         <label class="btn" style="text-align: center; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
             <div class="btn-icon" style="background: rgba(255,255,255,0.1); color: #fff; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center;"><span class="material-icons">photo_camera</span></div>
             <span style="font-size: 11px; margin-top: 4px; color: #cbd5e1; font-weight:bold;">카메라</span>
-            <input type="file" id="pa-camfile" accept="image/*" capture="environment" style="display:none;">
+    <!-- 🚨 수정됨: 네이티브 카메라 대신 인앱 라이브 카메라를 호출하는 버튼 -->
+            <button type="button" class="btn" id="pa-btn-live-cam" style="border: none; background: transparent; cursor: pointer; padding: 0;">
+                <div class="btn-icon"><span class="material-icons">photo_camera</span></div>
+                <span>라이브 촬영</span>
+            </button>
         </label>
 
         <button class="btn pa-auto-btn" id="pa-auto-btn" style="border: none; background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center;" disabled>

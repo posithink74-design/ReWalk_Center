@@ -1380,3 +1380,135 @@ function drawStressWave(ctx, normX, normY, metrics, intensity) {
     
     ctx.restore();
 }
+// =========================================================================
+// 🚀 [인앱 라이브 카메라 및 실시간 격자 오버레이 엔진] 🚀
+// =========================================================================
+
+(function() {
+    var currentStream = null;
+    var useFrontCamera = false;
+    var isLiveMode = false;
+    var animationFrameId = null;
+
+    var btnLiveCam = document.getElementById('pa-btn-live-cam');
+    var btnCapture = document.getElementById('pa-btn-capture');
+    var btnCamSwitch = document.getElementById('pa-btn-cam-switch');
+    var btnCamCancel = document.getElementById('pa-btn-cam-cancel');
+    var videoEl = document.getElementById('pa-live-video');
+    var liveControls = document.getElementById('pa-live-controls');
+
+    if(!btnLiveCam || !videoEl) return;
+
+    // 1. 라이브 카메라 시작
+    async function startCamera() {
+        if(currentStream) stopCamera();
+        
+        var constraints = {
+            video: {
+                facingMode: useFrontCamera ? 'user' : 'environment',
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+            }
+        };
+
+        try {
+            currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+            videoEl.srcObject = currentStream;
+            videoEl.style.display = 'block';
+            liveControls.style.display = 'flex';
+            
+            // 기존 이미지 및 Placeholder 숨기기
+            document.getElementById('pa-img').style.display = 'none';
+            if(document.getElementById('pa-ph')) document.getElementById('pa-ph').style.display = 'none';
+            if(document.getElementById('pa-rotbar')) document.getElementById('pa-rotbar').style.display = 'none';
+
+            isLiveMode = true;
+            
+            // 🚨 핵심: 비디오 위에 격자선(Grid)과 중심선을 실시간으로 계속 투영시킴
+            function renderLiveOverlay() {
+                if(!isLiveMode) return;
+                // 기존 posture_app.js에 있는 syncCv()를 호출하여 리사이즈 및 격자선 그리기 실행
+                if(typeof syncCv === 'function') syncCv(); 
+                animationFrameId = requestAnimationFrame(renderLiveOverlay);
+            }
+            renderLiveOverlay();
+
+        } catch(err) {
+            alert('카메라 접근 권한이 없거나 지원하지 않는 기기입니다.\n기기 설정에서 브라우저의 카메라 권한을 허용해 주세요.');
+            console.error("Camera Error:", err);
+        }
+    }
+
+    // 2. 라이브 카메라 종료
+    function stopCamera() {
+        isLiveMode = false;
+        if(animationFrameId) cancelAnimationFrame(animationFrameId);
+        if(currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+            currentStream = null;
+        }
+        videoEl.style.display = 'none';
+        liveControls.style.display = 'none';
+    }
+
+    // 3. 화면 캡처 (사진 찰칵!)
+    function captureFrame() {
+        if(!currentStream) return;
+        
+        // 비디오 해상도에 맞춘 임시 캔버스 생성
+        var c = document.createElement('canvas');
+        c.width = videoEl.videoWidth;
+        c.height = videoEl.videoHeight;
+        var ctx = c.getContext('2d');
+        
+        // 좌우 반전 처리 (전면 카메라일 경우 거울 모드)
+        if(useFrontCamera) {
+            ctx.translate(c.width, 0);
+            ctx.scale(-1, 1);
+        }
+        ctx.drawImage(videoEl, 0, 0, c.width, c.height);
+
+        // 캡처한 이미지를 현재 상태(State)에 저장
+        var capturedUrl = c.toDataURL('image/jpeg', 0.85);
+        var st = window.__paState;
+        st.slides[st.v].img = capturedUrl;
+        st.slides[st.v].landmarks = null;
+        st.slides[st.v].shapes = [];
+        st.rotDeg[st.v] = 0;
+
+        stopCamera();
+
+        // 캡처한 이미지를 화면에 띄우고 AI 분석 대기 모드로 전환
+        var imgEl = document.getElementById('pa-img');
+        imgEl.src = capturedUrl;
+        imgEl.style.display = 'block';
+        
+        if(document.getElementById('pa-rotbar')) document.getElementById('pa-rotbar').style.display = 'flex';
+        var aBtn = document.getElementById('pa-auto-btn');
+        if(aBtn) {
+            aBtn.disabled = false; 
+            aBtn.innerHTML = '<div class="btn-icon"><span class="material-icons">auto_awesome</span></div><span>AI 자동 분석</span>'; 
+            aBtn.classList.remove('on');
+        }
+        if(document.getElementById('pa-auto-st')) document.getElementById('pa-auto-st').textContent = '캡처 완료! 각도를 맞추고 AI 버튼을 눌러주세요.';
+        
+        if(typeof syncCv === 'function') syncCv();
+    }
+
+    // 이벤트 리스너 연결
+    btnLiveCam.addEventListener('click', startCamera);
+    btnCamCancel.addEventListener('click', function() {
+        stopCamera();
+        if(!document.getElementById('pa-img').src) {
+            if(document.getElementById('pa-ph')) document.getElementById('pa-ph').style.display = 'flex';
+        } else {
+            document.getElementById('pa-img').style.display = 'block';
+        }
+    });
+    btnCamSwitch.addEventListener('click', function() {
+        useFrontCamera = !useFrontCamera;
+        startCamera(); // 카메라 방향 전환 재시작
+    });
+    btnCapture.addEventListener('click', captureFrame);
+
+})();
